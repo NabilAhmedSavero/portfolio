@@ -1,0 +1,10 @@
+.git
+.next
+node_modules
+.npm-cache
+.vercel
+out
+.env*
+*.tsbuildinfo
+*.log
+sanity-schema.json
