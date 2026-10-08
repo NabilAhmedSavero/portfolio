@@ -47,6 +47,10 @@ export const getHomeExperiences = cache(async (): Promise<readonly HomeExperienc
   const records = await fetchPublished<EXPERIENCE_QUERY_RESULT>(EXPERIENCE_QUERY);
   if (records === null) return experienceFallback;
 
+  // Keep the reference content during initial connection to an empty dataset.
+  // Publishing Home marks the migration; empty collections then respect removals.
+  if (records.length === 0 && !(await getSiteContent())) return experienceFallback;
+
   // A successful empty collection respects the editor's unpublish/delete decisions.
   return records.flatMap((record) => {
     if (!record.position?.trim()) return [];

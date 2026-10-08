@@ -1,6 +1,10 @@
 # Sanity CMS connection and publishing
 
-The portfolio uses the official `next-sanity` integration, Sanity Studio, Sanity TypeGen, Portable Text, and `@sanity/image-url`. No Sanity project has been created or connected, and no content has been uploaded by this implementation.
+The portfolio uses the official `next-sanity` integration, Sanity Studio, Sanity TypeGen, Portable Text, and `@sanity/image-url`. The existing Sanity project `8vz5kyiz`, dataset `production`, is configured locally and on the existing `nabil-portfolio-staging` Vercel project. No content has been uploaded or published by this implementation.
+
+Staging: https://nabil-portfolio-staging.vercel.app. This exact origin is now allowed in Sanity CORS with **Allow credentials** enabled; the authentication-provider endpoint was verified with this origin. Server-rendered public content reads do not require CORS. `http://localhost:3001` and `http://localhost:3333` are the supplied local origins. Use `localhost:3001` for local Studio testing; `127.0.0.1` is a different origin.
+
+The public published-data query currently returns no documents. This proves the request can reach the project, not that a live publish or authenticated editing session has succeeded. No read token was added. If the dataset is private, its unauthenticated queries can return an empty result; verify dataset visibility in Sanity Manage and use a server-only Viewer token if required. Never send a token in chat or commit it.
 
 ## What is ready
 
@@ -14,9 +18,9 @@ The portfolio uses the official `next-sanity` integration, Sanity Studio, Sanity
 
 ## Connect your account manually
 
-1. Sign in to [Sanity Manage](https://www.sanity.io/manage) with your own Sanity account and create a project. Use a plan suitable for a single editor; no paid plugin is required here. Do not run a scaffolding initializer over this existing project.
-2. Create a dataset named `production`, or choose an existing dataset and use its exact name. A **public** dataset allows the website to read published content without an API token. Public reads and private editing are separate: editing still requires Sanity authentication and project permissions. Keep only your intended account as a project member, including any organization-level access.
-3. Copy the Project ID from the project settings. In `D:/Portfolio`, copy `.env.example` to `.env.local`, then set these two values locally:
+1. Sign in to [Sanity Manage](https://www.sanity.io/manage) with your own Sanity account and select the existing project `8vz5kyiz`. Do not create another project or run a scaffolding initializer over this repository.
+2. Use the existing dataset `production`. A **public** dataset allows the website to read published content without an API token. Public reads and private editing are separate: editing still requires Sanity authentication and project permissions. Keep only your intended account as a project member, including any organization-level access.
+3. These identifiers are already set in the ignored `D:/Portfolio/.env.local`. On a new checkout, copy `.env.example` to `.env.local` only if the local file does not exist, then set:
 
    ```dotenv
    NEXT_PUBLIC_SANITY_PROJECT_ID=your_actual_project_id
@@ -37,7 +41,7 @@ Open **Home / Site Content** to edit the fixed site document. Blank optional fie
 
 Create **Experience** documents with the supplied position, company, period, and description. Periods are free-form text and are rendered as entered. The optional image has its own alt text. Set **Display order** to an integer; smaller numbers appear first. Turn on **Visible on website**, then **Publish**. Changing a draft field alone has no public effect. Publish visibility/order changes, unpublish an item, or delete it through Studio to change the public collection.
 
-The two reference Experience items are local fallbacks for missing configuration or failed requests. Once connected, a successful empty CMS Experience collection is respected, including when you intentionally unpublish/delete every item. Add and publish the intended Experience documents when connecting the project.
+The two reference Experience items are local fallbacks for missing configuration, failed requests, or an empty collection before Home / Site Content is first published. Publish your intended Experience documents before publishing the Home singleton to complete migration without removing the current visible items. After Home is published, a successful empty CMS Experience collection is respected, including when you intentionally unpublish/delete every item. Published Experience documents can also render before the singleton exists. This keeps an initial empty project from changing the current Home design while preserving deliberate removals after migration.
 
 Create **Work / Projects** documents using the existing names—Plied, Faction, Kumala Sari, Evaware, AI note-taking app, and Scribe—only where you intend to include them. Supply your own short subtitles, covers, and alt text. Additional images and an external URL are optional. There are no categories, tags, dates, or case-study pages. Visibility and order work the same way as Experience.
 
