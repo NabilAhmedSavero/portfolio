@@ -1,10 +1,10 @@
 # Sanity CMS connection and publishing
 
-The portfolio uses the official `next-sanity` integration, Sanity Studio, Sanity TypeGen, Portable Text, and `@sanity/image-url`. The existing Sanity project `8vz5kyiz`, dataset `production`, is configured locally and on the existing `nabil-portfolio-staging` Vercel project. No content has been uploaded or published by this implementation.
+The portfolio uses the official `next-sanity` integration, Sanity Studio, Sanity TypeGen, Portable Text, and `@sanity/image-url`. The existing Sanity project `8vz5kyiz`, dataset `production`, is configured locally and on the existing `nabil-portfolio-staging` Vercel project. On October 9, 2026 (Asia/Makassar), the exact current Home fallback and two Experience items were seeded and published.
 
 Staging: https://nabil-portfolio-staging.vercel.app. This exact origin is now allowed in Sanity CORS with **Allow credentials** enabled; the authentication-provider endpoint was verified with this origin. Server-rendered public content reads do not require CORS. `http://localhost:3001` and `http://localhost:3333` are the supplied local origins. Use `localhost:3001` for local Studio testing; `127.0.0.1` is a different origin.
 
-The public published-data query currently returns no documents. This proves the request can reach the project, not that a live publish or authenticated editing session has succeeded. No read token was added. If the dataset is private, its unauthenticated queries can return an empty result; verify dataset visibility in Sanity Manage and use a server-only Viewer token if required. Never send a token in chat or commit it.
+The authenticated dataset check confirmed `production` is public. Public published-data queries now return `siteContent`, `serving-hours`, and `independent-designer`; no read token was added. Experience was published first, followed by Home. The existing profile and Serving Hours images were uploaded unchanged, with their original hashes verified. Staging picked up the published CMS image references through revalidation after deployment, without another deployment. Work / Projects remains unseeded with `useCmsProjects` disabled, including its existing footer.
 
 ## What is ready
 
@@ -33,7 +33,7 @@ The public published-data query currently returns no documents. This proves the 
 5. In Sanity Manage → API → CORS origins, add `http://localhost:3000` with **Allow credentials** enabled so Studio can use authenticated browser requests. If you use `127.0.0.1` or a different port, add that exact origin too. When a Vercel website exists, add its exact HTTPS origin with credentials enabled. Add preview origins individually when you need to edit there. CORS is not an authentication system.
 6. Run `npm run dev`, open `http://localhost:3000/studio`, and sign in using Sanity’s built-in login. Only accounts permitted by your Sanity project can edit. No application password, admin API, or separate login is needed.
 
-Account creation, project membership, real dataset access, CORS, login, image uploads, and publishing cannot be verified until you complete these steps. Do not put account passwords or tokens in source files.
+The existing project connection, public dataset access, staging CORS, CLI login, image uploads, and initial publishing have been verified. Studio editing continues to require your Sanity account and project permissions. Do not put account passwords or tokens in source files.
 
 ## Enter and migrate content
 
@@ -59,7 +59,7 @@ Confirm the Work page after publishing. Turning the switch off and publishing re
 
 Home renders hero display name/role/profile image/alt text, the location label, About, Currently paragraphs, the freelance display paragraph, contact introduction/CTA, Experience text/images, contact email/social links/display text, and footer text. The live clock uses `Asia/Makassar`. Published CMS values override the Framer fallback data through `src/sanity/lib/home.ts`; presentation components do not contain portfolio copy.
 
-Work uses the enabled CMS project collection, including cover image/alt text, project name, subtitle, and optional external URL. Additional project images remain modeled and queried for future presentation; no gallery or case-study feature has been added. Experience and Project schemas remain unchanged. Three optional Site fields were added for the visible Home composition: smaller-screen About, Currently contact introduction, and social-link display text. Existing documents remain compatible.
+When its migration switch is enabled, Work uses the CMS project collection, including cover image/alt text, project name, subtitle, and optional external URL. Additional project images remain modeled and queried for future presentation; no gallery or case-study feature has been added. The Experience schema includes the optional text monogram needed for the existing `NS` display; the Project schema is unchanged. Three optional Site fields support the visible Home composition: smaller-screen About, Currently contact introduction, and social-link display text. Existing documents remain compatible.
 
 ## How publishing updates Vercel
 

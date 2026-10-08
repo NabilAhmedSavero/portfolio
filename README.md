@@ -13,7 +13,7 @@ npm run dev
 
 Open http://localhost:3000. The routes are `/` (Home) and `/work` (Work).
 
-The embedded Sanity editor is at `/studio` and uses Sanity authentication. The existing project `8vz5kyiz` / `production` is configured through ignored local environment variables and Vercel settings. Follow [the CMS setup and publishing guide](docs/sanity-setup.md) for account access, CORS, content migration, and publishing. Local Home and Work content remains available while the CMS is empty and migration is pending.
+The embedded Sanity editor is at `/studio` and uses Sanity authentication. The existing project `8vz5kyiz` / `production` is configured through ignored local environment variables and Vercel settings. Home and the two Experience items are published with the exact reference copy and original images. Work remains on its local placeholders. Follow [the CMS setup and publishing guide](docs/sanity-setup.md) for editing and publishing. Local content remains available when the CMS is unconfigured or unavailable.
 
 ## Validation
 
@@ -25,7 +25,7 @@ npm run build
 
 For a local production preview, run `npm run start` after building.
 
-Run `npm run sanity:typegen` after changing CMS schemas or queries. Account connection and live publishing require manual verification; dependency/tool notices are recorded in the CMS guide.
+Run `npm run sanity:typegen` after changing CMS schemas or queries. Initial publication and the staging site's automatic revalidation have been verified; dependency/tool notices are recorded in the CMS guide.
 
 ## File structure
 
@@ -82,4 +82,4 @@ No animation or icon libraries, forms, or case-study routes were added. Fonts ar
 
 The existing staging deployment is [nabil-portfolio-staging.vercel.app](https://nabil-portfolio-staging.vercel.app), using the **Next.js** preset and Node.js 24. The local directory is linked to `saverovkn-7205s-projects/nabil-portfolio-staging`. No custom domain or GitHub repository has been created. Git tracks the source locally; deployment uses the authenticated Vercel CLI.
 
-The two public Sanity identifiers are configured for this staging project's Production, Preview, and Development environments. The staging site uses Vercel's Production target on its temporary `vercel.app` domain; this is separate from a future final-domain website. Updating `NEXT_PUBLIC_` identifiers requires redeployment; content publishing uses the existing 60-second revalidation and does not require source edits or a deployment. Live publishing still needs an actual account-side test. `.env.local` and `.vercel` are ignored by Git and excluded from CLI uploads.
+The two public Sanity identifiers are configured for this staging project's Production, Preview, and Development environments. The staging site uses Vercel's Production target on its temporary `vercel.app` domain; this is separate from a future final-domain website. Updating `NEXT_PUBLIC_` identifiers requires redeployment; content publishing uses the existing 60-second revalidation and does not require source edits or a deployment. The initial Home/Experience publish was verified on staging without another deployment. `.env.local` and `.vercel` are ignored by Git and excluded from CLI uploads.
