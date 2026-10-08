@@ -12,7 +12,7 @@ export const EXPERIENCE_QUERY = defineQuery(`
   *[_type == "experience" && isVisible == true
     && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]
   | order(displayOrder asc, _id asc){
-    _id, position, company, period, description, logo, displayOrder
+    _id, position, company, period, description, logo, monogram, displayOrder
   }
 `);
 

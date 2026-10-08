@@ -62,6 +62,7 @@ export const getHomeExperiences = cache(async (): Promise<readonly HomeExperienc
       period: record.period || "",
       description: record.description || "",
       ...(logoUrl ? { logo: { src: logoUrl, alt: record.logo?.alt || record.company || "" } } : {}),
+      ...(record.monogram ? { monogram: record.monogram } : {}),
     }];
   });
 });

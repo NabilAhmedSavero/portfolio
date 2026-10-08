@@ -31,7 +31,9 @@ export async function Footer({ variant = "foundation" }: { variant?: "home" | "f
     );
   }
 
-  const site = await getSiteContent();
+  const content = await getSiteContent();
+  // Keep Work's current footer until its existing CMS migration switch is enabled.
+  const site = content?.useCmsProjects === true ? content : null;
   const emailHref = site?.contactEmail ? safeHref(`mailto:${site.contactEmail}`) : null;
   const socialLinks = (site?.socialLinks ?? []).flatMap((link) => {
     const href = safeHref(link.href);

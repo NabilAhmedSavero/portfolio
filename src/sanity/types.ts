@@ -61,6 +61,7 @@ export type Experience = {
   period?: string;
   description?: string;
   logo?: ContentImage;
+  monogram?: string;
   displayOrder?: number;
   isVisible?: boolean;
 };
@@ -285,7 +286,7 @@ export type SITE_CONTENT_QUERY_RESULT = {
 
 // Source: src/sanity/lib/queries.ts
 // Variable: EXPERIENCE_QUERY
-// Query: *[_type == "experience" && isVisible == true    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]  | order(displayOrder asc, _id asc){    _id, position, company, period, description, logo, displayOrder  }
+// Query: *[_type == "experience" && isVisible == true    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]  | order(displayOrder asc, _id asc){    _id, position, company, period, description, logo, monogram, displayOrder  }
 export type EXPERIENCE_QUERY_RESULT = Array<{
   _id: string;
   position: string | null;
@@ -293,6 +294,7 @@ export type EXPERIENCE_QUERY_RESULT = Array<{
   period: string | null;
   description: string | null;
   logo: ContentImage | null;
+  monogram: string | null;
   displayOrder: number | null;
 }>;
 
@@ -317,7 +319,7 @@ export type PROJECTS_QUERY_RESULT = Array<{
 declare global {
   interface SanityQueries {
     '\n  *[_type == "siteContent" && _id == "siteContent"][0]{\n    _id, heroDisplayName, heroRole, heroProfileImage, locationTimezoneLabel,\n    about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,\n    contactEmail, socialLinks, footerText, useCmsProjects\n  }\n': SITE_CONTENT_QUERY_RESULT;
-    '\n  *[_type == "experience" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, position, company, period, description, logo, displayOrder\n  }\n': EXPERIENCE_QUERY_RESULT;
+    '\n  *[_type == "experience" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, position, company, period, description, logo, monogram, displayOrder\n  }\n': EXPERIENCE_QUERY_RESULT;
     '\n  *[_type == "project" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, name, subtitle, coverImage, additionalImages, externalUrl, displayOrder\n  }\n': PROJECTS_QUERY_RESULT;
   }
 }

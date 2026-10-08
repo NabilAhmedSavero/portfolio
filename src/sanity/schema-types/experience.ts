@@ -26,6 +26,12 @@ export const experience = defineType({
     defineField({ name: "description", title: "Description", type: "text" }),
     defineField({ name: "logo", title: "Logo / monogram (optional)", type: "contentImage" }),
     defineField({
+      name: "monogram",
+      title: "Text monogram (optional)",
+      type: "string",
+      description: "Shown in the existing monogram style when no logo image is supplied.",
+    }),
+    defineField({
       name: "displayOrder",
       title: "Display order",
       type: "number",
