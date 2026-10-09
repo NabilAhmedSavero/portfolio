@@ -1,34 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useSelectedLayoutSegment } from "next/navigation";
 
 const links = [
-  { href: "/", label: "Home" },
-  { href: "/work", label: "Work" },
+  { href: "/", label: "Home", segment: null },
+  { href: "/work", label: "Works", segment: "work" },
 ];
 
 export function Navbar() {
-  const pathname = usePathname();
+  // The layout segment stays correct when Vercel revalidates Home as /index.
+  const activeSegment = useSelectedLayoutSegment();
 
   return (
-    <nav aria-label="Main navigation" className="site-nav">
+    <nav aria-label="Main navigation" className="site-nav" data-work-canvas={activeSegment === "work" ? "true" : undefined}>
       <ul className="nav-links">
-        {links.map(({ href, label }) => (
+        {links.map(({ href, label, segment }) => (
           <li key={href}>
             <Link
               href={href}
-              aria-current={pathname === href ? "page" : undefined}
-              className="nav-link underline-offset-4 hover:underline aria-[current=page]:underline"
+              aria-current={activeSegment === segment ? "page" : undefined}
+              className="nav-link"
             >
               {label}
             </Link>
           </li>
         ))}
       </ul>
-      <a href="#contact" className="contact-action">
-        Let’s talk
-      </a>
+      {activeSegment === "work" && <div id="work-canvas-controls" role="group" aria-label="Canvas controls" />}
     </nav>
   );
 }

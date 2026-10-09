@@ -3,11 +3,14 @@ import { dataset, isSanityConfigured, projectId } from "../env";
 
 const builder = isSanityConfigured ? createImageUrlBuilder({ projectId, dataset }) : null;
 
-export function imageUrl(image: SanityImageSource | null | undefined): string | null {
+export function imageUrl(image: SanityImageSource | null | undefined, preserveOriginal = false): string | null {
   if (!builder || !image) return null;
 
   try {
-    return builder.image(image).width(1600).auto("format").url();
+    const source = builder.image(image);
+    return preserveOriginal
+      ? source.ignoreImageParams().width(3200).fit("max").auto("format").url()
+      : source.width(1600).auto("format").url();
   } catch {
     return null;
   }

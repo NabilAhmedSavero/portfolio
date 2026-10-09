@@ -1,18 +1,32 @@
 @import "tailwindcss";
 
+/* Shared with the existing Home headings; the dock also needs it on direct Work loads. */
+@font-face {
+  font-family: "Portfolio Inter";
+  src: url("/fonts/inter-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Temporary values. Replace these with the final Framer specifications. */
 :root {
-  --content-max-width: 48rem;
+  --content-max-width: 37.5rem;
   --page-padding: clamp(1rem, 4vw, 2rem);
   --space-small: 0.5rem;
   --space-medium: 1rem;
   --space-large: 1.5rem;
   --section-gap: clamp(2.5rem, 6vw, 4rem);
   --work-image-ratio: 16 / 10;
-  --background: #ffffff;
+  --background: #fafafa;
   --foreground: #1a1a1a;
   --muted: #595959;
   --line: #dedede;
+  --dock-bottom: 36px;
+  --dock-height: 44px;
+  --dock-clearance: 16px;
+  --dock-accent: #135e4f;
+  --dock-muted: #65817b;
 }
 
 @theme inline {
@@ -63,39 +77,65 @@
 @layer components {
   .site-container {
     width: 100%;
-    max-width: calc(var(--content-max-width) + 2 * var(--page-padding));
+    max-width: var(--content-max-width);
     margin-inline: auto;
     padding-inline: var(--page-padding);
   }
 
   .site-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-medium);
-    padding-block: var(--space-large);
+    position: fixed;
+    z-index: 20;
+    bottom: calc(var(--dock-bottom) + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    padding: 4px;
+    border-radius: 999px;
+    background: #fff;
+    font-family: "Portfolio Inter", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: -0.01em;
+    box-shadow:
+      0 0.48175px 0.48175px -1.25px rgb(0 0 0 / 9%),
+      0 1.83083px 1.83083px -2.5px rgb(0 0 0 / 8%),
+      0 8px 8px -3.75px rgb(0 0 0 / 3%);
   }
 
   .nav-links {
     display: flex;
-    gap: var(--space-medium);
+    gap: 4px;
   }
 
   .nav-link {
-    display: inline-block;
-    padding-block: var(--space-small);
-  }
-
-  .contact-action {
-    display: inline-block;
-    padding: var(--space-small) var(--space-medium);
-    background: var(--foreground);
-    color: var(--background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(var(--dock-height) - 8px);
+    padding-inline: 12px;
+    border-radius: 999px;
+    color: var(--dock-muted);
+    text-decoration: none;
     white-space: nowrap;
+    transition: background-color 125ms ease, color 150ms ease;
   }
 
-  .contact-action:focus-visible {
-    outline-color: var(--foreground);
+  .nav-link[aria-current="page"] {
+    background: #e7efed;
+    color: var(--dock-accent);
+  }
+
+  @media (hover: hover) {
+    .nav-link:hover { color: var(--dock-accent); }
+  }
+
+  .page-transition {
+    padding-bottom: calc(var(--dock-bottom) + var(--dock-height) + var(--dock-clearance) + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link { transition: none; }
   }
 
   .page-stack,

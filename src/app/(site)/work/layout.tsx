@@ -1,15 +1,8 @@
 import type { ReactNode } from "react";
-import { Footer } from "@/components/footer";
-import { Navbar } from "@/components/navbar";
-import { SiteContainer } from "@/components/site-container";
 
-// Keep the existing Work foundation separate from the now-designed Home page.
+// Works owns the viewport; Home keeps the narrow shared container.
 export default function WorkLayout({ children }: { children: ReactNode }) {
   return (
-    <SiteContainer>
-      <header><Navbar /></header>
-      <main id="main-content" tabIndex={-1}>{children}</main>
-      <Footer />
-    </SiteContainer>
+    <main id="main-content" className="work-canvas-layout" tabIndex={-1}>{children}</main>
   );
 }

@@ -6,8 +6,37 @@ export type Project = {
   image: {
     src: string;
     alt: string;
+    aspectRatio?: number;
   };
+  additionalImages?: readonly {
+    id: string;
+    src: string;
+    alt: string;
+    aspectRatio?: number;
+  }[];
 };
+
+export type WorkSlide = {
+  id: string;
+  name: string;
+  subtitle: string;
+  externalUrl?: string;
+  image: Project["image"];
+};
+
+/** One collection of images, preserving project and CMS image order. */
+export function createWorkSlides(items: readonly Project[]): WorkSlide[] {
+  return items.flatMap((project) => [
+    { id: "cover", ...project.image },
+    ...(project.additionalImages ?? []),
+  ].map((image) => ({
+    id: `${project.id}:${image.id}`,
+    name: project.name,
+    subtitle: project.subtitle,
+    ...(project.externalUrl ? { externalUrl: project.externalUrl } : {}),
+    image: { src: image.src, alt: image.alt, aspectRatio: image.aspectRatio },
+  })));
+}
 
 // A single collection for all work. Replace subtitles and images with supplied content.
 export const projects: readonly Project[] = [
@@ -18,6 +47,7 @@ export const projects: readonly Project[] = [
     image: {
       src: "/images/work-placeholder.svg",
       alt: "Project image placeholder for Plied",
+      aspectRatio: 1.6,
     },
   },
   {
@@ -27,6 +57,7 @@ export const projects: readonly Project[] = [
     image: {
       src: "/images/work-placeholder.svg",
       alt: "Project image placeholder for Faction",
+      aspectRatio: 1.6,
     },
   },
   {
@@ -36,6 +67,7 @@ export const projects: readonly Project[] = [
     image: {
       src: "/images/work-placeholder.svg",
       alt: "Project image placeholder for Kumala Sari",
+      aspectRatio: 1.6,
     },
   },
   {
@@ -45,6 +77,7 @@ export const projects: readonly Project[] = [
     image: {
       src: "/images/work-placeholder.svg",
       alt: "Project image placeholder for Evaware",
+      aspectRatio: 1.6,
     },
   },
   {
@@ -54,6 +87,7 @@ export const projects: readonly Project[] = [
     image: {
       src: "/images/work-placeholder.svg",
       alt: "Project image placeholder for AI note-taking app",
+      aspectRatio: 1.6,
     },
   },
   {
@@ -63,6 +97,7 @@ export const projects: readonly Project[] = [
     image: {
       src: "/images/work-placeholder.svg",
       alt: "Project image placeholder for Scribe",
+      aspectRatio: 1.6,
     },
   },
 ];

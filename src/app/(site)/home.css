@@ -7,14 +7,6 @@
 }
 
 @font-face {
-  font-family: "Portfolio Inter";
-  src: url("/fonts/inter-medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: "Portfolio Geist Mono";
   src: url("/fonts/geist-mono-regular.woff2") format("woff2");
   font-weight: 400;
@@ -24,13 +16,16 @@
 
 /* Measured from the published Framer page. Scoped to Home so Work stays intact. */
 .home-page {
-  --home-width: 40rem;
+  --home-width: var(--content-max-width);
   --home-padding: 1rem;
   --home-section-space: 2rem;
   --home-paragraph-gap: 1.25rem;
   --home-border: #e8e8e8;
   --home-muted: #737373;
   --home-link: #738c87;
+  --home-link-hover: #1f4840;
+  --home-entrance-duration: 650ms;
+  --home-entrance-easing: cubic-bezier(0.22, 1, 0.36, 1);
   font-family: "Portfolio Inter", Arial, sans-serif;
   font-size: 0.9375rem;
   line-height: 1.6;
@@ -144,11 +139,14 @@
 
 .home-page .home-prose p { color: #404040; }
 
-.home-page a {
+.home-page a,
+.home-page a:visited {
   color: var(--home-link);
   text-decoration: underline dotted;
   text-underline-offset: auto;
 }
+
+.home-page a:hover { color: var(--home-link-hover); }
 
 .home-page .home-about-mobile { display: none; }
 
@@ -224,13 +222,11 @@
   overflow-wrap: anywhere;
 }
 
-.home-page .home-contact-row a { color: #738c80; }
-
 .home-page .home-footer {
   padding: 2.5rem var(--home-padding);
   text-align: center;
-  font-size: 10px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 16px;
   letter-spacing: -0.02em;
   color: var(--home-muted);
 }
@@ -238,4 +234,32 @@
 @media (max-width: 1199.98px) {
   .home-page .home-about-desktop { display: none; }
   .home-page .home-about-mobile { display: grid; }
+}
+
+/* The early initializer releases the first timeline once critical assets are ready.
+   Without JS, CSS completes normally and base content stays fully visible. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-home-entrance="initial"] .home-page .home-panel:not([data-home-reveal]),
+  .home-page .home-panel:is([data-home-reveal="initial"], [data-home-reveal="revealing"]) {
+    animation-name: home-blur-fade;
+    animation-duration: var(--home-entrance-duration);
+    animation-timing-function: var(--home-entrance-easing);
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+  }
+
+  #home-entrance-init[data-home-boot="armed"] ~ .page-transition .home-page .home-panel {
+    animation-play-state: paused;
+  }
+
+  .home-page .home-panel[data-home-reveal="pending"] {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(12px);
+  }
+}
+
+@keyframes home-blur-fade {
+  from { opacity: 0; filter: blur(4px); transform: translateY(12px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
 }

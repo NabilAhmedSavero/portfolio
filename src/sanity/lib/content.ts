@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { projects, type Project } from "@/data/projects";
-import type { EXPERIENCE_QUERY_RESULT, PROJECTS_QUERY_RESULT, SITE_CONTENT_QUERY_RESULT } from "../types";
+import type { ContentImage, EXPERIENCE_QUERY_RESULT, PROJECTS_QUERY_RESULT, SITE_CONTENT_QUERY_RESULT } from "../types";
 import { fetchPublished } from "./client";
 import { imageUrl } from "./images";
 import { safeHref } from "./links";
@@ -17,6 +17,18 @@ export const getExperiences = cache(async () =>
 export const getProjectDocuments = cache(() => fetchPublished<PROJECTS_QUERY_RESULT>(PROJECTS_QUERY));
 
 export const getWorkProjects = cache(async (): Promise<readonly Project[]> => {
+  function originalAspectRatio(image: ContentImage | null | undefined): number | undefined {
+    const dimensions = image?.asset?._ref?.match(/^image-[^-]+-(\d+)x(\d+)-[a-z0-9]+$/i);
+    if (!dimensions) return undefined;
+
+    const width = Number(dimensions[1]);
+    const height = Number(dimensions[2]);
+    const ratio = width / height;
+    return Number.isFinite(width) && width > 0 && Number.isFinite(height) && height > 0 && Number.isFinite(ratio) && ratio > 0
+      ? ratio
+      : undefined;
+  }
+
   const site = await getSiteContent();
   if (site?.useCmsProjects !== true) return projects;
 
@@ -26,7 +38,7 @@ export const getWorkProjects = cache(async (): Promise<readonly Project[]> => {
   // An empty successful response remains empty after the editor has activated CMS work.
   return cmsProjects.flatMap((project) => {
     if (!project.name?.trim()) return [];
-    const coverUrl = imageUrl(project.coverImage);
+    const coverUrl = imageUrl(project.coverImage, true);
     const externalUrl = safeHref(project.externalUrl);
 
     return [{
@@ -38,7 +50,12 @@ export const getWorkProjects = cache(async (): Promise<readonly Project[]> => {
         alt: coverUrl
           ? project.coverImage?.alt || project.name
           : `Project image placeholder for ${project.name}`,
+        aspectRatio: coverUrl ? originalAspectRatio(project.coverImage) : 1.6,
       },
+      additionalImages: (project.additionalImages ?? []).flatMap((image) => {
+        const src = imageUrl(image, true);
+        return src ? [{ id: image._key, src, alt: image.alt || project.name!, aspectRatio: originalAspectRatio(image) }] : [];
+      }),
       ...(externalUrl ? { externalUrl } : {}),
     }];
   });
