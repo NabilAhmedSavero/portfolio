@@ -2,6 +2,8 @@
    Works Page — Horizontal Photographic Gallery
    ========================================================================== */
 
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
 :root {
   /* Sleek, minimal custom hand cursors */
   --work-cursor-grab: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M9 13V6a2 2 0 0 1 4 0v7m0-4.5a2 2 0 0 1 4 0v4.5m0-3a2 2 0 0 1 4 0v3.5m0-2a2 2 0 0 1 4 0V17c0 5-3.5 8-8 8s-8-3-8-8v-4a2 2 0 0 1 4 0v2.5' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 14 14, grab;
@@ -63,10 +65,11 @@ body:has(.work-gallery-layout) {
   height: 100dvh !important;
 }
 
-/* Stage: bounded vertically to center items in viewport, strictly clips 3D overflow */
+/* Stage: bounded vertically to center items in viewport, strictly clips 3D overflow.
+   Card size increased by ~5-8% (clamp(380px, 55vw, 640px)) */
 .work-gallery-stage {
   --dock-reserved: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + env(safe-area-inset-bottom, 0px));
-  --card-width: clamp(360px, 50vw, 600px);
+  --card-width: clamp(380px, 55vw, 640px);
   --card-pad: clamp(10px, 1.4vw, 14px);
   --card-image-ratio: 1.6;
   --card-height: calc((var(--card-width) - (2 * var(--card-pad))) / var(--card-image-ratio) + (2 * var(--card-pad)));
@@ -366,13 +369,14 @@ body:has(.work-gallery-layout) {
   }
   to {
     transform: scale(1);
-    opacity: 1;
   }
 }
 
 /* ==========================================================================
    Bottom Nav Dock: Strict Pill Layout [Home | Works] [ < ] [ 1 / 6 ] [ > ] [ Reset ]
-   ZERO project title rendering anywhere in dock
+   - Active arrows: dark, bold (text-gray-900 / #111827)
+   - Disabled arrows: faded, light (text-gray-300 / #d1d5db), pointer-events: none
+   - Counter: monospace technical font (JetBrains Mono), muted (text-gray-500 / #6b7280)
    ========================================================================== */
 .site-nav[data-work-gallery="true"] {
   position: fixed;
@@ -400,14 +404,14 @@ body:has(.work-gallery-layout) {
   transform: translateY(-50%);
   width: 1px;
   height: 20px;
-  background: rgba(35, 35, 35, 0.12);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .work-gallery-dock-controls {
   z-index: 50;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   pointer-events: auto !important;
 }
 
@@ -420,20 +424,22 @@ body:has(.work-gallery-layout) {
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: var(--dock-muted, #65817b);
+  color: #111827; /* Darker/bolder active arrow (text-gray-900) */
   cursor: var(--work-cursor-pointer) !important;
   pointer-events: auto !important;
-  transition: color 150ms ease, background-color 150ms ease;
+  transition: color 150ms ease, background-color 150ms ease, opacity 150ms ease;
 }
 
 .work-dock-btn:hover:not(:disabled) {
-  color: var(--dock-accent, #135e4f);
-  background: #f0f4f3;
+  color: #000000;
+  background: #f3f4f6;
 }
 
 .work-dock-btn:disabled {
-  opacity: 0.35;
+  color: #d1d5db !important; /* Significantly lighter/faded (text-gray-300) */
+  opacity: 0.3 !important;
   cursor: default !important;
+  pointer-events: none !important; /* Disables click/hover interactions */
 }
 
 .work-dock-btn svg {
@@ -441,17 +447,21 @@ body:has(.work-gallery-layout) {
   height: 15px;
 }
 
+/* Technical Monospace Counter: JetBrains Mono, muted (text-gray-500) */
 .work-dock-counter {
-  min-width: 44px;
-  font-family: inherit;
-  font-size: 13px;
+  min-width: 48px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
   font-weight: 500;
   line-height: 20px;
-  color: var(--dock-muted, #65817b);
+  letter-spacing: -0.02em;
+  color: #6b7280; /* Muted gray (text-gray-500) */
   font-variant-numeric: tabular-nums;
   text-align: center;
   white-space: nowrap;
   padding-inline: 4px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Fallback floating dock if navbar portal is unavailable */

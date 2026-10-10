@@ -296,7 +296,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
   const activeItem = items[activeIndex];
 
-  // Strictly only controls: [ < ] [ 1 / 6 ] [ > ] [ Reset ] (ZERO project title)
+  // Strictly only controls: [ < ] [ 1 / 6 ] [ > ] [ Reset ]
   const dockControls = (
     <div
       className="work-gallery-dock-controls"
@@ -320,7 +320,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="2.25"
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
@@ -329,7 +329,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         </svg>
       </button>
 
-      <span className="work-dock-counter" aria-live="polite">
+      <span className="work-dock-counter font-mono" aria-live="polite">
         {items.length ? `${activeIndex + 1} / ${items.length}` : "0 / 0"}
       </span>
 
@@ -348,7 +348,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="2.25"
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
@@ -373,7 +373,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
@@ -464,7 +464,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
                       src={item.image.src}
                       alt={item.image.alt}
                       fill
-                      sizes="(max-width: 640px) 92vw, (max-width: 1024px) 62vw, 640px"
+                      sizes="(max-width: 640px) 92vw, (max-width: 1024px) 65vw, 680px"
                       draggable={false}
                       priority={Math.abs(offset) <= 1}
                     />
