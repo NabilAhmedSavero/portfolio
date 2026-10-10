@@ -217,9 +217,9 @@ export function WorkGallery({
     : 0;
 
   return (
-    <section aria-label="Work Projects">
+    <section aria-label="Work Projects" className="w-full">
       {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
         {items.map((item, index) => {
           const Tag = item.externalUrl ? "a" : "div";
           const linkProps = item.externalUrl
@@ -240,15 +240,15 @@ export function WorkGallery({
               };
 
           return (
-            <article key={item.id} className="group flex flex-col">
+            <article key={item.id} className="group flex flex-col w-full">
               <Tag
                 {...linkProps}
                 onClick={(e) => handleCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
-                className="group/image block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
+                className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
                 aria-label={`View ${item.name}`}
               >
                 {/* Image Container: Clean 8px rounded corners, edge-to-edge, zero padding */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[8px] p-0 bg-neutral-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-300 group-hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)]">
+                <div className="aspect-[16/10] w-full relative overflow-hidden rounded-[8px] p-0 bg-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-300 group-hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)]">
                   <Image
                     src={item.image.src}
                     alt={item.image.alt}
@@ -257,7 +257,7 @@ export function WorkGallery({
                     quality={100}
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority={index < 2}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    className="w-full h-full absolute inset-0 object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   />
 
                   {/* Desktop Hover State: dimmed overlay + pure white floating text (Skale style) */}
