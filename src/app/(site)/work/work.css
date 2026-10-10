@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap");
+
 .work-gallery-layout {
   position: fixed;
   inset: 0;
@@ -12,21 +14,52 @@
   height: 100%;
 }
 
+/* Stage: bounded vertically between top edge (0) and top of bottom nav dock (100dvh - 80px)
+   ensuring the centered photo's distance to top edge equals distance to bottom dock */
 .work-gallery-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  --dock-reserved: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + env(safe-area-inset-bottom, 0px));
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: calc(100dvh - var(--dock-reserved));
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  perspective: 1200px;
   touch-action: pan-y;
+  cursor: grab;
 }
 
-/* Horizontal hanging string across viewport width */
+.work-gallery-stage:active {
+  cursor: grabbing;
+}
+
+/* Click-to-Focus dark overlay with backdrop blur */
+.work-focus-dimmer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(14, 14, 14, 0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  animation: workDimmerFadeIn 220ms ease forwards;
+}
+
+@keyframes workDimmerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Horizontal hanging string with natural catenary arc curve */
 .work-string-line {
   position: absolute;
-  top: clamp(2.5rem, 6vh, 4rem);
+  top: calc(50% - var(--track-height, min(66vh, 480px)) / 2 + 10px);
   left: 0;
   width: 100%;
-  height: 12px;
+  height: 26px;
   z-index: 3;
   pointer-events: none;
 }
@@ -37,17 +70,18 @@
   height: 100%;
 }
 
-/* Hanging carousel track */
+/* Track holding the hanging photos */
 .work-carousel-track {
-  --card-width: clamp(280px, 38vw, 440px);
-  position: absolute;
-  top: calc(clamp(2.5rem, 6vh, 4rem) + 4px);
-  left: 50%;
+  --card-width: clamp(340px, 48vw, 560px);
+  --track-height: min(66vh, calc(100dvh - var(--dock-reserved) - 4rem));
+  position: relative;
   width: 0;
-  height: calc(100dvh - clamp(2.5rem, 6vh, 4rem) - calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + 2rem));
+  height: var(--track-height);
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  transform: translate3d(var(--drag-px, 0px), 0, 0);
+  transition: transform 60ms linear;
   pointer-events: none;
 }
 
@@ -57,35 +91,40 @@
   top: 14px;
   left: calc(-1 * var(--card-width) / 2);
   width: var(--card-width);
-  max-height: min(68vh, calc(100dvh - 12.5rem));
+  max-height: var(--track-height);
   background: #ffffff;
   border: 1px solid rgba(35, 35, 35, 0.1);
   border-radius: 2px;
-  padding: clamp(0.75rem, 1.8vw, 1.125rem);
+  padding: clamp(0.5rem, 1.1vw, 0.75rem);
+  padding-bottom: clamp(0.45rem, 0.9vw, 0.65rem);
   box-shadow:
-    0 4px 16px -2px rgba(0, 0, 0, 0.05),
-    0 16px 36px -6px rgba(0, 0, 0, 0.09);
+    0 4px 18px -2px rgba(0, 0, 0, 0.06),
+    0 16px 38px -6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   transform-origin: center top;
   transition:
     transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 350ms ease,
     opacity 400ms ease;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Wooden clip overhanging card top edge and string */
+/* Single wooden clip centered at the top */
 .work-wooden-clip {
   position: absolute;
   top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 16px;
   height: 50px;
   z-index: 15;
   pointer-events: none;
 }
 
+/* Maximized project image area */
 .work-print-image-frame {
   position: relative;
   display: block;
@@ -101,77 +140,98 @@
   pointer-events: none;
 }
 
+/* Handwritten title font (Caveat) with reduced margin */
 .work-print-title {
   display: block;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.015em;
+  font-family: "Caveat", "Kalam", "Bradley Hand", cursive, sans-serif;
+  font-size: clamp(1rem, 1.35vw, 1.15rem);
+  font-weight: 500;
+  line-height: 1.25;
   color: #232323;
-  margin-top: clamp(0.75rem, 1.2vw, 1rem);
+  margin-top: 0.35rem;
+  padding-inline: 0.15rem;
   text-align: left;
 }
 
-/* Desktop/Tablet: Always 1 focused photo centered (100%, 0deg).
-   Neighboring photos partially visible on left and right (85%, -2deg / +2deg) */
+/* Desktop/Tablet: Center card (100% scale, 0deg).
+   Side neighbors: clipped to max 10% width on left and right edges with 3D tilted depth effect */
 .work-hanging-card[data-position="active"] {
   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
   opacity: 1;
   z-index: 10;
   pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Click-to-Focus lifted state */
+.work-hanging-card[data-position="active"][data-focused="true"] {
+  transform: translate3d(0, 0, 80px) scale(1.08) rotate(0deg);
+  z-index: 25;
+  box-shadow:
+    0 25px 60px -10px rgba(0, 0, 0, 0.38),
+    0 35px 80px -15px rgba(0, 0, 0, 0.42);
 }
 
 .work-hanging-card[data-position="prev"] {
-  transform: translate3d(calc(-1 * (var(--card-width) * 0.88 + clamp(1.5rem, 3.5vw, 3rem))), 0, 0) scale(0.85) rotate(-2deg);
-  opacity: 0.85;
+  transform: translate3d(calc(-50vw - 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(18deg) rotateZ(-2.5deg);
+  opacity: 0.8;
   z-index: 5;
   cursor: pointer;
   pointer-events: auto;
 }
 
 .work-hanging-card[data-position="next"] {
-  transform: translate3d(calc(1 * (var(--card-width) * 0.88 + clamp(1.5rem, 3.5vw, 3rem))), 0, 0) scale(0.85) rotate(2deg);
-  opacity: 0.85;
+  transform: translate3d(calc(50vw + 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(-18deg) rotateZ(2.5deg);
+  opacity: 0.8;
   z-index: 5;
   cursor: pointer;
   pointer-events: auto;
 }
 
 .work-hanging-card[data-position="hidden-left"] {
-  transform: translate3d(calc(-2 * (var(--card-width) + 2rem)), 0, 0) scale(0.75) rotate(-2.5deg);
+  transform: translate3d(-130vw, 0, -100px) scale(0.7) rotateY(25deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;
 }
 
 .work-hanging-card[data-position="hidden-right"] {
-  transform: translate3d(calc(2 * (var(--card-width) + 2rem)), 0, 0) scale(0.75) rotate(2.5deg);
+  transform: translate3d(130vw, 0, -100px) scale(0.7) rotateY(-25deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;
 }
 
-/* Mobile: STRICT RULE: Only 1 full photo in focus. Do NOT show cropped neighbors on left/right edges */
+/* Mobile: Single active photo dead-center vertically. Zero cropped side neighbors. */
 @media (max-width: 640px) {
+  .work-gallery-stage {
+    height: calc(100dvh - var(--dock-reserved));
+    align-items: center;
+  }
+
   .work-carousel-track {
-    --card-width: min(86vw, 340px);
+    --card-width: min(88vw, 360px);
+    --track-height: min(62vh, 420px);
   }
 
   .work-hanging-card[data-position="prev"] {
-    transform: translate3d(-120vw, 0, 0) scale(0.85) rotate(0deg) !important;
+    transform: translate3d(-140vw, 0, 0) scale(0.8) rotate(0deg) !important;
     opacity: 0 !important;
     pointer-events: none !important;
   }
 
   .work-hanging-card[data-position="next"] {
-    transform: translate3d(120vw, 0, 0) scale(0.85) rotate(0deg) !important;
+    transform: translate3d(140vw, 0, 0) scale(0.8) rotate(0deg) !important;
     opacity: 0 !important;
     pointer-events: none !important;
   }
+
+  .work-hanging-card[data-position="active"][data-focused="true"] {
+    transform: translate3d(0, 0, 40px) scale(1.05) rotate(0deg);
+  }
 }
 
-/* Bottom Nav Dock: Integrates into floating navbar */
+/* Bottom Nav Dock integration */
 .site-nav[data-work-gallery="true"] {
   display: flex;
   align-items: center;
@@ -242,7 +302,7 @@
   white-space: nowrap;
 }
 
-/* Fallback floating dock if navbar portal is unavailable */
+/* Standalone floating dock fallback if portal target is unavailable */
 .work-floating-dock-fallback {
   position: fixed;
   bottom: calc(var(--dock-bottom, 36px) + env(safe-area-inset-bottom, 0px));
@@ -260,7 +320,6 @@
 .work-gallery-empty {
   color: var(--muted, #595959);
   font-size: 0.9375rem;
-  margin-top: 5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
