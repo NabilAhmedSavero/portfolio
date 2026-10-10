@@ -52,7 +52,7 @@ export function WorkGallery({
   return (
     <section aria-label="Work Projects">
       {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-12 md:gap-y-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {items.map((item, index) => {
           const Tag = item.externalUrl ? "a" : "div";
           const linkProps = item.externalUrl
