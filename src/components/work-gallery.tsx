@@ -181,25 +181,19 @@ export function WorkGallery({
       {/* Lightbox Modal: Maximized open state */}
       {lightboxItem && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-between py-[3vh] px-4 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-evenly px-4 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
           onClick={() => setLightboxItem(null)}
           role="dialog"
           aria-modal="true"
           aria-label={`Full preview of ${lightboxItem.name}`}
         >
-          {/* Top spacer (title hidden) to preserve symmetric vertical centering */}
-          <div className="h-[32px] shrink-0 pointer-events-none" aria-hidden="true" />
-
-          {/* Center: Maximized Image leaving ONLY ~5% top/bottom margin, clicks outside image close overlay */}
-          <div className="relative z-10 flex items-center justify-center w-full flex-1 min-h-0 py-2 sm:py-3 pointer-events-none">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={lightboxItem.image.src}
-              alt={lightboxItem.image.alt}
-              className="h-full w-auto max-h-[85vh] sm:max-h-[88vh] max-w-[95vw] object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={lightboxItem.image.src}
+            alt={lightboxItem.image.alt}
+            className="z-10 max-h-[78vh] sm:max-h-[80vh] max-w-[95vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          />
 
           {/* Bottom: Round navigation controls (32px size) with image counter centered horizontally */}
           <nav
