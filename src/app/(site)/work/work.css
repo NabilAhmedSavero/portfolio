@@ -67,12 +67,11 @@ body:has(.work-gallery-layout) {
    Card size increased by ~5-8% (clamp(400px, 58vw, 680px)) */
 .work-gallery-stage {
   --dock-reserved: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + env(safe-area-inset-bottom, 0px));
-  --card-width: clamp(400px, 58vw, 680px);
+  --card-width: clamp(420px, 66vw, 840px);
   --card-pad: clamp(10px, 1.4vw, 14px);
   --card-image-ratio: 1.6;
   --card-height: calc((var(--card-width) - (2 * var(--card-pad))) / var(--card-image-ratio) + (2 * var(--card-pad)));
-  --card-gap: clamp(18px, 2.5vw, 32px);
-  --card-side-scale: 0.84;
+  --card-side-scale: 0.85;
 
   position: fixed;
   top: 0;
@@ -210,9 +209,9 @@ body.is-gallery-dragging * {
   cursor: grab;
 }
 
-/* Side neighbors: tightened spacing, revealing well over 10% (35%-60%) */
+/* Side neighbors: max 15%-20% (18%) visible on left and right edges */
 .work-hanging-card[data-position="prev"] {
-  transform: translate3d(calc(-0.92 * var(--card-width) - var(--card-gap)), 0, -50px) scale(var(--card-side-scale, 0.84)) rotateY(12deg) rotateZ(-1.5deg);
+  transform: translate3d(calc(-50vw - 0.32 * var(--card-width) * var(--card-side-scale, 0.85)), 0, -50px) scale(var(--card-side-scale, 0.85)) rotateY(14deg) rotateZ(-2deg);
   opacity: 0.88;
   z-index: 8;
   cursor: grab;
@@ -220,7 +219,7 @@ body.is-gallery-dragging * {
 }
 
 .work-hanging-card[data-position="next"] {
-  transform: translate3d(calc(0.92 * var(--card-width) + var(--card-gap)), 0, -50px) scale(var(--card-side-scale, 0.84)) rotateY(-12deg) rotateZ(1.5deg);
+  transform: translate3d(calc(50vw + 0.32 * var(--card-width) * var(--card-side-scale, 0.85)), 0, -50px) scale(var(--card-side-scale, 0.85)) rotateY(-14deg) rotateZ(2deg);
   opacity: 0.88;
   z-index: 8;
   cursor: grab;
@@ -228,14 +227,14 @@ body.is-gallery-dragging * {
 }
 
 .work-hanging-card[data-position="hidden-left"] {
-  transform: translate3d(calc(-1.84 * var(--card-width) - 2 * var(--card-gap)), 0, -90px) scale(0.7) rotateY(18deg);
+  transform: translate3d(calc(-125vw - 0.5 * var(--card-width)), 0, -90px) scale(0.7) rotateY(18deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;
 }
 
 .work-hanging-card[data-position="hidden-right"] {
-  transform: translate3d(calc(1.84 * var(--card-width) + 2 * var(--card-gap)), 0, -90px) scale(0.7) rotateY(-18deg);
+  transform: translate3d(calc(125vw + 0.5 * var(--card-width)), 0, -90px) scale(0.7) rotateY(-18deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;
@@ -337,18 +336,10 @@ body.is-gallery-dragging * {
   justify-content: center;
   cursor: pointer !important;
   pointer-events: auto !important;
-  touch-action: manipulation;
+  touch-action: auto !important;
   -webkit-tap-highlight-color: transparent;
-  animation: workFocusPortalFade 200ms ease forwards;
-}
-
-@keyframes workFocusPortalFade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  animation: none !important;
+  transition: none !important;
 }
 
 .work-focus-image-wrapper {
@@ -365,6 +356,8 @@ body.is-gallery-dragging * {
   border: none !important;
   padding: 0 !important;
   pointer-events: none;
+  animation: none !important;
+  transition: none !important;
 }
 
 .work-focus-raw-img {
@@ -382,17 +375,9 @@ body.is-gallery-dragging * {
   pointer-events: auto !important;
   user-select: none;
   -webkit-user-select: none;
-  animation: workFocusImgPop 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes workFocusImgPop {
-  from {
-    transform: scale(0.93);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-  }
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
 }
 
 /* ==========================================================================
@@ -460,7 +445,7 @@ body.is-gallery-dragging * {
 
 .work-dock-btn:disabled {
   color: #135E4F !important;
-  opacity: 0.1 !important; /* Exactly 10% opacity */
+  opacity: 0.3 !important; /* Exactly 30% opacity */
   cursor: default !important;
   pointer-events: none !important; /* Disables click/hover interactions */
 }

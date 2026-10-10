@@ -318,7 +318,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     >
       <button
         type="button"
-        className={`work-dock-btn text-[#135E4F] ${activeIndex === 0 ? "opacity-10 pointer-events-none cursor-default" : ""}`}
+        className={`work-dock-btn text-[#135E4F] ${activeIndex === 0 ? "opacity-30 pointer-events-none cursor-default" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
           step(-1);
@@ -346,7 +346,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
       <button
         type="button"
-        className={`work-dock-btn text-[#135E4F] ${activeIndex === items.length - 1 ? "opacity-10 pointer-events-none cursor-default" : ""}`}
+        className={`work-dock-btn text-[#135E4F] ${activeIndex === items.length - 1 ? "opacity-30 pointer-events-none cursor-default" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
           step(1);
@@ -504,18 +504,19 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         activeItem &&
         createPortal(
           <div
-            className="work-focus-portal fixed inset-0 w-full h-[100dvh] backdrop-blur-[4px]"
+            className="work-focus-portal fixed inset-0 w-full h-[100dvh] backdrop-blur-[4px] transition-none"
             style={{
               backgroundColor: "rgba(0, 0, 0, 0.75)",
               backdropFilter: "blur(4px)",
               WebkitBackdropFilter: "blur(4px)",
+              pointerEvents: "auto",
+              touchAction: "auto",
+              animation: "none",
+              transition: "none",
             }}
             onClick={() => setIsFocused(false)}
-            onTouchEnd={(e) => {
-              if (e.target === e.currentTarget) {
-                setIsFocused(false);
-              }
-            }}
+            onTouchEnd={() => setIsFocused(false)}
+            onPointerDown={() => setIsFocused(false)}
             role="dialog"
             aria-modal="true"
             aria-label={`Focused view of ${activeItem.name}`}
@@ -524,9 +525,15 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
             <img
               src={activeItem.image.src}
               alt={activeItem.image.alt}
-              className="work-focus-raw-img"
+              className="work-focus-raw-img transition-none"
+              style={{
+                animation: "none",
+                transition: "none",
+                transform: "none",
+              }}
               onClick={(e) => e.stopPropagation()}
               onTouchEnd={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
             />
           </div>,
           document.body,
