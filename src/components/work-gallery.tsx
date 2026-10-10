@@ -75,6 +75,13 @@ export function WorkGallery({
     }
   };
 
+  const currentIndex = lightboxItem
+    ? Math.max(
+        0,
+        items.findIndex((i) => i.id === lightboxItem.id),
+      )
+    : 0;
+
   return (
     <section aria-label="Work Projects">
       {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
@@ -180,12 +187,8 @@ export function WorkGallery({
           aria-modal="true"
           aria-label={`Full preview of ${lightboxItem.name}`}
         >
-          {/* Top: Title only on highest point of viewport with reasonable top padding */}
-          <header className="text-center z-20 shrink-0 pointer-events-none select-none">
-            <h2 className="text-white text-sm sm:text-base md:text-lg font-medium tracking-tight">
-              {lightboxItem.name}
-            </h2>
-          </header>
+          {/* Top spacer (title hidden) to preserve symmetric vertical centering */}
+          <div className="h-[32px] shrink-0 pointer-events-none" aria-hidden="true" />
 
           {/* Center: Maximized Image leaving ONLY ~5% top/bottom margin, clicks outside image close overlay */}
           <div className="relative z-10 flex items-center justify-center w-full flex-1 min-h-0 py-2 sm:py-3 pointer-events-none">
@@ -198,19 +201,20 @@ export function WorkGallery({
             />
           </div>
 
-          {/* Bottom: Round Smintfy-style navigation chevrons (max height 24px, 8px gap) centered horizontally */}
+          {/* Bottom: Round navigation controls (32px size) with image counter centered horizontally */}
           <nav
-            className="flex items-center justify-center gap-2 z-20 shrink-0"
+            className="flex items-center justify-center gap-3 sm:gap-4 z-20 shrink-0 h-[32px]"
+            onClick={(e) => e.stopPropagation()}
             aria-label="Modal image navigation"
           >
             <button
               type="button"
               onClick={handlePrev}
-              className="w-[24px] h-[24px] max-h-[24px] max-w-[24px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
+              className="w-[32px] h-[32px] min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
               aria-label="Previous image"
             >
               <svg
-                className="w-[14px] h-[14px]"
+                className="w-[16px] h-[16px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -222,14 +226,26 @@ export function WorkGallery({
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
+
+            {/* Counter: e.g. 1 / 18 */}
+            <span
+              className="font-mono text-[13px] sm:text-[14px] text-white/90 select-none tracking-wider tabular-nums flex items-center"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <span>{currentIndex + 1}</span>
+              <span className="text-white/40 mx-1.5 font-sans font-light select-none">/</span>
+              <span>{items.length}</span>
+            </span>
+
             <button
               type="button"
               onClick={handleNext}
-              className="w-[24px] h-[24px] max-h-[24px] max-w-[24px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
+              className="w-[32px] h-[32px] min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
               aria-label="Next image"
             >
               <svg
-                className="w-[14px] h-[14px]"
+                className="w-[16px] h-[16px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
