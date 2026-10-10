@@ -262,7 +262,7 @@ export function WorkGallery({
 
                   {/* Desktop Hover State: dimmed overlay + pure white floating text (Skale style) */}
                   <div className="absolute inset-0 bg-black/35 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                    <div className="flex items-center gap-[12px] text-white text-xl sm:text-2xl md:text-[24px] font-medium tracking-tight transform transition-transform duration-300 scale-95 group-hover:scale-100">
+                    <div className="flex items-center gap-[6px] text-white text-xl sm:text-2xl md:text-[24px] font-medium tracking-tight transform transition-transform duration-300 scale-95 group-hover:scale-100">
                       <span>
                         {item.externalUrl ? "Case study" : "Open"}
                       </span>
