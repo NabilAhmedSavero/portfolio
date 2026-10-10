@@ -108,24 +108,34 @@ export function WorkGallery({
                 </div>
               </Tag>
 
-              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with 2px gap */}
-              <div className="mt-6 flex flex-col gap-[2px]">
+              {/* Caption: Title / Subtitle horizontal alignment format */}
+              <div className="mt-6 flex items-baseline flex-wrap gap-x-1.5 gap-y-0.5">
                 <h2
                   className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
                   style={{ fontSize: "15px", fontWeight: 500 }}
                 >
                   {item.name}
                 </h2>
-                <p
-                  className="text-[14px] font-[400] leading-normal"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 400,
-                    color: "hsl(0, 0%, 25%)",
-                  }}
-                >
-                  {item.subtitle}
-                </p>
+                {item.subtitle && (
+                  <>
+                    <span
+                      className="text-neutral-400 select-none text-[14px] font-normal"
+                      aria-hidden="true"
+                    >
+                      /
+                    </span>
+                    <p
+                      className="text-[14px] font-[400] leading-normal"
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        color: "hsl(0, 0%, 25%)",
+                      }}
+                    >
+                      {item.subtitle}
+                    </p>
+                  </>
+                )}
               </div>
             </article>
           );
