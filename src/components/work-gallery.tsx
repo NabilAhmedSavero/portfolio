@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import type { WorkSlide } from "@/data/projects";
 
 export type WorkGalleryItem = {
@@ -25,19 +25,45 @@ export function WorkGallery({
     WorkSlide | WorkGalleryItem | null
   >(null);
 
-  // Close lightbox on Escape key
+  const handlePrev = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (!lightboxItem) return;
+      const currentIndex = items.findIndex((i) => i.id === lightboxItem.id);
+      const prevIndex = (currentIndex - 1 + items.length) % items.length;
+      setLightboxItem(items[prevIndex]);
+    },
+    [lightboxItem, items],
+  );
+
+  const handleNext = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (!lightboxItem) return;
+      const currentIndex = items.findIndex((i) => i.id === lightboxItem.id);
+      const nextIndex = (currentIndex + 1) % items.length;
+      setLightboxItem(items[nextIndex]);
+    },
+    [lightboxItem, items],
+  );
+
+  // Close lightbox on Escape, navigate with ArrowLeft/ArrowRight
   useEffect(() => {
     if (!lightboxItem) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setLightboxItem(null);
+      } else if (e.key === "ArrowLeft") {
+        handlePrev();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [lightboxItem]);
+  }, [lightboxItem, handlePrev, handleNext]);
 
   const handleCardClick = (
     e: MouseEvent<HTMLElement>,
@@ -145,47 +171,89 @@ export function WorkGallery({
         })}
       </div>
 
-      {/* Lightbox Modal for projects without external links */}
+      {/* Lightbox Modal: Simplified open state */}
       {lightboxItem && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 md:p-10 cursor-pointer animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-black/90 backdrop-blur-md p-4 sm:p-6 cursor-pointer animate-in fade-in duration-200 select-none"
           onClick={() => setLightboxItem(null)}
           role="dialog"
           aria-modal="true"
           aria-label={`Full preview of ${lightboxItem.name}`}
         >
-          <div
-            className="relative max-w-5xl w-full max-h-[90vh] overflow-hidden rounded-xl md:rounded-2xl bg-neutral-900 shadow-2xl cursor-default"
+          {/* Highest point of viewport: Title only with reasonable top padding */}
+          <header
+            className="pt-4 sm:pt-6 text-center cursor-default shrink-0 z-10"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative aspect-[16/10] w-full max-h-[80vh]">
+            <h2 className="text-white text-base sm:text-lg font-medium tracking-tight">
+              {lightboxItem.name}
+            </h2>
+          </header>
+
+          {/* Center: Maximized Image with equal ~5% viewport gap to top title and bottom navs */}
+          <div
+            className="relative flex items-center justify-center w-full flex-1 max-w-[95vw] my-[5vh] cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative w-full h-full max-h-[78vh] sm:max-h-[80vh] flex items-center justify-center">
               <Image
                 src={lightboxItem.image.src}
                 alt={lightboxItem.image.alt}
                 fill
-                sizes="(max-width: 1200px) 95vw, 1200px"
-                className="object-contain"
+                sizes="95vw"
+                priority
+                className="object-contain rounded-[8px]"
               />
             </div>
-            <div className="p-4 sm:p-5 bg-neutral-950/90 flex items-center justify-between border-t border-white/10">
-              <div>
-                <h3 className="text-sm sm:text-base font-semibold text-white">
-                  {lightboxItem.name}
-                </h3>
-                <p className="text-xs sm:text-sm text-neutral-400">
-                  {lightboxItem.subtitle}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setLightboxItem(null)}
-                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs text-white font-medium transition-colors"
-                aria-label="Close preview"
-              >
-                Close
-              </button>
-            </div>
           </div>
+
+          {/* Bottom: Round Smintfy-style navigation chevrons (20px icons, 8px gap) centered horizontally */}
+          <nav
+            className="pb-4 sm:pb-6 flex items-center justify-center gap-2 cursor-default shrink-0 z-10"
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Modal image navigation"
+          >
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#505050]/90 hover:bg-[#626262] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              aria-label="Previous image"
+            >
+              {/* Chevron Left 20px */}
+              <svg
+                className="w-[20px] h-[20px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#505050]/90 hover:bg-[#626262] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              aria-label="Next image"
+            >
+              {/* Chevron Right 20px */}
+              <svg
+                className="w-[20px] h-[20px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </nav>
         </div>
       )}
     </section>
