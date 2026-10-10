@@ -9,11 +9,10 @@ const links = [
 ];
 
 export function Navbar() {
-  // The layout segment stays correct when Vercel revalidates Home as /index.
   const activeSegment = useSelectedLayoutSegment();
 
   return (
-    <nav aria-label="Main navigation" className="site-nav" data-work-canvas={activeSegment === "work" ? "true" : undefined}>
+    <nav aria-label="Main navigation" className="site-nav">
       <ul className="nav-links">
         {links.map(({ href, label, segment }) => (
           <li key={href}>
@@ -27,7 +26,6 @@ export function Navbar() {
           </li>
         ))}
       </ul>
-      {activeSegment === "work" && <div id="work-canvas-controls" role="group" aria-label="Canvas controls" />}
     </nav>
   );
 }

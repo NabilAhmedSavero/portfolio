@@ -1,183 +1,169 @@
-@font-face {
-  font-family: "Portfolio Inter";
-  src: url("/fonts/inter-regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+.work-gallery-layout {
+  min-height: 100dvh;
+  width: 100%;
+  background: var(--background, #fafafa);
 }
 
-.work-canvas-layout {
-  --canvas-dock-reserved: calc(var(--dock-bottom) + 48px + var(--dock-clearance) + env(safe-area-inset-bottom, 0px));
-  position: fixed;
-  inset: 0;
-  height: 100dvh;
-  overflow: clip;
-  background: #fafafa;
+.work-gallery-page {
+  width: 100%;
+  min-height: 100dvh;
 }
 
-.work-canvas-page,
-.work-canvas-viewport { width: 100%; height: 100%; }
+.work-gallery {
+  width: 100%;
+  max-width: 42rem;
+  margin-inline: auto;
+  padding-inline: var(--page-padding, clamp(1rem, 4vw, 2rem));
+  padding-top: clamp(2.5rem, 6vw, 4.5rem);
+  padding-bottom: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + 4rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(3.5rem, 8vw, 6rem);
+}
 
-.work-canvas-viewport {
-  --canvas-frame-width: clamp(14rem, 72vw, 48.75rem);
-  --canvas-available-height: calc(100dvh - var(--canvas-dock-reserved));
-  --canvas-edge: 1rem;
-  --canvas-label-height: 1.5rem;
-  --canvas-label-gap: 0.5rem;
-  --canvas-max-image-height: max(1px, calc(var(--canvas-available-height) - 2 * var(--canvas-edge) - var(--canvas-label-height) - var(--canvas-label-gap)));
-  --canvas-gap: clamp(2rem, 8vw, 8rem);
-  position: relative;
-  overflow: clip;
-  touch-action: none;
-  cursor: grab;
+.work-print-card {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 38rem;
+  padding: clamp(0.875rem, 2vw, 1.375rem);
+  border: 1px solid rgba(35, 35, 35, 0.1);
+  border-radius: 2px;
+  background: #ffffff;
+  box-shadow:
+    0 2px 8px -2px rgba(0, 0, 0, 0.04),
+    0 12px 28px -6px rgba(0, 0, 0, 0.07);
+  transform: rotate(var(--card-rotation, 0deg));
+  transform-origin: center center;
+  transition:
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 300ms ease;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.work-canvas-viewport[data-dragging="true"],
-.work-canvas-viewport[data-dragging="true"] button { cursor: grabbing; }
 
-.work-canvas-plane {
-  --canvas-first-width: min(var(--canvas-frame-width), calc(var(--canvas-max-image-height) * var(--canvas-first-ratio)));
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: grid;
-  grid-template-columns: repeat(var(--canvas-columns), var(--canvas-frame-width));
-  align-items: start;
-  justify-items: start;
-  gap: var(--canvas-gap);
-  width: max-content;
-  transform-origin: 0 0;
-  /* First-frame centering also works in the server render, before hydration. */
-  transform: translate(
-    var(--canvas-x, calc((100vw - var(--canvas-first-width)) / 2)),
-    var(--canvas-y, calc((var(--canvas-available-height) - var(--canvas-label-height) - var(--canvas-label-gap) - var(--canvas-first-width) / var(--canvas-first-ratio)) / 2))
-  ) scale(var(--canvas-zoom, 1));
-  will-change: transform;
+@media (hover: hover) {
+  .work-print-card:hover {
+    box-shadow:
+      0 4px 14px -2px rgba(0, 0, 0, 0.06),
+      0 20px 40px -8px rgba(0, 0, 0, 0.12);
+  }
 }
-.work-canvas-plane[data-panning="smooth"] { transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1); }
-.work-canvas-item {
+
+.work-print-card:focus-visible {
+  outline: 2px solid #2d806f;
+  outline-offset: 4px;
+}
+
+/* Mobile cards MUST be strictly 0deg (no rotation) */
+@media (max-width: 640px) {
+  .work-print-card {
+    --card-rotation: 0deg !important;
+    transform: none !important;
+  }
+}
+
+.work-print-image-frame {
   position: relative;
-  width: min(var(--canvas-frame-width), calc(var(--canvas-max-image-height) * var(--canvas-image-ratio)));
-  margin: 0;
-}
-
-.work-canvas-item figcaption,
-.work-canvas-focus figcaption {
-  /* Home body specifications; Home's own styles remain untouched. */
-  font-family: "Portfolio Inter", Arial, sans-serif;
-  font-size: 0.9375rem;
-  font-weight: 400;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-  color: #404040;
-  margin-bottom: 0.5rem;
-}
-.work-canvas-item figcaption { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.work-canvas-item[data-selected="true"] figcaption { color: #2d806f; }
-.work-canvas-item[data-selected="true"] .work-canvas-frame { outline: calc(2px / var(--canvas-zoom, 1)) solid #2d806f; outline-offset: 0; }
-.work-canvas-item .work-canvas-frame:focus-visible { outline-offset: 4px; }
-
-.work-canvas-frame,
-.work-canvas-focus-image {
-  position: relative;
+  display: block;
   width: 100%;
-  aspect-ratio: var(--canvas-image-ratio, 1.6);
-  border: 1px solid rgba(35, 35, 35, 0.1);
-  padding: 0;
-  background: transparent;
+  aspect-ratio: var(--card-image-ratio, 1.6);
+  background: #f5f5f5;
+  box-shadow: 0 0 0 1px rgba(35, 35, 35, 0.06);
+  overflow: hidden;
 }
-.work-canvas-frame { display: block; cursor: grab; }
-.work-canvas-frame img,
-.work-canvas-focus-image img { object-fit: contain; pointer-events: none; }
-.work-canvas-empty { position: absolute; inset: 0; display: grid; place-items: center; padding: 1.5rem; }
 
-.site-nav[data-work-canvas="true"] { display: flex; align-items: center; max-width: calc(100vw - 2rem); }
-.site-nav[data-work-canvas="true"] #work-canvas-controls {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  min-width: 294px;
-  margin-left: 8px;
-  padding-left: 9px;
+.work-print-image-frame img {
+  object-fit: contain;
+  pointer-events: none;
 }
-#work-canvas-controls::before,
-.work-canvas-zoom-controls::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  translate: 0 -50%;
-  width: 1px;
-  height: 20px;
-  background: rgba(35, 35, 35, 0.1);
+
+.work-print-title {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.125rem, 1.65vw, 1.375rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: #232323;
+  margin-top: clamp(0.75rem, 1.5vw, 1.125rem);
+  text-align: left;
 }
-.work-canvas-step-controls,
-.work-canvas-zoom-controls { position: relative; display: flex; align-items: center; gap: 4px; }
-.work-canvas-zoom-controls { padding-left: 9px; }
-#work-canvas-controls button {
-  flex-shrink: 0;
+
+.work-gallery-empty {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  color: var(--dock-muted);
-  background: transparent;
-  cursor: pointer;
-  transition: color 150ms ease;
+  min-height: 40vh;
+  color: var(--muted, #595959);
+  font-size: 0.9375rem;
 }
-#work-canvas-controls button:hover { color: var(--dock-accent); }
-#work-canvas-controls button:disabled { opacity: 0.4; cursor: default; }
-#work-canvas-controls svg { width: 16px; height: 16px; }
-.work-canvas-counter,
-#work-canvas-controls .work-canvas-reset { font-size: 12px; line-height: 20px; }
-.work-canvas-counter { min-width: 44px; color: var(--dock-muted); font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
-#work-canvas-controls .work-canvas-reset { width: 48px; }
 
-.work-canvas-focus {
-  position: absolute;
+/* Focus Overlay: Lift-to-Focus */
+.work-focus-backdrop {
+  position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: calc(4rem + env(safe-area-inset-top, 0px)) 1.5rem calc(var(--canvas-dock-reserved) + 1rem);
-  background: #fafafa;
-}
-.work-canvas-focus figure {
-  width: min(75rem, 100%, calc(max(1px, (100dvh - var(--canvas-dock-reserved) - 6rem - env(safe-area-inset-top, 0px))) * var(--canvas-image-ratio)));
-  margin: 0;
-}
-.work-canvas-back {
-  position: absolute;
-  top: calc(1rem + env(safe-area-inset-top, 0px));
-  left: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--dock-muted);
+  padding: clamp(1rem, 4vw, 2.5rem);
+  background: rgba(18, 18, 18, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.work-canvas-back svg { width: 16px; height: 16px; }
 
-@media (max-width: 540px) {
-  .work-canvas-layout { --canvas-dock-reserved: calc(var(--dock-bottom) + 88px + var(--dock-clearance) + env(safe-area-inset-bottom, 0px)); }
-  .site-nav[data-work-canvas="true"] { flex-direction: column; gap: 4px; }
-  .site-nav[data-work-canvas="true"] #work-canvas-controls { min-width: 0; margin-left: 0; padding-left: 0; }
-  #work-canvas-controls::before { display: none; }
-  #work-canvas-controls button { width: 34px; }
+.work-focused-card {
+  --max-h: calc(100dvh - 3.5rem);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(0.875rem, 2vw, 1.375rem);
+  border: 1px solid rgba(35, 35, 35, 0.1);
+  border-radius: 2px;
+  background: #ffffff;
+  box-shadow:
+    0 20px 50px -10px rgba(0, 0, 0, 0.25),
+    0 30px 60px -15px rgba(0, 0, 0, 0.3);
+  max-height: var(--max-h);
+  width: min(92vw, 56rem, calc((var(--max-h) - 4.5rem) * var(--card-image-ratio, 1.6)));
+  transform-origin: center center;
+  cursor: default;
+  will-change: transform, box-shadow;
+}
+
+.work-focused-card .work-print-image-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--card-image-ratio, 1.6);
+  background: #f5f5f5;
+  box-shadow: 0 0 0 1px rgba(35, 35, 35, 0.06);
+  overflow: hidden;
+}
+
+.work-focused-card .work-print-title {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.125rem, 1.65vw, 1.375rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: #232323;
+  margin-top: clamp(0.75rem, 1.5vw, 1.125rem);
+  text-align: left;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .work-canvas-plane[data-panning="smooth"],
-  #work-canvas-controls button { transition: none; }
+  .work-print-card {
+    transition: none;
+  }
 }
