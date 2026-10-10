@@ -12,7 +12,11 @@ export function Navbar() {
   const activeSegment = useSelectedLayoutSegment();
 
   return (
-    <nav aria-label="Main navigation" className="site-nav">
+    <nav
+      aria-label="Main navigation"
+      className="site-nav"
+      data-work-gallery={activeSegment === "work" ? "true" : undefined}
+    >
       <ul className="nav-links">
         {links.map(({ href, label, segment }) => (
           <li key={href}>
@@ -26,6 +30,9 @@ export function Navbar() {
           </li>
         ))}
       </ul>
+      {activeSegment === "work" && (
+        <div id="work-gallery-dock" role="group" aria-label="Gallery controls" />
+      )}
     </nav>
   );
 }
