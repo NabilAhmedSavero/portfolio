@@ -72,7 +72,7 @@ body:has(.work-gallery-layout) {
   --card-image-ratio: 1.6;
   --card-height: calc((var(--card-width) - (2 * var(--card-pad))) / var(--card-image-ratio) + (2 * var(--card-pad)));
   --card-gap: clamp(18px, 2.5vw, 32px);
-  --card-side-scale: 0.84;
+  --card-side-scale: 0.82;
 
   position: fixed;
   top: 0;
@@ -210,9 +210,9 @@ body.is-gallery-dragging * {
   cursor: grab;
 }
 
-/* Side neighbors: tightened spacing, revealing well over 10% (35%-60%) */
+/* Side neighbors: pushed to extreme edges with healthy gap, max 18%-20% visible */
 .work-hanging-card[data-position="prev"] {
-  transform: translate3d(calc(-0.92 * var(--card-width) - var(--card-gap)), 0, -50px) scale(var(--card-side-scale, 0.84)) rotateY(12deg) rotateZ(-1.5deg);
+  transform: translate3d(calc(-50vw - 0.32 * var(--card-width) * var(--card-side-scale, 0.82)), 0, -50px) scale(var(--card-side-scale, 0.82)) rotateY(16deg) rotateZ(-2deg);
   opacity: 0.88;
   z-index: 8;
   cursor: grab;
@@ -220,7 +220,7 @@ body.is-gallery-dragging * {
 }
 
 .work-hanging-card[data-position="next"] {
-  transform: translate3d(calc(0.92 * var(--card-width) + var(--card-gap)), 0, -50px) scale(var(--card-side-scale, 0.84)) rotateY(-12deg) rotateZ(1.5deg);
+  transform: translate3d(calc(50vw + 0.32 * var(--card-width) * var(--card-side-scale, 0.82)), 0, -50px) scale(var(--card-side-scale, 0.82)) rotateY(-16deg) rotateZ(2deg);
   opacity: 0.88;
   z-index: 8;
   cursor: grab;
@@ -228,14 +228,14 @@ body.is-gallery-dragging * {
 }
 
 .work-hanging-card[data-position="hidden-left"] {
-  transform: translate3d(calc(-1.84 * var(--card-width) - 2 * var(--card-gap)), 0, -90px) scale(0.7) rotateY(18deg);
+  transform: translate3d(calc(-135vw - 0.5 * var(--card-width)), 0, -100px) scale(0.68) rotateY(22deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;
 }
 
 .work-hanging-card[data-position="hidden-right"] {
-  transform: translate3d(calc(1.84 * var(--card-width) + 2 * var(--card-gap)), 0, -90px) scale(0.7) rotateY(-18deg);
+  transform: translate3d(calc(135vw + 0.5 * var(--card-width)), 0, -100px) scale(0.68) rotateY(-22deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;

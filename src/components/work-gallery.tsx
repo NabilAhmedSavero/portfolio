@@ -65,6 +65,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   const currentDragX = useRef(0);
   const pointerHistory = useRef<{ x: number; time: number }[]>([]);
   const hasMoved = useRef(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
   // Lock scrollbars strictly while on /work to eliminate flash
   useEffect(() => {
@@ -136,6 +137,25 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
       document.body.classList.remove("is-gallery-dragging");
     };
   }, [isGrabbing]);
+
+  // Native DOM click/tap outside listener for bulletproof mobile backdrop close
+  useEffect(() => {
+    if (!isFocused) return;
+
+    const handlePointerOutside = (e: MouseEvent | TouchEvent) => {
+      if (imgRef.current && !imgRef.current.contains(e.target as Node)) {
+        setIsFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerOutside);
+    document.addEventListener("touchstart", handlePointerOutside, { passive: true });
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerOutside);
+      document.removeEventListener("touchstart", handlePointerOutside);
+    };
+  }, [isFocused]);
 
   // 1:1 Live Drag & Swipe gesture handling
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
@@ -523,6 +543,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
+              ref={imgRef}
               src={activeItem.image.src}
               alt={activeItem.image.alt}
               className="work-focus-raw-img transition-none"
