@@ -58,11 +58,13 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   // Live 1:1 drag physics tracking refs
   const trackRef = useRef<HTMLDivElement | null>(null);
   const isDragging = useRef(false);
+  const isPointerCaptured = useRef(false);
   const dragStartX = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
   const currentDragX = useRef(0);
   const pointerHistory = useRef<{ x: number; time: number }[]>([]);
   const hasMoved = useRef(false);
+  const lastStepTime = useRef(0);
 
   // Lock scrollbars strictly while on /work to eliminate flash
   useEffect(() => {
@@ -105,6 +107,16 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     [items.length],
   );
 
+  const safeStep = useCallback(
+    (delta: number) => {
+      const now = Date.now();
+      if (now - lastStepTime.current < 200) return;
+      lastStepTime.current = now;
+      step(delta);
+    },
+    [step],
+  );
+
   // Keyboard navigation & Escape to exit focus
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -115,15 +127,15 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         }
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        step(-1);
+        safeStep(-1);
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        step(1);
+        safeStep(1);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isFocused, step]);
+  }, [isFocused, safeStep]);
 
   // 1:1 Live Drag & Swipe gesture handling
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
@@ -139,6 +151,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     if (e.button !== 0 && e.pointerType === "mouse") return;
 
     isDragging.current = true;
+    isPointerCaptured.current = false;
     dragStartX.current = e.clientX;
     dragStartY.current = e.clientY;
     currentDragX.current = 0;
@@ -149,12 +162,6 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     if (trackRef.current) {
       trackRef.current.style.transition = "none";
     }
-
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      // Ignore
-    }
   };
 
   const onPointerMove = (e: ReactPointerEvent<HTMLElement>) => {
@@ -163,8 +170,17 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     const dx = e.clientX - dragStartX.current;
     const dy = Math.abs(e.clientY - (dragStartY.current ?? e.clientY));
 
-    if (Math.abs(dx) > 6 || dy > 6) {
+    // Only engage drag mode and pointer capture after genuine movement > 10px
+    if (Math.abs(dx) > 10 || dy > 10) {
       hasMoved.current = true;
+      if (!isPointerCaptured.current) {
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+          isPointerCaptured.current = true;
+        } catch {
+          // Ignore
+        }
+      }
     }
 
     // Rubber-band resistance at gallery boundaries
@@ -195,10 +211,13 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     isDragging.current = false;
     setIsGrabbing(false);
 
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      // Ignore
+    if (isPointerCaptured.current) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        // Ignore
+      }
+      isPointerCaptured.current = false;
     }
 
     const deltaX = currentDragX.current;
@@ -214,9 +233,36 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
       }
     }
 
+    const startX = dragStartX.current;
+    const startY = dragStartY.current;
     dragStartX.current = null;
     dragStartY.current = null;
     currentDragX.current = 0;
+
+    // Displacement check: if under 12px, handle as TAP / CLICK
+    const dist = Math.hypot(
+      e.clientX - startX,
+      e.clientY - (startY ?? e.clientY),
+    );
+
+    if (dist < 12) {
+      const cardEl = (e.target as HTMLElement).closest(".work-hanging-card");
+      if (cardEl) {
+        const pos = cardEl.getAttribute("data-position");
+        if (pos === "prev") {
+          safeStep(-1);
+          return;
+        }
+        if (pos === "next") {
+          safeStep(1);
+          return;
+        }
+        if (pos === "active") {
+          setIsFocused(true);
+          return;
+        }
+      }
+    }
 
     // Evaluate velocity and distance to determine next/prev or snap back
     let targetDelta = 0;
@@ -255,6 +301,9 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   const onPointerCancel = () => {
     isDragging.current = false;
     setIsGrabbing(false);
+    if (isPointerCaptured.current) {
+      isPointerCaptured.current = false;
+    }
     dragStartX.current = null;
     dragStartY.current = null;
     currentDragX.current = 0;
@@ -285,7 +334,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         className="work-dock-btn"
         onClick={(e) => {
           e.stopPropagation();
-          step(-1);
+          safeStep(-1);
         }}
         disabled={activeIndex === 0}
         aria-label="Previous project"
@@ -317,7 +366,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         className="work-dock-btn"
         onClick={(e) => {
           e.stopPropagation();
-          step(1);
+          safeStep(1);
         }}
         disabled={activeIndex === items.length - 1}
         aria-label="Next project"
@@ -373,18 +422,6 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
     >
-      {/* Click-to-focus dark overlay with backdrop blur */}
-      {isFocused && (
-        <div
-          className="work-focus-dimmer"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsFocused(false);
-          }}
-          aria-label="Close focus"
-        />
-      )}
-
       {/* Atomic Hanging Assembly: String and Photo Cards bound together */}
       <div className="work-hanging-assembly">
         {/* String Layer: Z-index 2 (BEHIND photos at Z:5), anchored to clip notch */}
@@ -426,7 +463,6 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
                   key={item.id}
                   className="work-hanging-card"
                   data-position={position}
-                  data-focused={offset === 0 && isFocused ? "true" : undefined}
                   style={
                     {
                       "--card-image-ratio": item.image.aspectRatio ?? 1.6,
@@ -436,11 +472,11 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
                     e.stopPropagation();
                     if (hasMoved.current) return;
                     if (offset === -1) {
-                      step(-1);
+                      safeStep(-1);
                     } else if (offset === 1) {
-                      step(1);
+                      safeStep(1);
                     } else if (offset === 0) {
-                      setIsFocused((prev) => !prev);
+                      setIsFocused(true);
                     }
                   }}
                   aria-current={offset === 0 ? "true" : undefined}
@@ -469,13 +505,52 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         </div>
       </div>
 
-      {/* Floating dock controls: Z-index 50 (ABOVE everything) */}
+      {/* Floating dock controls in Navbar */}
       {mounted &&
         (dockNode ? (
           createPortal(dockControls, dockNode)
         ) : (
           <div className="work-floating-dock-fallback">{dockControls}</div>
         ))}
+
+      {/* Lift-to-Focus Portal: Z-index 100 on body (ABOVE EVERYTHING, blurring nav dock) */}
+      {mounted &&
+        isFocused &&
+        activeItem &&
+        createPortal(
+          <div
+            className="work-focus-portal"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsFocused(false);
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Focused view of ${activeItem.name}`}
+          >
+            <div
+              className="work-focus-card-wrapper"
+              onClick={(e) => e.stopPropagation()}
+              style={
+                {
+                  "--card-image-ratio": activeItem.image.aspectRatio ?? 1.6,
+                } as CSSProperties
+              }
+            >
+              <WoodenClip style={{ left: "50%", transform: "translateX(-50%)" }} />
+              <div className="work-print-image-frame">
+                <Image
+                  src={activeItem.image.src}
+                  alt={activeItem.image.alt}
+                  fill
+                  sizes="(max-width: 640px) 92vw, (max-width: 1024px) 78vw, 860px"
+                  priority
+                />
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </section>
   );
 }
