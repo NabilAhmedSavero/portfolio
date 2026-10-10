@@ -24,7 +24,8 @@
   --home-muted: #737373;
   --home-link: #738c87;
   --home-link-hover: #1f4840;
-  --home-entrance-duration: 800ms;
+  --home-entrance-duration: 950ms;
+  --home-entrance-delay: 150ms;
   --home-entrance-easing: cubic-bezier(0.22, 1, 0.36, 1);
   font-family: "Portfolio Inter", Arial, sans-serif;
   font-size: 0.9375rem;
@@ -244,7 +245,8 @@
     animation-name: home-blur-fade;
     animation-duration: var(--home-entrance-duration);
     animation-timing-function: var(--home-entrance-easing);
-    animation-delay: 0s;
+    animation-delay: var(--home-entrance-delay);
+    animation-fill-mode: backwards;
     animation-iteration-count: 1;
   }
 
