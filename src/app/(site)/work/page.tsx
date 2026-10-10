@@ -1,19 +1,46 @@
 import type { Metadata } from "next";
-import { WorkGallery } from "@/components/work-gallery";
-import { createWorkSlides } from "@/data/projects";
-import { getWorkProjects } from "@/sanity/lib/content";
+import { client } from "@/sanity/lib/client";
+import { WorkGallery, type SanityProject } from "@/components/work-gallery";
+import { projects as fallbackProjects } from "@/data/projects";
 
 export const metadata: Metadata = {
   title: "Work",
 };
 
+const WORK_PROJECTS_QUERY = `
+  *[_type == "project" && (isVisible == true || !defined(isVisible)) && !(_id in path("drafts.**"))]
+  | order(displayOrder asc, _createdAt desc) {
+    _id,
+    name,
+    title,
+    subtitle,
+    coverImage,
+    mainImage,
+    additionalImages,
+    externalUrl,
+    displayOrder
+  }
+`;
+
 export default async function WorkPage() {
-  const projects = await getWorkProjects();
+  let sanityProjects: SanityProject[] = [];
+
+  if (client) {
+    try {
+      sanityProjects = await client.fetch<SanityProject[]>(
+        WORK_PROJECTS_QUERY,
+        {},
+        { next: { revalidate: 10 } }
+      );
+    } catch (error) {
+      console.warn("[Sanity] Failed to fetch projects on work page:", error);
+    }
+  }
 
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 pt-6 sm:pt-8 md:pt-10 pb-20 sm:pb-24">
       <h1 className="sr-only">Work</h1>
-      <WorkGallery items={createWorkSlides(projects)} />
+      <WorkGallery projects={sanityProjects} fallbackProjects={fallbackProjects} />
     </div>
   );
 }

@@ -29,11 +29,8 @@ export const getWorkProjects = cache(async (): Promise<readonly Project[]> => {
       : undefined;
   }
 
-  const site = await getSiteContent();
-  if (site?.useCmsProjects !== true) return projects;
-
   const cmsProjects = await getProjectDocuments();
-  if (cmsProjects === null) return projects;
+  if (!cmsProjects || cmsProjects.length === 0) return projects;
 
   // An empty successful response remains empty after the editor has activated CMS work.
   return cmsProjects.flatMap((project) => {

@@ -3,7 +3,7 @@ import "server-only";
 import { createClient } from "next-sanity";
 import { apiVersion, dataset, isSanityConfigured, projectId } from "../env";
 
-const client = isSanityConfigured
+export const client = isSanityConfigured
   ? createClient({
       projectId,
       dataset,

@@ -1,8 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState, type MouseEvent } from "react";
-import type { WorkSlide } from "@/data/projects";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
+import { createWorkSlides, type Project, type WorkSlide } from "@/data/projects";
+import { urlFor, imageUrl } from "@/sanity/lib/images";
+
+import type { ContentImage } from "@/sanity/types";
+import type { SanityImageSource } from "@sanity/image-url";
+
+export type SanityProject = {
+  _id: string;
+  name?: string;
+  title?: string;
+  subtitle?: string;
+  coverImage?: ContentImage | SanityImageSource;
+  mainImage?: ContentImage | SanityImageSource;
+  additionalImages?: Array<
+    ContentImage & {
+      _key?: string;
+      aspectRatio?: number;
+    }
+  >;
+  externalUrl?: string;
+  displayOrder?: number;
+};
 
 export type WorkGalleryItem = {
   id: string;
@@ -16,11 +37,124 @@ export type WorkGalleryItem = {
   };
 };
 
+export type WorkGalleryProps = {
+  projects?: readonly SanityProject[];
+  items?: readonly (WorkSlide | WorkGalleryItem)[];
+  fallbackProjects?: readonly Project[];
+};
+
+function resolveSanityImageUrl(
+  source: SanityImageSource | ContentImage | { src?: string; alt?: string } | string | null | undefined,
+): string {
+  if (!source) return "/images/work-placeholder.svg";
+  if (typeof source === "string") return source;
+  if (typeof source === "object" && "src" in source && typeof source.src === "string") {
+    return source.src;
+  }
+
+  try {
+    const builder = urlFor(source as SanityImageSource);
+    if (builder) {
+      return builder.width(1600).auto("format").url();
+    }
+  } catch {
+    // fallback below
+  }
+
+  return imageUrl(source as SanityImageSource) || "/images/work-placeholder.svg";
+}
+
+function resolveSanityAspectRatio(
+  source: ContentImage | SanityImageSource | { aspectRatio?: number } | null | undefined,
+): number {
+  if (source && typeof source === "object") {
+    if ("aspectRatio" in source && typeof source.aspectRatio === "number") {
+      return source.aspectRatio;
+    }
+    const asset = "asset" in source ? source.asset : undefined;
+    const ref = asset && typeof asset === "object" && "_ref" in asset ? asset._ref : undefined;
+    if (typeof ref === "string") {
+      const match = ref.match(/^image-[^-]+-(\d+)x(\d+)-[a-z0-9]+$/i);
+      if (match) {
+        const w = Number(match[1]);
+        const h = Number(match[2]);
+        if (w > 0 && h > 0) return w / h;
+      }
+    }
+  }
+  return 1.6;
+}
+
+function getAltText(source: unknown, fallback: string): string {
+  if (source && typeof source === "object" && "alt" in source && typeof source.alt === "string") {
+    return source.alt;
+  }
+  return fallback;
+}
+
+function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryItem[] {
+  return projects.flatMap((project) => {
+    const name = project.name || project.title || "Untitled";
+    const subtitle = project.subtitle || "";
+    const coverSource = project.coverImage || project.mainImage;
+    const coverUrl = resolveSanityImageUrl(coverSource);
+    const coverAlt = getAltText(coverSource, name);
+    const coverRatio = resolveSanityAspectRatio(coverSource);
+
+    const coverItem: WorkGalleryItem = {
+      id: `${project._id}:cover`,
+      name,
+      subtitle,
+      externalUrl: project.externalUrl,
+      image: {
+        src: coverUrl,
+        alt: coverAlt,
+        aspectRatio: coverRatio,
+      },
+    };
+
+    const additionalItems: WorkGalleryItem[] = (project.additionalImages ?? []).flatMap(
+      (img, idx) => {
+        const src = resolveSanityImageUrl(img);
+        if (!src) return [];
+        return [
+          {
+            id: `${project._id}:${img._key || idx}`,
+            name,
+            subtitle,
+            externalUrl: project.externalUrl,
+            image: {
+              src,
+              alt: getAltText(img, name),
+              aspectRatio: resolveSanityAspectRatio(img),
+            },
+          },
+        ];
+      },
+    );
+
+    return [coverItem, ...additionalItems];
+  });
+}
+
 export function WorkGallery({
-  items,
-}: {
-  items: readonly (WorkSlide | WorkGalleryItem)[];
-}) {
+  projects,
+  items: directItems,
+  fallbackProjects,
+}: WorkGalleryProps) {
+  const items = useMemo(() => {
+    if (projects && projects.length > 0) {
+      return createItemsFromSanity(projects);
+    }
+    if (directItems && directItems.length > 0) {
+      return directItems;
+    }
+    if (fallbackProjects && fallbackProjects.length > 0) {
+      return createWorkSlides(fallbackProjects);
+    }
+    return [];
+  }, [projects, directItems, fallbackProjects]);
+
   const [lightboxItem, setLightboxItem] = useState<
     WorkSlide | WorkGalleryItem | null
   >(null);

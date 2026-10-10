@@ -3,6 +3,10 @@ import { dataset, isSanityConfigured, projectId } from "../env";
 
 const builder = isSanityConfigured ? createImageUrlBuilder({ projectId, dataset }) : null;
 
+export function urlFor(source: SanityImageSource) {
+  return builder ? builder.image(source) : null;
+}
+
 export function imageUrl(image: SanityImageSource | null | undefined, preserveOriginal = false): string | null {
   if (!builder || !image) return null;
 
