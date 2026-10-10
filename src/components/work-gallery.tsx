@@ -370,13 +370,12 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
       <button
         type="button"
-        className={`work-dock-btn work-dock-btn-reset text-[#135E4F] opacity-10 ${activeIndex === 0 ? "pointer-events-none cursor-default" : "hover:opacity-100"}`}
+        className="work-dock-btn work-dock-btn-reset text-[#135E4F] opacity-100 cursor-pointer"
         onClick={(e) => {
           e.stopPropagation();
           setIsFocused(false);
           setActiveIndex(0);
         }}
-        disabled={activeIndex === 0}
         aria-label="Reset to first project"
         title="Reset to first project"
       >

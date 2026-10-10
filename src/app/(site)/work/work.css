@@ -465,27 +465,18 @@ body.is-gallery-dragging * {
   pointer-events: none !important; /* Disables click/hover interactions */
 }
 
-/* Reset icon: #135E4F with 10% opacity */
+/* Reset icon: fully active #135E4F with 100% opacity */
 .work-dock-btn-reset {
   color: #135E4F !important;
-  opacity: 0.1 !important;
-  transition: opacity 150ms ease, background-color 150ms ease;
+  opacity: 1 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  transition: opacity 150ms ease, background-color 150ms ease, transform 150ms ease;
 }
 
-.work-dock-btn-reset:not(:disabled) {
-  cursor: var(--work-cursor-pointer) !important;
-}
-
-.work-dock-btn-reset:not(:disabled):hover {
+.work-dock-btn-reset:hover {
   opacity: 1 !important;
   background: rgba(19, 94, 79, 0.08);
-}
-
-.work-dock-btn-reset:disabled {
-  color: #135E4F !important;
-  opacity: 0.1 !important;
-  cursor: default !important;
-  pointer-events: none !important;
 }
 
 .work-dock-btn svg {
