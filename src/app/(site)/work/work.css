@@ -5,12 +5,10 @@
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap");
 
 :root {
-  /* Sleek, minimal custom hand cursors */
-  --work-cursor-grab: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M9 13V6a2 2 0 0 1 4 0v7m0-4.5a2 2 0 0 1 4 0v4.5m0-3a2 2 0 0 1 4 0v3.5m0-2a2 2 0 0 1 4 0V17c0 5-3.5 8-8 8s-8-3-8-8v-4a2 2 0 0 1 4 0v2.5' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 14 14, grab;
-
-  --work-cursor-grabbing: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M8 12a2 2 0 0 1 3 0v.5h1a2 2 0 0 1 3 0v.5h1a2 2 0 0 1 3 0v.5a2 2 0 0 1 3 0V17c0 5-3.5 8-8 8s-8-3-8-8v-4.5z' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 14 14, grabbing;
-
-  --work-cursor-pointer: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M9 4a2 2 0 0 1 4 0v9.5h1a2 2 0 0 1 3 0v.5h1a2 2 0 0 1 3 0v.5a2 2 0 0 1 3 0V18c0 5-3.5 8-8 8s-8-3-8-8v-6a2 2 0 0 1 4 0v3.5h1V4z' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 11 3, pointer;
+  /* Clean standard cursors */
+  --work-cursor-grab: grab;
+  --work-cursor-grabbing: grabbing;
+  --work-cursor-pointer: pointer;
 }
 
 /* Strict layout lock: eliminate white line artifact, overflow, and scrollbar flashing */
@@ -73,6 +71,8 @@ body:has(.work-gallery-layout) {
   --card-pad: clamp(10px, 1.4vw, 14px);
   --card-image-ratio: 1.6;
   --card-height: calc((var(--card-width) - (2 * var(--card-pad))) / var(--card-image-ratio) + (2 * var(--card-pad)));
+  --card-gap: clamp(18px, 2.5vw, 32px);
+  --card-side-scale: 0.84;
 
   position: fixed;
   top: 0;
@@ -87,14 +87,16 @@ body:has(.work-gallery-layout) {
   overflow-x: hidden !important;
   perspective: 1200px;
   touch-action: none;
-  cursor: var(--work-cursor-grab);
+  cursor: grab;
   user-select: none;
   -webkit-user-select: none;
 }
 
 .work-gallery-stage.is-grabbing,
-.work-gallery-stage.is-grabbing * {
-  cursor: var(--work-cursor-grabbing) !important;
+.work-gallery-stage.is-grabbing *,
+body.is-gallery-dragging,
+body.is-gallery-dragging * {
+  cursor: grabbing !important;
 }
 
 /* ==========================================================================
@@ -166,6 +168,7 @@ body:has(.work-gallery-layout) {
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  cursor: grab;
 }
 
 /* 3. Scaled-down Wooden Clothespin (50% scale: 8px x 25px)
@@ -204,35 +207,35 @@ body:has(.work-gallery-layout) {
   opacity: 1;
   z-index: 10;
   pointer-events: auto;
-  cursor: var(--work-cursor-pointer);
+  cursor: grab;
 }
 
-/* Side neighbors: clipped to max 10% visible edge slice with 3D tilted depth */
+/* Side neighbors: tightened spacing, revealing well over 10% (35%-60%) */
 .work-hanging-card[data-position="prev"] {
-  transform: translate3d(calc(-50vw - 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(18deg) rotateZ(-2.5deg);
-  opacity: 0.85;
+  transform: translate3d(calc(-0.92 * var(--card-width) - var(--card-gap)), 0, -50px) scale(var(--card-side-scale, 0.84)) rotateY(12deg) rotateZ(-1.5deg);
+  opacity: 0.88;
   z-index: 8;
-  cursor: var(--work-cursor-pointer);
+  cursor: grab;
   pointer-events: auto !important;
 }
 
 .work-hanging-card[data-position="next"] {
-  transform: translate3d(calc(50vw + 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(-18deg) rotateZ(2.5deg);
-  opacity: 0.85;
+  transform: translate3d(calc(0.92 * var(--card-width) + var(--card-gap)), 0, -50px) scale(var(--card-side-scale, 0.84)) rotateY(-12deg) rotateZ(1.5deg);
+  opacity: 0.88;
   z-index: 8;
-  cursor: var(--work-cursor-pointer);
+  cursor: grab;
   pointer-events: auto !important;
 }
 
 .work-hanging-card[data-position="hidden-left"] {
-  transform: translate3d(-130vw, 0, -100px) scale(0.7) rotateY(25deg);
+  transform: translate3d(calc(-1.84 * var(--card-width) - 2 * var(--card-gap)), 0, -90px) scale(0.7) rotateY(18deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;
 }
 
 .work-hanging-card[data-position="hidden-right"] {
-  transform: translate3d(130vw, 0, -100px) scale(0.7) rotateY(-25deg);
+  transform: translate3d(calc(1.84 * var(--card-width) + 2 * var(--card-gap)), 0, -90px) scale(0.7) rotateY(-18deg);
   opacity: 0;
   z-index: 1;
   pointer-events: none;

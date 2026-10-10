@@ -49,6 +49,16 @@
     line-height: 1.6;
   }
 
+  /* Clean standard cursors across site */
+  a,
+  button,
+  [role="button"],
+  input[type="submit"],
+  input[type="button"],
+  select {
+    cursor: pointer;
+  }
+
   h1,
   h2,
   h3 {

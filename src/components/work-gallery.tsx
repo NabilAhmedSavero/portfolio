@@ -126,6 +126,17 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isFocused, step]);
 
+  useEffect(() => {
+    if (isGrabbing) {
+      document.body.classList.add("is-gallery-dragging");
+    } else {
+      document.body.classList.remove("is-gallery-dragging");
+    }
+    return () => {
+      document.body.classList.remove("is-gallery-dragging");
+    };
+  }, [isGrabbing]);
+
   // 1:1 Live Drag & Swipe gesture handling
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
     if (isFocused) return;
