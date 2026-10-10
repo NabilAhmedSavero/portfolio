@@ -97,11 +97,13 @@ export function WorkGallery({
                       <span>
                         {item.externalUrl ? "Case study" : "Click to open"}
                       </span>
-                      <span
-                        className="inline-block transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 select-none font-normal"
-                        aria-hidden="true"
-                      >
-                        ↗
+                      <span className="inline-flex items-center self-center translate-y-[3px]">
+                        <span
+                          className="inline-block transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 select-none font-normal text-[24px] sm:text-[28px] md:text-[28px] leading-none"
+                          aria-hidden="true"
+                        >
+                          ↗
+                        </span>
                       </span>
                     </div>
                   </div>
