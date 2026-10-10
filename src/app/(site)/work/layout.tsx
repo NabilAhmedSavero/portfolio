@@ -10,8 +10,10 @@ export default function WorkLayout({ children }: { children: ReactNode }) {
         position: "fixed",
         inset: 0,
         overflow: "hidden",
+        overflowX: "hidden",
         height: "100dvh",
         width: "100vw",
+        maxWidth: "100%",
       }}
     >
       {children}

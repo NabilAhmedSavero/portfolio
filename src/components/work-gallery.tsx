@@ -52,6 +52,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   const [isFocused, setIsFocused] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
   const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
+  const [titleNode, setTitleNode] = useState<HTMLElement | null>(null);
 
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
@@ -79,16 +80,16 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     };
   }, []);
 
-  // Persistent dock discovery for route transitions
+  // Persistent dock & floating title discovery for route transitions
   useEffect(() => {
-    const updateDock = () => {
-      const el = document.getElementById("work-gallery-dock");
-      setDockNode(el);
+    const updateNodes = () => {
+      setDockNode(document.getElementById("work-gallery-dock"));
+      setTitleNode(document.getElementById("work-gallery-title"));
     };
 
-    updateDock();
-    const raf = requestAnimationFrame(updateDock);
-    const observer = new MutationObserver(updateDock);
+    updateNodes();
+    const raf = requestAnimationFrame(updateNodes);
+    const observer = new MutationObserver(updateNodes);
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
@@ -143,7 +144,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     // Don't drag if clicking buttons, dock, or navigation
     if (
       (e.target as HTMLElement).closest(
-        ".site-nav, #work-gallery-dock, .work-floating-dock-fallback, button, a",
+        ".site-nav, #work-gallery-dock, #work-gallery-title, .work-floating-dock-fallback, button, a",
       )
     ) {
       return;
@@ -321,6 +322,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
   const activeItem = items[activeIndex];
 
+  // Strictly only controls: [ < ] [ 1 / 6 ] [ > ] [ Reset ]
   const dockControls = (
     <div
       className="work-gallery-dock-controls"
@@ -353,13 +355,9 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         </svg>
       </button>
 
-      {/* Clean minimal project title & counter inside dock */}
-      <div className="work-dock-info">
-        <span className="work-dock-title">{activeItem ? activeItem.name : ""}</span>
-        <span className="work-dock-counter" aria-live="polite">
-          {items.length ? `${activeIndex + 1}/${items.length}` : "0/0"}
-        </span>
-      </div>
+      <span className="work-dock-counter" aria-live="polite">
+        {items.length ? `${activeIndex + 1} / ${items.length}` : "0 / 0"}
+      </span>
 
       <button
         type="button"
@@ -505,12 +503,27 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         </div>
       </div>
 
+      {/* Floating project title positioned directly ABOVE the nav pill */}
+      {mounted &&
+        titleNode &&
+        createPortal(
+          <span className="work-dock-floating-title">
+            {activeItem ? activeItem.name : ""}
+          </span>,
+          titleNode,
+        )}
+
       {/* Floating dock controls in Navbar */}
       {mounted &&
         (dockNode ? (
           createPortal(dockControls, dockNode)
         ) : (
-          <div className="work-floating-dock-fallback">{dockControls}</div>
+          <div className="work-floating-dock-fallback">
+            <span className="work-dock-floating-title">
+              {activeItem ? activeItem.name : ""}
+            </span>
+            {dockControls}
+          </div>
         ))}
 
       {/* Lift-to-Focus Portal: Z-index 100 on body (ABOVE EVERYTHING, blurring nav dock) */}

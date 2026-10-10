@@ -11,13 +11,15 @@
   --work-cursor-pointer: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M9 4a2 2 0 0 1 4 0v9.5h1a2 2 0 0 1 3 0v.5h1a2 2 0 0 1 3 0v.5a2 2 0 0 1 3 0V18c0 5-3.5 8-8 8s-8-3-8-8v-6a2 2 0 0 1 4 0v3.5h1V4z' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 11 3, pointer;
 }
 
-/* Strict layout lock: eliminate scrollbar flashing and layout shift during route transitions */
+/* Strict layout lock: eliminate white line artifact, overflow, and scrollbar flashing */
 .work-gallery-layout {
   position: fixed;
   inset: 0;
   width: 100vw;
+  max-width: 100%;
   height: 100dvh;
-  overflow: hidden;
+  overflow: hidden !important;
+  overflow-x: hidden !important;
   background: var(--background, #fafafa);
   z-index: 1;
 }
@@ -26,26 +28,42 @@
   position: fixed;
   inset: 0;
   width: 100vw;
+  max-width: 100%;
   height: 100dvh;
-  overflow: hidden;
+  overflow: hidden !important;
+  overflow-x: hidden !important;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-html:has(.work-gallery-layout),
+html:has(.work-gallery-layout) {
+  scrollbar-gutter: auto !important;
+  overflow: hidden !important;
+  overflow-x: hidden !important;
+  width: 100vw !important;
+  max-width: 100% !important;
+  height: 100dvh !important;
+}
+
 body:has(.work-gallery-layout) {
   overflow: hidden !important;
+  overflow-x: hidden !important;
+  width: 100vw !important;
+  max-width: 100% !important;
   height: 100dvh !important;
 }
 
 .page-transition:has(.work-gallery-layout) {
   padding-bottom: 0 !important;
   overflow: hidden !important;
+  overflow-x: hidden !important;
+  width: 100vw !important;
+  max-width: 100% !important;
   height: 100dvh !important;
 }
 
-/* Stage: bounded vertically to center items in viewport */
+/* Stage: bounded vertically to center items in viewport, strictly clips 3D overflow */
 .work-gallery-stage {
   --dock-reserved: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + env(safe-area-inset-bottom, 0px));
   --card-width: clamp(360px, 50vw, 600px);
@@ -57,11 +75,13 @@ body:has(.work-gallery-layout) {
   top: 0;
   left: 0;
   width: 100vw;
+  max-width: 100%;
   height: calc(100dvh - var(--dock-reserved));
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: hidden !important;
+  overflow-x: hidden !important;
   perspective: 1200px;
   touch-action: none;
   cursor: var(--work-cursor-grab);
@@ -76,14 +96,17 @@ body:has(.work-gallery-layout) {
 
 /* ==========================================================================
    Hanging Assembly: String and Photo Cards bound together
+   overflow: visible allows inner 3D depth, while parent stage clips at 100vw
    ========================================================================== */
 .work-hanging-assembly {
   position: relative;
   width: 100vw;
+  max-width: 100%;
   height: var(--card-height);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 }
 
 /* 1. String Layer: Z-index 2 (BEHIND photos at Z:5), anchored to top of card */
@@ -222,10 +245,13 @@ body:has(.work-gallery-layout) {
     position: fixed;
     inset: 0;
     width: 100vw;
+    max-width: 100%;
     height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden !important;
+    overflow-x: hidden !important;
     --card-width: 90vw;
     --card-pad: 8px;
     --card-height: calc((90vw - 16px) / var(--card-image-ratio) + 16px);
@@ -234,10 +260,12 @@ body:has(.work-gallery-layout) {
   .work-hanging-assembly {
     position: relative;
     width: 100vw;
+    max-width: 100%;
     height: var(--card-height);
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: visible;
   }
 
   .work-carousel-track {
@@ -354,14 +382,48 @@ body:has(.work-gallery-layout) {
 }
 
 /* ==========================================================================
-   Bottom Nav Dock: Minimal site typography (< Plied 1/6 > [reset])
+   Bottom Nav Dock: Strict Pill Layout [Home | Works] [ < ] [ 1 / 6 ] [ > ] [ Reset ]
+   Floating project title sits directly ABOVE the nav pill
    ========================================================================== */
 .site-nav[data-work-gallery="true"] {
+  position: fixed;
   z-index: 50 !important;
   display: flex;
   align-items: center;
   gap: 8px;
   pointer-events: auto !important;
+}
+
+/* Floating project title positioned directly ABOVE the nav pill */
+#work-gallery-title,
+.work-dock-floating-title {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--foreground, #1a1a1a);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
+  animation: workTitleFadeIn 180ms ease;
+}
+
+@keyframes workTitleFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 3px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 #work-gallery-dock {
@@ -422,34 +484,17 @@ body:has(.work-gallery-layout) {
   height: 15px;
 }
 
-/* Dock Project Title & Counter: Site default minimal typography */
-.work-dock-info {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  padding-inline: 4px;
-}
-
-.work-dock-title {
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  color: var(--foreground, #1a1a1a);
-  max-width: clamp(75px, 18vw, 150px);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .work-dock-counter {
+  min-width: 44px;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 20px;
   color: var(--dock-muted, #65817b);
   font-variant-numeric: tabular-nums;
+  text-align: center;
   white-space: nowrap;
+  padding-inline: 4px;
 }
 
 /* Fallback floating dock if navbar portal is unavailable */
