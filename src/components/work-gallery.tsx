@@ -52,7 +52,7 @@ export function WorkGallery({
   return (
     <section aria-label="Work Projects">
       {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-x-12 gap-y-12 md:gap-y-16">
         {items.map((item, index) => {
           const Tag = item.externalUrl ? "a" : "div";
           const linkProps = item.externalUrl
@@ -77,11 +77,11 @@ export function WorkGallery({
               <Tag
                 {...linkProps}
                 onClick={(e) => handleCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
-                className="group/image block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-xl md:rounded-2xl"
+                className="group/image block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
                 aria-label={`View ${item.name}`}
               >
-                {/* Image Container: Clean rounded corners, hidden overflow */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl md:rounded-2xl bg-neutral-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-300 group-hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)]">
+                {/* Image Container: Clean 8px rounded corners, hidden overflow */}
+                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[8px] bg-neutral-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-300 group-hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)]">
                   <Image
                     src={item.image.src}
                     alt={item.image.alt}
@@ -108,8 +108,8 @@ export function WorkGallery({
                 </div>
               </Tag>
 
-              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with 4px gap */}
-              <div className="mt-[18px] flex flex-col gap-[4px]">
+              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with exactly 16px mt and 4px gap */}
+              <div className="mt-4 flex flex-col gap-1">
                 <h2
                   className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
                   style={{ fontSize: "15px", fontWeight: 500 }}
