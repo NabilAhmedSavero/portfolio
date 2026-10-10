@@ -494,7 +494,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         activeItem &&
         createPortal(
           <div
-            className="work-focus-portal"
+            className="work-focus-portal fixed inset-0 w-full h-[100dvh]"
             onClick={() => setIsFocused(false)}
             role="dialog"
             aria-modal="true"
@@ -502,13 +502,18 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
           >
             <div
               className="work-focus-image-wrapper"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setIsFocused(false);
+                }
+              }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={activeItem.image.src}
                 alt={activeItem.image.alt}
                 className="work-focus-raw-img"
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
           </div>,
