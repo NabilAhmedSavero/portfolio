@@ -181,7 +181,7 @@ export function WorkGallery({
       {/* Lightbox Modal: Maximized open state */}
       {lightboxItem && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-evenly px-4 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 h-[100dvh] z-50 flex flex-col items-center justify-evenly px-4 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
           onClick={() => setLightboxItem(null)}
           role="dialog"
           aria-modal="true"
@@ -191,7 +191,7 @@ export function WorkGallery({
           <img
             src={lightboxItem.image.src}
             alt={lightboxItem.image.alt}
-            className="z-10 max-h-[78vh] sm:max-h-[80vh] max-w-[95vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
+            className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
             onClick={(e) => e.stopPropagation()}
           />
 
