@@ -25,7 +25,7 @@ function WoodenClip({ style }: { style?: CSSProperties }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect x="2" y="3" width="12" height="46" rx="2" fill="rgba(0, 0, 0, 0.14)" />
+        <rect x="2" y="3" width="12" height="46" rx="2" fill="rgba(0, 0, 0, 0.12)" />
         <path
           d="M3 2 C3 1.5, 6 1.5, 6.5 2 L6.5 48 C6 48.5, 3 48.5, 3 48 Z"
           fill="#d8b277"
@@ -50,14 +50,14 @@ function WoodenClip({ style }: { style?: CSSProperties }) {
 export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
-  const [dragOffset, setDragOffset] = useState(0);
+  const [isGrabbing, setIsGrabbing] = useState(false);
   const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
 
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
-  const isDragging = useRef(false);
-  const dragStart = useRef<{ x: number; time: number } | null>(null);
-  const pointerHistory = useRef<{ x: number; time: number }[]>([]);
+  const dragStartX = useRef<number | null>(null);
+  const dragStartY = useRef<number | null>(null);
+  const hasMoved = useRef(false);
 
   // Persistent dock discovery for route transitions
   useEffect(() => {
@@ -107,14 +107,24 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isFocused, step]);
 
-  // Pointer drag/swipe with momentum
+  // Reliable threshold swipe (no complex 1:1 interpolation)
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
     if (isFocused) return;
+    // Don't drag if clicking buttons, dock, or navigation
+    if (
+      (e.target as HTMLElement).closest(
+        ".site-nav, #work-gallery-dock, .work-floating-dock-fallback, button, a",
+      )
+    ) {
+      return;
+    }
     if (e.button !== 0 && e.pointerType === "mouse") return;
 
-    dragStart.current = { x: e.clientX, time: performance.now() };
-    pointerHistory.current = [{ x: e.clientX, time: performance.now() }];
-    isDragging.current = true;
+    dragStartX.current = e.clientX;
+    dragStartY.current = e.clientY;
+    hasMoved.current = false;
+    setIsGrabbing(true);
+
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
@@ -123,72 +133,45 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   };
 
   const onPointerMove = (e: ReactPointerEvent<HTMLElement>) => {
-    if (!isDragging.current || !dragStart.current) return;
-    const now = performance.now();
-    pointerHistory.current.push({ x: e.clientX, time: now });
-
-    while (
-      pointerHistory.current.length > 1 &&
-      now - pointerHistory.current[0].time > 150
-    ) {
-      pointerHistory.current.shift();
+    if (dragStartX.current === null) return;
+    const dx = Math.abs(e.clientX - dragStartX.current);
+    const dy = Math.abs(e.clientY - (dragStartY.current ?? e.clientY));
+    if (dx > 8 || dy > 8) {
+      hasMoved.current = true;
     }
-
-    const deltaX = e.clientX - dragStart.current.x;
-    setDragOffset(deltaX);
   };
 
   const onPointerUp = (e: ReactPointerEvent<HTMLElement>) => {
-    if (!isDragging.current || !dragStart.current) return;
-    isDragging.current = false;
+    if (dragStartX.current === null) return;
+    setIsGrabbing(false);
+
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {
       // Ignore
     }
 
-    const deltaX = e.clientX - dragStart.current.x;
-    const now = performance.now();
-    const history = pointerHistory.current;
-    let velocity = 0;
-    if (history.length >= 2) {
-      const oldest = history[0];
-      const dt = now - oldest.time;
-      if (dt > 10) {
-        velocity = (e.clientX - oldest.x) / dt;
+    const deltaX = e.clientX - dragStartX.current;
+    const deltaY = e.clientY - (dragStartY.current ?? e.clientY);
+
+    dragStartX.current = null;
+    dragStartY.current = null;
+
+    // Threshold swipe: swipe > 50px horizontally steps by 1
+    if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < -50) {
+        step(1); // Swipe left -> next
+      } else if (deltaX > 50) {
+        step(-1); // Swipe right -> prev
       }
     }
-
-    setDragOffset(0);
-
-    // If drag was very small, treat as click
-    if (Math.abs(deltaX) < 10 && Math.abs(velocity) < 0.25) {
-      dragStart.current = null;
-      return;
-    }
-
-    // Velocity-based swipe momentum
-    const absV = Math.abs(velocity);
-    let stepCount = 1;
-    if (absV > 1.8) {
-      stepCount = 3;
-    } else if (absV > 0.9) {
-      stepCount = 2;
-    }
-
-    if (deltaX < -40 || velocity < -0.3) {
-      step(stepCount);
-    } else if (deltaX > 40 || velocity > 0.3) {
-      step(-stepCount);
-    }
-
-    dragStart.current = null;
   };
 
   const onPointerCancel = () => {
-    isDragging.current = false;
-    setDragOffset(0);
-    dragStart.current = null;
+    setIsGrabbing(false);
+    dragStartX.current = null;
+    dragStartY.current = null;
+    hasMoved.current = false;
   };
 
   const dockControls = (
@@ -196,11 +179,16 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
       className="work-gallery-dock-controls"
       role="group"
       aria-label="Gallery slide controls"
+      onPointerDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
     >
       <button
         type="button"
         className="work-dock-btn"
-        onClick={() => step(-1)}
+        onClick={(e) => {
+          e.stopPropagation();
+          step(-1);
+        }}
         disabled={activeIndex === 0}
         aria-label="Previous project"
         title="Previous project (Left arrow)"
@@ -223,7 +211,10 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
       <button
         type="button"
         className="work-dock-btn"
-        onClick={() => step(1)}
+        onClick={(e) => {
+          e.stopPropagation();
+          step(1);
+        }}
         disabled={activeIndex === items.length - 1}
         aria-label="Next project"
         title="Next project (Right arrow)"
@@ -243,7 +234,8 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
       <button
         type="button"
         className="work-dock-btn"
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           setIsFocused(false);
           setActiveIndex(0);
         }}
@@ -269,14 +261,14 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
   return (
     <section
-      className="work-gallery-stage"
+      className={`work-gallery-stage${isGrabbing ? " is-grabbing" : ""}`}
       aria-label="Hanging photographs gallery"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
     >
-      {/* Click-to-focus backdrop dimmer */}
+      {/* Click-to-focus dark overlay with backdrop blur */}
       {isFocused && (
         <div
           className="work-focus-dimmer"
@@ -288,44 +280,32 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         />
       )}
 
-      {/* Natural catenary arc curved string spanning viewport width */}
+      {/* String Layer: Z-index 2 (BEHIND photos at Z:5) */}
       <div className="work-string-line" aria-hidden="true">
         <svg
           className="work-string-svg"
           viewBox="0 0 1000 30"
           preserveAspectRatio="none"
         >
+          {/* Subtle thin hanging wire with natural catenary dip */}
           <path
-            d="M 0 10 Q 500 24 1000 10"
-            stroke="rgba(0, 0, 0, 0.08)"
-            strokeWidth="2.5"
-            fill="none"
-          />
-          <path
-            d="M 0 8 Q 500 22 1000 8"
-            stroke="#9e9185"
+            d="M 0 10 Q 500 23 1000 10"
+            stroke="rgba(0, 0, 0, 0.05)"
             strokeWidth="1.5"
-            strokeDasharray="8,2"
             fill="none"
           />
           <path
-            d="M 0 7.5 Q 500 21.5 1000 7.5"
-            stroke="rgba(255, 255, 255, 0.45)"
-            strokeWidth="0.75"
+            d="M 0 9 Q 500 22 1000 9"
+            stroke="rgba(140, 130, 120, 0.45)"
+            strokeWidth="1.2"
+            strokeDasharray="6,2"
             fill="none"
           />
         </svg>
       </div>
 
-      {/* Hanging photographs track */}
-      <div
-        className="work-carousel-track"
-        style={
-          dragOffset !== 0
-            ? ({ "--drag-px": `${dragOffset}px` } as CSSProperties)
-            : undefined
-        }
-      >
+      {/* Hanging photographs track: Z-index 5 (IN FRONT of string) */}
+      <div className="work-carousel-track">
         {items.length ? (
           items.map((item, index) => {
             const offset = index - activeIndex;
@@ -347,21 +327,20 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
                   } as CSSProperties
                 }
                 onClick={(e) => {
+                  e.stopPropagation();
+                  if (hasMoved.current) return;
                   if (offset === -1) {
-                    e.stopPropagation();
                     step(-1);
                   } else if (offset === 1) {
-                    e.stopPropagation();
                     step(1);
                   } else if (offset === 0) {
-                    e.stopPropagation();
                     setIsFocused((prev) => !prev);
                   }
                 }}
                 aria-current={offset === 0 ? "true" : undefined}
                 aria-label={`${item.name} (${index + 1} of ${items.length})`}
               >
-                {/* Single wooden clip perfectly centered at top */}
+                {/* Clothespin Front: Z-index 15 (IN FRONT of photo) */}
                 <WoodenClip style={{ left: "50%", transform: "translateX(-50%)" }} />
 
                 <div className="work-print-image-frame">
@@ -369,7 +348,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
                     src={item.image.src}
                     alt={item.image.alt}
                     fill
-                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 60vw, 580px"
+                    sizes="(max-width: 640px) 92vw, (max-width: 1024px) 62vw, 640px"
                     draggable={false}
                     priority={Math.abs(offset) <= 1}
                   />
@@ -383,7 +362,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         )}
       </div>
 
-      {/* Floating dock controls */}
+      {/* Floating dock controls: Z-index 50 (ABOVE everything) */}
       {mounted &&
         (dockNode ? (
           createPortal(dockControls, dockNode)

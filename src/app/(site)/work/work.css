@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Kalam:wght@400;700&display=swap");
 
 .work-gallery-layout {
   position: fixed;
@@ -14,8 +14,8 @@
   height: 100%;
 }
 
-/* Stage: bounded vertically between top edge (0) and top of bottom nav dock (100dvh - 80px)
-   ensuring the centered photo's distance to top edge equals distance to bottom dock */
+/* Stage: bounded vertically between top edge (0) and top of bottom nav dock (100dvh - 80px),
+   guaranteeing the top gap to viewport edge equals the bottom gap to nav dock */
 .work-gallery-stage {
   --dock-reserved: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + env(safe-area-inset-bottom, 0px));
   position: fixed;
@@ -30,20 +30,22 @@
   perspective: 1200px;
   touch-action: pan-y;
   cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.work-gallery-stage:active {
+.work-gallery-stage.is-grabbing {
   cursor: grabbing;
 }
 
-/* Click-to-Focus dark overlay with backdrop blur */
+/* Click-to-Focus dark overlay with backdrop blur (Z: 30, above string and inactive cards) */
 .work-focus-dimmer {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 30;
   background: rgba(14, 14, 14, 0.58);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
   animation: workDimmerFadeIn 220ms ease forwards;
 }
@@ -53,14 +55,14 @@
   to { opacity: 1; }
 }
 
-/* Horizontal hanging string with natural catenary arc curve */
+/* 1. String Layer: Z-index 2 (BEHIND photos at Z: 5) */
 .work-string-line {
   position: absolute;
-  top: calc(50% - var(--track-height, min(66vh, 480px)) / 2 + 10px);
+  top: calc(50% - var(--track-height, min(65vh, 480px)) / 2 + 10px);
   left: 0;
   width: 100%;
   height: 26px;
-  z-index: 3;
+  z-index: 2;
   pointer-events: none;
 }
 
@@ -70,22 +72,21 @@
   height: 100%;
 }
 
-/* Track holding the hanging photos */
+/* 2. Track & Cards Layer: Z-index 5 (IN FRONT of string) */
 .work-carousel-track {
-  --card-width: clamp(340px, 48vw, 560px);
-  --track-height: min(66vh, calc(100dvh - var(--dock-reserved) - 4rem));
+  --card-width: clamp(360px, 52vw, 620px);
+  --track-height: min(65vh, calc(100dvh - var(--dock-reserved) - 3.5rem));
   position: relative;
   width: 0;
   height: var(--track-height);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  transform: translate3d(var(--drag-px, 0px), 0, 0);
-  transition: transform 60ms linear;
+  z-index: 5;
   pointer-events: none;
 }
 
-/* Photographic print hanging card */
+/* Photographic print hanging card: Z-index 5 / 10 */
 .work-hanging-card {
   position: absolute;
   top: 14px;
@@ -95,8 +96,8 @@
   background: #ffffff;
   border: 1px solid rgba(35, 35, 35, 0.1);
   border-radius: 2px;
-  padding: clamp(0.5rem, 1.1vw, 0.75rem);
-  padding-bottom: clamp(0.45rem, 0.9vw, 0.65rem);
+  padding: clamp(0.5rem, 1vw, 0.75rem);
+  padding-bottom: clamp(0.4rem, 0.8vw, 0.6rem);
   box-shadow:
     0 4px 18px -2px rgba(0, 0, 0, 0.06),
     0 16px 38px -6px rgba(0, 0, 0, 0.1);
@@ -104,15 +105,15 @@
   flex-direction: column;
   transform-origin: center top;
   transition:
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 350ms ease,
-    opacity 400ms ease;
+    transform 480ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms ease,
+    opacity 350ms ease;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Single wooden clip centered at the top */
+/* 3. Clothespin Layer: Z-index 15 (clamps over the front of the photo) */
 .work-wooden-clip {
   position: absolute;
   top: -16px;
@@ -140,12 +141,12 @@
   pointer-events: none;
 }
 
-/* Handwritten title font (Caveat) with reduced margin */
+/* Handwritten marker font ('Patrick Hand' / 'Kalam') with +1px size */
 .work-print-title {
   display: block;
-  font-family: "Caveat", "Kalam", "Bradley Hand", cursive, sans-serif;
-  font-size: clamp(1rem, 1.35vw, 1.15rem);
-  font-weight: 500;
+  font-family: "Patrick Hand", "Kalam", cursive, sans-serif;
+  font-size: clamp(1.15rem, 1.55vw, 1.35rem);
+  font-weight: 400;
   line-height: 1.25;
   color: #232323;
   margin-top: 0.35rem;
@@ -153,8 +154,7 @@
   text-align: left;
 }
 
-/* Desktop/Tablet: Center card (100% scale, 0deg).
-   Side neighbors: clipped to max 10% width on left and right edges with 3D tilted depth effect */
+/* Desktop/Tablet: Center card (100% scale, 0deg) */
 .work-hanging-card[data-position="active"] {
   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
   opacity: 1;
@@ -163,18 +163,19 @@
   cursor: pointer;
 }
 
-/* Click-to-Focus lifted state */
+/* Click-to-Focus lifted state (Z: 40, above the dimmer at Z: 30) */
 .work-hanging-card[data-position="active"][data-focused="true"] {
   transform: translate3d(0, 0, 80px) scale(1.08) rotate(0deg);
-  z-index: 25;
+  z-index: 40;
   box-shadow:
     0 25px 60px -10px rgba(0, 0, 0, 0.38),
     0 35px 80px -15px rgba(0, 0, 0, 0.42);
 }
 
+/* Side neighbors: clipped to show a MAXIMUM of 10% width on left and right edges, with 3D tilted depth */
 .work-hanging-card[data-position="prev"] {
   transform: translate3d(calc(-50vw - 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(18deg) rotateZ(-2.5deg);
-  opacity: 0.8;
+  opacity: 0.82;
   z-index: 5;
   cursor: pointer;
   pointer-events: auto;
@@ -182,7 +183,7 @@
 
 .work-hanging-card[data-position="next"] {
   transform: translate3d(calc(50vw + 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(-18deg) rotateZ(2.5deg);
-  opacity: 0.8;
+  opacity: 0.82;
   z-index: 5;
   cursor: pointer;
   pointer-events: auto;
@@ -211,7 +212,7 @@
 
   .work-carousel-track {
     --card-width: min(88vw, 360px);
-    --track-height: min(62vh, 420px);
+    --track-height: min(60vh, 420px);
   }
 
   .work-hanging-card[data-position="prev"] {
@@ -231,18 +232,22 @@
   }
 }
 
-/* Bottom Nav Dock integration */
+/* Bottom Nav Dock: Z-index 50 (ABOVE EVERYTHING) */
 .site-nav[data-work-gallery="true"] {
+  z-index: 50 !important;
   display: flex;
   align-items: center;
   gap: 8px;
+  pointer-events: auto !important;
 }
 
 #work-gallery-dock {
+  z-index: 50;
   position: relative;
   display: flex;
   align-items: center;
   padding-left: 8px;
+  pointer-events: auto !important;
 }
 
 #work-gallery-dock::before {
@@ -257,9 +262,11 @@
 }
 
 .work-gallery-dock-controls {
+  z-index: 50;
   display: flex;
   align-items: center;
   gap: 4px;
+  pointer-events: auto !important;
 }
 
 .work-dock-btn {
@@ -272,7 +279,8 @@
   border-radius: 999px;
   background: transparent;
   color: var(--dock-muted, #65817b);
-  cursor: pointer;
+  cursor: pointer !important;
+  pointer-events: auto !important;
   transition: color 150ms ease, background-color 150ms ease;
 }
 
@@ -283,7 +291,7 @@
 
 .work-dock-btn:disabled {
   opacity: 0.35;
-  cursor: default;
+  cursor: default !important;
 }
 
 .work-dock-btn svg {
@@ -302,19 +310,20 @@
   white-space: nowrap;
 }
 
-/* Standalone floating dock fallback if portal target is unavailable */
+/* Fallback floating dock if navbar portal is unavailable */
 .work-floating-dock-fallback {
   position: fixed;
   bottom: calc(var(--dock-bottom, 36px) + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
-  z-index: 25;
+  z-index: 50;
   padding: 4px 8px;
   border-radius: 999px;
   background: #ffffff;
   box-shadow:
     0 2px 8px -2px rgba(0, 0, 0, 0.08),
     0 8px 24px -4px rgba(0, 0, 0, 0.12);
+  pointer-events: auto !important;
 }
 
 .work-gallery-empty {
