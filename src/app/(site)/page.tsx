@@ -37,8 +37,9 @@ export default async function HomePage() {
           </section>
 
           <Section id="about" title="About" className="home-panel">
-            <div className="home-prose home-about-desktop"><RichText value={site.about} /></div>
-            <div className="home-prose home-about-mobile"><RichText value={site.aboutMobile} /></div>
+            <div className="home-prose">
+              <RichText value={site.about} />
+            </div>
           </Section>
 
           <Section id="currently" title="Currently" className="home-panel">

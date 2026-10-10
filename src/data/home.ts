@@ -27,11 +27,9 @@ export const homeFallback = {
     paragraph("interests", "I like designing AI products, workflow-heavy digital tools, and websites, especially when there’s a lot to simplify and make easier to use."),
     paragraph("background", "I come from a computer science background, but I’ve always been more drawn to the design side of technology, from interfaces and interactions to how a website or product feels as a whole."),
   ] satisfies RichText,
-  aboutMobile: [
-    paragraph("intro-compact", "Hi! I’m Nabil, you might know me as @saverovkn."),
-    paragraph("interests-compact", "I like designing products with a lot of moving parts, especially AI tools and workflow-heavy interfaces, and making them easier to understand and use."),
-    paragraph("websites-compact", "I also enjoy designing and building websites, from early ideas to polished Framer sites."),
-  ] satisfies RichText,
+  get aboutMobile() {
+    return this.about;
+  },
   currently: [
     paragraph("availability", "I'm open to joining design studios and product teams building interesting digital products."),
   ] satisfies RichText,

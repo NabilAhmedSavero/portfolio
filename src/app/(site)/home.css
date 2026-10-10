@@ -135,6 +135,13 @@
 .home-page .home-prose {
   display: grid;
   gap: var(--home-paragraph-gap);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .home-page .home-prose {
+    font-size: 0.9375rem;
+  }
 }
 
 .home-page .home-prose p { color: #404040; }
@@ -147,8 +154,6 @@
 }
 
 .home-page a:hover { color: var(--home-link-hover); }
-
-.home-page .home-about-mobile { display: none; }
 
 .home-page .home-experiences {
   display: grid;
@@ -229,11 +234,6 @@
   line-height: 16px;
   letter-spacing: -0.02em;
   color: var(--home-muted);
-}
-
-@media (max-width: 1199.98px) {
-  .home-page .home-about-desktop { display: none; }
-  .home-page .home-about-mobile { display: grid; }
 }
 
 /* The early initializer releases the first timeline once critical assets are ready.
