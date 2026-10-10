@@ -35,7 +35,7 @@ export function Navbar() {
         id="work-gallery-dock"
         role="group"
         aria-label="Gallery controls"
-        style={{ display: isWork ? "flex" : "none" }}
+        className="empty:hidden"
       />
     </nav>
   );

@@ -1,564 +1,176 @@
 "use client";
 
 import Image from "next/image";
-import { createPortal } from "react-dom";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
-} from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import type { WorkSlide } from "@/data/projects";
 
-const emptySubscribe = () => () => {};
+export type WorkGalleryItem = {
+  id: string;
+  name: string;
+  subtitle: string;
+  externalUrl?: string;
+  image: {
+    src: string;
+    alt: string;
+    aspectRatio?: number;
+  };
+};
 
-// Scaled down by 50% (8px x 25px) so it only bites the top margin without covering photo
-function WoodenClip({ style }: { style?: CSSProperties }) {
-  return (
-    <div className="work-wooden-clip" style={style} aria-hidden="true">
-      <svg
-        width="8"
-        height="25"
-        viewBox="0 0 16 50"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect x="2" y="3" width="12" height="46" rx="2" fill="rgba(0, 0, 0, 0.12)" />
-        <path
-          d="M3 2 C3 1.5, 6 1.5, 6.5 2 L6.5 48 C6 48.5, 3 48.5, 3 48 Z"
-          fill="#d8b277"
-          stroke="#9b733b"
-          strokeWidth="0.5"
-        />
-        <path
-          d="M9.5 2 C10 1.5, 13 1.5, 13 2 L13 48 C13 48.5, 10 48.5, 9.5 48 Z"
-          fill="#cda467"
-          stroke="#9b733b"
-          strokeWidth="0.5"
-        />
-        <rect x="5.5" y="14" width="5" height="5" rx="1" fill="#7d5929" opacity="0.35" />
-        <rect x="2.5" y="21" width="11" height="7" rx="2" fill="#9e9e9e" stroke="#555555" strokeWidth="0.5" />
-        <line x1="3" y1="24.5" x2="13" y2="24.5" stroke="#e0e0e0" strokeWidth="0.75" />
-        <ellipse cx="8" cy="24.5" rx="2.5" ry="1.5" fill="#444444" />
-      </svg>
-    </div>
-  );
-}
+export function WorkGallery({
+  items,
+}: {
+  items: readonly (WorkSlide | WorkGalleryItem)[];
+}) {
+  const [lightboxItem, setLightboxItem] = useState<
+    WorkSlide | WorkGalleryItem | null
+  >(null);
 
-export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isFocused, setIsFocused] = useState(false);
-  const [isGrabbing, setIsGrabbing] = useState(false);
-  const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
-
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-
-  // Live 1:1 drag physics tracking refs
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const isDragging = useRef(false);
-  const isPointerCaptured = useRef(false);
-  const dragStartX = useRef<number | null>(null);
-  const dragStartY = useRef<number | null>(null);
-  const currentDragX = useRef(0);
-  const pointerHistory = useRef<{ x: number; time: number }[]>([]);
-  const hasMoved = useRef(false);
-  const imgRef = useRef<HTMLImageElement | null>(null);
-
-  // Lock scrollbars strictly while on /work to eliminate flash
+  // Close lightbox on Escape key
   useEffect(() => {
-    const prevHtmlOverflow = document.documentElement.style.overflow;
-    const prevBodyOverflow = document.body.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
+    if (!lightboxItem) return;
 
-    return () => {
-      document.documentElement.style.overflow = prevHtmlOverflow;
-      document.body.style.overflow = prevBodyOverflow;
-    };
-  }, []);
-
-  // Persistent dock discovery for route transitions
-  useEffect(() => {
-    const updateDock = () => {
-      setDockNode(document.getElementById("work-gallery-dock"));
-    };
-
-    updateDock();
-    const raf = requestAnimationFrame(updateDock);
-    const observer = new MutationObserver(updateDock);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      cancelAnimationFrame(raf);
-      observer.disconnect();
-    };
-  }, []);
-
-  const step = useCallback(
-    (delta: number) => {
-      setIsFocused(false);
-      setActiveIndex((prev) =>
-        Math.max(0, Math.min(items.length - 1, prev + delta)),
-      );
-    },
-    [items.length],
-  );
-
-  // Keyboard navigation & Escape to exit focus
-  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (isFocused) {
-          e.preventDefault();
-          setIsFocused(false);
-        }
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        step(-1);
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        step(1);
+        setLightboxItem(null);
       }
     };
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isFocused, step]);
+  }, [lightboxItem]);
 
-  useEffect(() => {
-    if (isGrabbing) {
-      document.body.classList.add("is-gallery-dragging");
-    } else {
-      document.body.classList.remove("is-gallery-dragging");
-    }
-    return () => {
-      document.body.classList.remove("is-gallery-dragging");
-    };
-  }, [isGrabbing]);
-
-  // Native DOM click/tap outside listener for bulletproof mobile backdrop close
-  useEffect(() => {
-    if (!isFocused) return;
-
-    const handlePointerOutside = (e: MouseEvent | TouchEvent) => {
-      if (imgRef.current && !imgRef.current.contains(e.target as Node)) {
-        setIsFocused(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handlePointerOutside);
-    document.addEventListener("touchstart", handlePointerOutside, { passive: true });
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerOutside);
-      document.removeEventListener("touchstart", handlePointerOutside);
-    };
-  }, [isFocused]);
-
-  // 1:1 Live Drag & Swipe gesture handling
-  const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
-    if (isFocused) return;
-    // Don't drag if clicking buttons, dock, or navigation
-    if (
-      (e.target as HTMLElement).closest(
-        ".site-nav, #work-gallery-dock, .work-floating-dock-fallback, button, a",
-      )
-    ) {
-      return;
-    }
-    if (e.button !== 0 && e.pointerType === "mouse") return;
-
-    isDragging.current = true;
-    isPointerCaptured.current = false;
-    dragStartX.current = e.clientX;
-    dragStartY.current = e.clientY;
-    currentDragX.current = 0;
-    hasMoved.current = false;
-    pointerHistory.current = [{ x: e.clientX, time: performance.now() }];
-    setIsGrabbing(true);
-
-    if (trackRef.current) {
-      trackRef.current.style.transition = "none";
+  const handleCardClick = (
+    e: MouseEvent<HTMLElement>,
+    item: WorkSlide | WorkGalleryItem,
+  ) => {
+    if (!item.externalUrl) {
+      e.preventDefault();
+      setLightboxItem(item);
     }
   };
-
-  const onPointerMove = (e: ReactPointerEvent<HTMLElement>) => {
-    if (!isDragging.current || dragStartX.current === null) return;
-
-    const dx = e.clientX - dragStartX.current;
-    const dy = Math.abs(e.clientY - (dragStartY.current ?? e.clientY));
-
-    // Only engage drag mode and pointer capture after genuine movement > 12px
-    if (Math.abs(dx) > 12 || dy > 12) {
-      hasMoved.current = true;
-      if (!isPointerCaptured.current) {
-        try {
-          e.currentTarget.setPointerCapture(e.pointerId);
-          isPointerCaptured.current = true;
-        } catch {
-          // Ignore
-        }
-      }
-    }
-
-    // Rubber-band resistance at gallery boundaries
-    let deltaX = dx;
-    if (
-      (activeIndex === 0 && deltaX > 0) ||
-      (activeIndex === items.length - 1 && deltaX < 0)
-    ) {
-      deltaX *= 0.32;
-    }
-
-    currentDragX.current = deltaX;
-
-    // Direct 1:1 live movement on DOM
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translate3d(${deltaX}px, 0, 0)`;
-    }
-
-    const now = performance.now();
-    pointerHistory.current.push({ x: e.clientX, time: now });
-    if (pointerHistory.current.length > 5) {
-      pointerHistory.current.shift();
-    }
-  };
-
-  const onPointerUp = (e: ReactPointerEvent<HTMLElement>) => {
-    if (!isDragging.current || dragStartX.current === null) return;
-    isDragging.current = false;
-    setIsGrabbing(false);
-
-    if (isPointerCaptured.current) {
-      try {
-        e.currentTarget.releasePointerCapture(e.pointerId);
-      } catch {
-        // Ignore
-      }
-      isPointerCaptured.current = false;
-    }
-
-    const deltaX = currentDragX.current;
-    const now = performance.now();
-    const history = pointerHistory.current;
-
-    let velocity = 0;
-    if (history.length >= 2) {
-      const oldest = history[0];
-      const dt = now - oldest.time;
-      if (dt > 10) {
-        velocity = (e.clientX - oldest.x) / dt;
-      }
-    }
-
-    const startX = dragStartX.current;
-    const startY = dragStartY.current;
-    dragStartX.current = null;
-    dragStartY.current = null;
-    currentDragX.current = 0;
-
-    const dist = Math.hypot(
-      e.clientX - startX,
-      e.clientY - (startY ?? e.clientY),
-    );
-
-    // If movement was small (< 14px), it's a tap/click: DO NOT drag-step!
-    // The native onClick on the card handles navigation vs focus cleanly.
-    if (dist < 14) {
-      return;
-    }
-
-    // Evaluate drag velocity and distance to determine next/prev or snap back
-    let targetDelta = 0;
-    const swipeDistance = 45;
-    const swipeVelocity = 0.28;
-
-    if (deltaX < -swipeDistance || velocity < -swipeVelocity) {
-      if (activeIndex < items.length - 1) {
-        targetDelta = 1;
-      }
-    } else if (deltaX > swipeDistance || velocity > swipeVelocity) {
-      if (activeIndex > 0) {
-        targetDelta = -1;
-      }
-    }
-
-    // Smoothly animate track back to 0
-    if (trackRef.current) {
-      trackRef.current.style.transition =
-        "transform 420ms cubic-bezier(0.22, 1, 0.36, 1)";
-      trackRef.current.style.transform = "translate3d(0, 0, 0)";
-    }
-
-    if (targetDelta !== 0) {
-      setIsFocused(false);
-      setActiveIndex((prev) =>
-        Math.max(0, Math.min(items.length - 1, prev + targetDelta)),
-      );
-    }
-
-    setTimeout(() => {
-      hasMoved.current = false;
-    }, 50);
-  };
-
-  const onPointerCancel = () => {
-    isDragging.current = false;
-    setIsGrabbing(false);
-    if (isPointerCaptured.current) {
-      isPointerCaptured.current = false;
-    }
-    dragStartX.current = null;
-    dragStartY.current = null;
-    currentDragX.current = 0;
-
-    if (trackRef.current) {
-      trackRef.current.style.transition =
-        "transform 350ms cubic-bezier(0.22, 1, 0.36, 1)";
-      trackRef.current.style.transform = "translate3d(0, 0, 0)";
-    }
-
-    setTimeout(() => {
-      hasMoved.current = false;
-    }, 50);
-  };
-
-  const activeItem = items[activeIndex];
-
-  // Strictly only controls: [ < ] [ 1 / 6 ] [ > ] [ Reset ]
-  const dockControls = (
-    <div
-      className="work-gallery-dock-controls"
-      role="group"
-      aria-label="Gallery slide controls"
-      onPointerDown={(e) => e.stopPropagation()}
-      onTouchStart={(e) => e.stopPropagation()}
-    >
-      <button
-        type="button"
-        className={`work-dock-btn text-[#135E4F] ${activeIndex === 0 ? "opacity-30 pointer-events-none cursor-default" : ""}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          step(-1);
-        }}
-        disabled={activeIndex === 0}
-        aria-label="Previous project"
-        title="Previous project (Left arrow)"
-      >
-        <svg
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M12.5 15l-5-5 5-5" />
-        </svg>
-      </button>
-
-      <span className="work-dock-counter font-mono" aria-live="polite">
-        {items.length ? `${activeIndex + 1} / ${items.length}` : "0 / 0"}
-      </span>
-
-      <button
-        type="button"
-        className={`work-dock-btn text-[#135E4F] ${activeIndex === items.length - 1 ? "opacity-30 pointer-events-none cursor-default" : ""}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          step(1);
-        }}
-        disabled={activeIndex === items.length - 1}
-        aria-label="Next project"
-        title="Next project (Right arrow)"
-      >
-        <svg
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M7.5 5l5 5-5 5" />
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        className="work-dock-btn work-dock-btn-reset text-[#135E4F] opacity-100 cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsFocused(false);
-          setActiveIndex(0);
-        }}
-        aria-label="Reset to first project"
-        title="Reset to first project"
-      >
-        <svg
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.25"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M3.5 10a6.5 6.5 0 1 0 1.9-4.6L3.5 7.5" />
-          <path d="M3.5 3.5v4h4" />
-        </svg>
-      </button>
-    </div>
-  );
 
   return (
-    <section
-      className={`work-gallery-stage${isGrabbing ? " is-grabbing" : ""}`}
-      aria-label="Hanging photographs gallery"
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerCancel}
-    >
-      {/* Atomic Hanging Assembly: String and Photo Cards bound together */}
-      <div className="work-hanging-assembly">
-        {/* String Layer: Z-index 2 (BEHIND photos at Z:5), anchored to clip notch */}
-        <div className="work-string-line" aria-hidden="true">
-          <svg
-            className="work-string-svg"
-            viewBox="0 0 1000 16"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M 0 3 Q 500 7 1000 3"
-              stroke="rgba(0, 0, 0, 0.05)"
-              strokeWidth="1.5"
-              fill="none"
-            />
-            <path
-              d="M 0 2.5 Q 500 6.5 1000 2.5"
-              stroke="rgba(140, 130, 120, 0.45)"
-              strokeWidth="1.2"
-              strokeDasharray="6,2"
-              fill="none"
-            />
-          </svg>
-        </div>
-
-        {/* Carousel Track: translates live 1:1 during drag */}
-        <div ref={trackRef} className="work-carousel-track">
-          {items.length ? (
-            items.map((item, index) => {
-              const offset = index - activeIndex;
-              let position = "hidden-right";
-              if (offset === 0) position = "active";
-              else if (offset === -1) position = "prev";
-              else if (offset === 1) position = "next";
-              else if (offset < -1) position = "hidden-left";
-
-              return (
-                <article
-                  key={item.id}
-                  className="work-hanging-card"
-                  data-position={position}
-                  style={
-                    {
-                      "--card-image-ratio": item.image.aspectRatio ?? 1.6,
-                    } as CSSProperties
+    <section aria-label="Work Projects">
+      {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+        {items.map((item, index) => {
+          const Tag = item.externalUrl ? "a" : "div";
+          const linkProps = item.externalUrl
+            ? {
+                href: item.externalUrl,
+                target: "_blank",
+                rel: "noopener noreferrer",
+              }
+            : {
+                role: "button",
+                tabIndex: 0,
+                onKeyDown: (e: React.KeyboardEvent) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setLightboxItem(item);
                   }
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (hasMoved.current) return;
-                    if (index !== activeIndex) {
-                      // CRITICAL RULE: If clicked card is NOT center card, ONLY navigate!
-                      setIsFocused(false);
-                      setActiveIndex(index);
-                    } else {
-                      // CRITICAL RULE: ONLY open focus overlay if clicked card IS center active card!
-                      setIsFocused(true);
-                    }
-                  }}
-                  aria-current={offset === 0 ? "true" : undefined}
-                  aria-label={`${item.name} (${index + 1} of ${items.length})`}
-                >
-                  {/* Scaled-down Wooden Clip: clamps white margin only, no photo overlap */}
-                  <WoodenClip style={{ left: "50%", transform: "translateX(-50%)" }} />
+                },
+              };
 
-                  {/* Clean blank photographic print: image only, no title text */}
-                  <div className="work-print-image-frame">
-                    <Image
-                      src={item.image.src}
-                      alt={item.image.alt}
-                      fill
-                      sizes="(max-width: 640px) 92vw, (max-width: 1024px) 65vw, 680px"
-                      draggable={false}
-                      priority={Math.abs(offset) <= 1}
-                    />
+          return (
+            <article key={item.id} className="group flex flex-col">
+              <Tag
+                {...linkProps}
+                onClick={(e) => handleCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
+                className="group/image block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-xl md:rounded-2xl"
+                aria-label={`View ${item.name}`}
+              >
+                {/* Image Container: Clean rounded corners, hidden overflow */}
+                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl md:rounded-2xl bg-neutral-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-300 group-hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)]">
+                  <Image
+                    src={item.image.src}
+                    alt={item.image.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 580px"
+                    priority={index < 2}
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                  />
+
+                  {/* Desktop Hover State: slight dimming overlay + centered blur badge */}
+                  <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
+                    <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md text-xs sm:text-sm font-medium text-neutral-900 shadow-lg transform transition-all duration-300 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100">
+                      <span>
+                        {item.externalUrl ? "View Project" : "Click to open"}
+                      </span>
+                      <svg
+                        className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M4 12L12 4M12 4H6M12 4V10" />
+                      </svg>
+                    </div>
                   </div>
-                </article>
-              );
-            })
-          ) : (
-            <p className="work-gallery-empty">No work images published yet.</p>
-          )}
-        </div>
+                </div>
+              </Tag>
+
+              {/* Caption: Project title (bold) and short subtitle (muted) directly below */}
+              <div className="mt-4 flex flex-col gap-1">
+                <h2 className="text-base sm:text-lg font-bold text-neutral-900 tracking-tight">
+                  {item.name}
+                </h2>
+                <p className="text-xs sm:text-sm text-neutral-500 font-normal leading-relaxed">
+                  {item.subtitle}
+                </p>
+              </div>
+            </article>
+          );
+        })}
       </div>
 
-      {/* Floating dock controls in Navbar */}
-      {mounted &&
-        (dockNode ? (
-          createPortal(dockControls, dockNode)
-        ) : (
-          <div className="work-floating-dock-fallback">{dockControls}</div>
-        ))}
-
-      {/* Lift-to-Focus Portal: Z-index 9999 on body.
-          STRIPPED OF ALL PHYSICAL AESTHETICS (no white frame, no clip, no string, no shadows).
-          Displays ONLY the raw project image maximized with subtle backdrop blur. */}
-      {mounted &&
-        isFocused &&
-        activeItem &&
-        createPortal(
+      {/* Lightbox Modal for projects without external links */}
+      {lightboxItem && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 md:p-10 cursor-pointer animate-in fade-in duration-200"
+          onClick={() => setLightboxItem(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Full preview of ${lightboxItem.name}`}
+        >
           <div
-            className="work-focus-portal fixed inset-0 w-full h-[100dvh] backdrop-blur-[4px] transition-none"
-            style={{
-              backgroundColor: "rgba(0, 0, 0, 0.75)",
-              backdropFilter: "blur(4px)",
-              WebkitBackdropFilter: "blur(4px)",
-              pointerEvents: "auto",
-              touchAction: "auto",
-              animation: "none",
-              transition: "none",
-            }}
-            onClick={() => setIsFocused(false)}
-            onTouchEnd={() => setIsFocused(false)}
-            onPointerDown={() => setIsFocused(false)}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Focused view of ${activeItem.name}`}
+            className="relative max-w-5xl w-full max-h-[90vh] overflow-hidden rounded-xl md:rounded-2xl bg-neutral-900 shadow-2xl cursor-default"
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              ref={imgRef}
-              src={activeItem.image.src}
-              alt={activeItem.image.alt}
-              className="work-focus-raw-img transition-none"
-              style={{
-                animation: "none",
-                transition: "none",
-                transform: "none",
-              }}
-              onClick={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
-            />
-          </div>,
-          document.body,
-        )}
+            <div className="relative aspect-[16/10] w-full max-h-[80vh]">
+              <Image
+                src={lightboxItem.image.src}
+                alt={lightboxItem.image.alt}
+                fill
+                sizes="(max-width: 1200px) 95vw, 1200px"
+                className="object-contain"
+              />
+            </div>
+            <div className="p-4 sm:p-5 bg-neutral-950/90 flex items-center justify-between border-t border-white/10">
+              <div>
+                <h3 className="text-sm sm:text-base font-semibold text-white">
+                  {lightboxItem.name}
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-400">
+                  {lightboxItem.subtitle}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLightboxItem(null)}
+                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs text-white font-medium transition-colors"
+                aria-label="Close preview"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
