@@ -52,7 +52,7 @@ export function WorkGallery({
   return (
     <section aria-label="Work Projects">
       {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-x-12 gap-y-12 md:gap-y-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-12 md:gap-y-16">
         {items.map((item, index) => {
           const Tag = item.externalUrl ? "a" : "div";
           const linkProps = item.externalUrl
@@ -108,8 +108,8 @@ export function WorkGallery({
                 </div>
               </Tag>
 
-              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with exactly 16px mt and 4px gap */}
-              <div className="mt-4 flex flex-col gap-1">
+              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with mt-6 (24px) synced to gap-x-6 */}
+              <div className="mt-6 flex flex-col gap-1">
                 <h2
                   className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
                   style={{ fontSize: "15px", fontWeight: 500 }}
