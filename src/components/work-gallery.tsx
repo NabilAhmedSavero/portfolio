@@ -108,8 +108,8 @@ export function WorkGallery({
                 </div>
               </Tag>
 
-              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with mt-6 (24px) synced to gap-x-6 */}
-              <div className="mt-6 flex flex-col gap-1">
+              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with 2px gap */}
+              <div className="mt-6 flex flex-col gap-[2px]">
                 <h2
                   className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
                   style={{ fontSize: "15px", fontWeight: 500 }}
