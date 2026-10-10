@@ -307,7 +307,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     >
       <button
         type="button"
-        className="work-dock-btn"
+        className={`work-dock-btn text-[#135E4F] ${activeIndex === 0 ? "opacity-10 pointer-events-none cursor-default" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
           step(-1);
@@ -335,7 +335,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
       <button
         type="button"
-        className="work-dock-btn"
+        className={`work-dock-btn text-[#135E4F] ${activeIndex === items.length - 1 ? "opacity-10 pointer-events-none cursor-default" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
           step(1);
@@ -359,7 +359,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
       <button
         type="button"
-        className="work-dock-btn"
+        className={`work-dock-btn work-dock-btn-reset text-[#135E4F] opacity-10 ${activeIndex === 0 ? "pointer-events-none cursor-default" : "hover:opacity-100"}`}
         onClick={(e) => {
           e.stopPropagation();
           setIsFocused(false);
@@ -488,34 +488,36 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
       {/* Lift-to-Focus Portal: Z-index 9999 on body.
           STRIPPED OF ALL PHYSICAL AESTHETICS (no white frame, no clip, no string, no shadows).
-          Displays ONLY the raw project image maximized with 5vh margins top & bottom. */}
+          Displays ONLY the raw project image maximized with subtle backdrop blur. */}
       {mounted &&
         isFocused &&
         activeItem &&
         createPortal(
           <div
-            className="work-focus-portal fixed inset-0 w-full h-[100dvh]"
+            className="work-focus-portal fixed inset-0 w-full h-[100dvh] backdrop-blur-[4px]"
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.75)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+            }}
             onClick={() => setIsFocused(false)}
+            onTouchEnd={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsFocused(false);
+              }
+            }}
             role="dialog"
             aria-modal="true"
             aria-label={`Focused view of ${activeItem.name}`}
           >
-            <div
-              className="work-focus-image-wrapper"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  setIsFocused(false);
-                }
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={activeItem.image.src}
-                alt={activeItem.image.alt}
-                className="work-focus-raw-img"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={activeItem.image.src}
+              alt={activeItem.image.alt}
+              className="work-focus-raw-img"
+              onClick={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+            />
           </div>,
           document.body,
         )}

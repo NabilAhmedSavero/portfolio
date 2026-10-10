@@ -327,8 +327,8 @@ body:has(.work-gallery-layout) {
   height: 100dvh;
   z-index: 9999 !important;
   background-color: rgba(0, 0, 0, 0.75) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  backdrop-filter: blur(4px) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -444,22 +444,45 @@ body:has(.work-gallery-layout) {
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: #111827; /* Darker/bolder active arrow (text-gray-900) */
+  color: #135E4F; /* Active / Clickable (#135E4F) */
   cursor: var(--work-cursor-pointer) !important;
   pointer-events: auto !important;
   transition: color 150ms ease, background-color 150ms ease, opacity 150ms ease;
 }
 
 .work-dock-btn:hover:not(:disabled) {
-  color: #000000;
-  background: #f3f4f6;
+  color: #135E4F;
+  background: rgba(19, 94, 79, 0.08);
 }
 
 .work-dock-btn:disabled {
-  color: #d1d5db !important; /* Significantly lighter/faded (text-gray-300) */
-  opacity: 0.3 !important;
+  color: #135E4F !important;
+  opacity: 0.1 !important; /* Exactly 10% opacity */
   cursor: default !important;
   pointer-events: none !important; /* Disables click/hover interactions */
+}
+
+/* Reset icon: #135E4F with 10% opacity */
+.work-dock-btn-reset {
+  color: #135E4F !important;
+  opacity: 0.1 !important;
+  transition: opacity 150ms ease, background-color 150ms ease;
+}
+
+.work-dock-btn-reset:not(:disabled) {
+  cursor: var(--work-cursor-pointer) !important;
+}
+
+.work-dock-btn-reset:not(:disabled):hover {
+  opacity: 1 !important;
+  background: rgba(19, 94, 79, 0.08);
+}
+
+.work-dock-btn-reset:disabled {
+  color: #135E4F !important;
+  opacity: 0.1 !important;
+  cursor: default !important;
+  pointer-events: none !important;
 }
 
 .work-dock-btn svg {
