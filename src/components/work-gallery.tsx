@@ -91,35 +91,39 @@ export function WorkGallery({
                     className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   />
 
-                  {/* Desktop Hover State: slight dimming overlay + centered blur badge */}
-                  <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                    <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md text-xs sm:text-sm font-medium text-neutral-900 shadow-lg transform transition-all duration-300 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100">
+                  {/* Desktop Hover State: dimmed overlay + pure white floating text (Skale style) */}
+                  <div className="absolute inset-0 bg-black/35 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
+                    <div className="flex items-center gap-2 text-white text-xl sm:text-2xl md:text-[24px] font-medium tracking-tight transform transition-transform duration-300 scale-95 group-hover:scale-100">
                       <span>
-                        {item.externalUrl ? "View Project" : "Click to open"}
+                        {item.externalUrl ? "Case study" : "Click to open"}
                       </span>
-                      <svg
-                        className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                      <span
+                        className="inline-block transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 select-none font-normal"
                         aria-hidden="true"
                       >
-                        <path d="M4 12L12 4M12 4H6M12 4V10" />
-                      </svg>
+                        ↗
+                      </span>
                     </div>
                   </div>
                 </div>
               </Tag>
 
-              {/* Caption: Project title (bold) and short subtitle (muted) directly below */}
-              <div className="mt-4 flex flex-col gap-1">
-                <h2 className="text-base sm:text-lg font-bold text-neutral-900 tracking-tight">
+              {/* Caption: Title (15px Medium) + Subtitle (14px Regular hsl(0,0%,25%)) with 4px gap */}
+              <div className="mt-[18px] flex flex-col gap-[4px]">
+                <h2
+                  className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
+                  style={{ fontSize: "15px", fontWeight: 500 }}
+                >
                   {item.name}
                 </h2>
-                <p className="text-xs sm:text-sm text-neutral-500 font-normal leading-relaxed">
+                <p
+                  className="text-[14px] font-[400] leading-normal"
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    color: "hsl(0, 0%, 25%)",
+                  }}
+                >
                   {item.subtitle}
                 </p>
               </div>
