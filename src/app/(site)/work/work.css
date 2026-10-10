@@ -1,5 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Kalam:wght@400;700&display=swap");
+/* ==========================================================================
+   Works Page — Horizontal Photographic Gallery
+   ========================================================================== */
 
+:root {
+  /* Sleek, minimal custom hand cursors */
+  --work-cursor-grab: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M9 13V6a2 2 0 0 1 4 0v7m0-4.5a2 2 0 0 1 4 0v4.5m0-3a2 2 0 0 1 4 0v3.5m0-2a2 2 0 0 1 4 0V17c0 5-3.5 8-8 8s-8-3-8-8v-4a2 2 0 0 1 4 0v2.5' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 14 14, grab;
+
+  --work-cursor-grabbing: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M8 12a2 2 0 0 1 3 0v.5h1a2 2 0 0 1 3 0v.5h1a2 2 0 0 1 3 0v.5a2 2 0 0 1 3 0V17c0 5-3.5 8-8 8s-8-3-8-8v-4.5z' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 14 14, grabbing;
+
+  --work-cursor-pointer: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'><path d='M9 4a2 2 0 0 1 4 0v9.5h1a2 2 0 0 1 3 0v.5h1a2 2 0 0 1 3 0v.5a2 2 0 0 1 3 0V18c0 5-3.5 8-8 8s-8-3-8-8v-6a2 2 0 0 1 4 0v3.5h1V4z' fill='%2318181b' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 11 3, pointer;
+}
+
+/* Strict layout lock: eliminate scrollbar flashing and layout shift during route transitions */
 .work-gallery-layout {
   position: fixed;
   inset: 0;
@@ -7,17 +19,37 @@
   height: 100dvh;
   overflow: hidden;
   background: var(--background, #fafafa);
+  z-index: 1;
 }
 
 .work-gallery-page {
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
 }
 
-/* Stage: bounded vertically between top edge (0) and top of bottom nav dock (100dvh - 80px),
-   guaranteeing the top gap to viewport edge equals the bottom gap to nav dock */
+html:has(.work-gallery-layout),
+body:has(.work-gallery-layout) {
+  overflow: hidden !important;
+  height: 100dvh !important;
+}
+
+.page-transition:has(.work-gallery-layout) {
+  padding-bottom: 0 !important;
+  overflow: hidden !important;
+  height: 100dvh !important;
+}
+
+/* Stage: bounded vertically between top edge and nav dock */
 .work-gallery-stage {
   --dock-reserved: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + env(safe-area-inset-bottom, 0px));
+  --card-width: clamp(360px, 50vw, 600px);
+  --card-pad: clamp(8px, 1.2vw, 12px);
+  --card-image-ratio: 1.6;
+  --card-height: calc((var(--card-width) - (2 * var(--card-pad))) / var(--card-image-ratio) + (2 * var(--card-pad)));
+
   position: fixed;
   top: 0;
   left: 0;
@@ -28,17 +60,18 @@
   justify-content: center;
   overflow: hidden;
   perspective: 1200px;
-  touch-action: pan-y;
-  cursor: grab;
+  touch-action: none;
+  cursor: var(--work-cursor-grab);
   user-select: none;
   -webkit-user-select: none;
 }
 
-.work-gallery-stage.is-grabbing {
-  cursor: grabbing;
+.work-gallery-stage.is-grabbing,
+.work-gallery-stage.is-grabbing * {
+  cursor: var(--work-cursor-grabbing) !important;
 }
 
-/* Click-to-Focus dark overlay with backdrop blur (Z: 30, above string and inactive cards) */
+/* Click-to-Focus dark overlay with backdrop blur */
 .work-focus-dimmer {
   position: fixed;
   inset: 0;
@@ -46,7 +79,7 @@
   background: rgba(14, 14, 14, 0.58);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  cursor: pointer;
+  cursor: var(--work-cursor-pointer);
   animation: workDimmerFadeIn 220ms ease forwards;
 }
 
@@ -55,13 +88,25 @@
   to { opacity: 1; }
 }
 
-/* 1. String Layer: Z-index 2 (BEHIND photos at Z: 5) */
+/* ==========================================================================
+   Hanging Assembly: String and Photo Cards bound together
+   ========================================================================== */
+.work-hanging-assembly {
+  position: relative;
+  width: 100vw;
+  height: var(--card-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 1. String Layer: Z-index 2 (BEHIND photos at Z:5), anchored to top of card */
 .work-string-line {
   position: absolute;
-  top: calc(50% - var(--track-height, min(65vh, 480px)) / 2 + 10px);
+  top: -16px;
   left: 0;
-  width: 100%;
-  height: 26px;
+  width: 100vw;
+  height: 24px;
   z-index: 2;
   pointer-events: none;
 }
@@ -72,32 +117,30 @@
   height: 100%;
 }
 
-/* 2. Track & Cards Layer: Z-index 5 (IN FRONT of string) */
+/* 2. Track Layer: Z-index 5 (IN FRONT of string), translates live 1:1 during drag */
 .work-carousel-track {
-  --card-width: clamp(360px, 52vw, 620px);
-  --track-height: min(65vh, calc(100dvh - var(--dock-reserved) - 3.5rem));
   position: relative;
   width: 0;
-  height: var(--track-height);
+  height: var(--card-height);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   z-index: 5;
   pointer-events: none;
+  will-change: transform;
 }
 
-/* Photographic print hanging card: Z-index 5 / 10 */
+/* Clean blank photographic print card */
 .work-hanging-card {
   position: absolute;
-  top: 14px;
+  top: 0;
   left: calc(-1 * var(--card-width) / 2);
   width: var(--card-width);
-  max-height: var(--track-height);
+  height: var(--card-height);
   background: #ffffff;
   border: 1px solid rgba(35, 35, 35, 0.1);
   border-radius: 2px;
-  padding: clamp(0.5rem, 1vw, 0.75rem);
-  padding-bottom: clamp(0.4rem, 0.8vw, 0.6rem);
+  padding: var(--card-pad);
   box-shadow:
     0 4px 18px -2px rgba(0, 0, 0, 0.06),
     0 16px 38px -6px rgba(0, 0, 0, 0.1);
@@ -113,7 +156,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 3. Clothespin Layer: Z-index 15 (clamps over the front of the photo) */
+/* 3. Wooden Clothespin: Z-index 15 (clamps over the front of the photo) */
 .work-wooden-clip {
   position: absolute;
   top: -16px;
@@ -130,6 +173,7 @@
   position: relative;
   display: block;
   width: 100%;
+  height: 100%;
   aspect-ratio: var(--card-image-ratio, 1.6);
   background: #f5f5f5;
   box-shadow: 0 0 0 1px rgba(35, 35, 35, 0.06);
@@ -141,29 +185,16 @@
   pointer-events: none;
 }
 
-/* Handwritten marker font ('Patrick Hand' / 'Kalam') with +1px size */
-.work-print-title {
-  display: block;
-  font-family: "Patrick Hand", "Kalam", cursive, sans-serif;
-  font-size: clamp(1.15rem, 1.55vw, 1.35rem);
-  font-weight: 400;
-  line-height: 1.25;
-  color: #232323;
-  margin-top: 0.35rem;
-  padding-inline: 0.15rem;
-  text-align: left;
-}
-
 /* Desktop/Tablet: Center card (100% scale, 0deg) */
 .work-hanging-card[data-position="active"] {
   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
   opacity: 1;
   z-index: 10;
   pointer-events: auto;
-  cursor: pointer;
+  cursor: var(--work-cursor-pointer);
 }
 
-/* Click-to-Focus lifted state (Z: 40, above the dimmer at Z: 30) */
+/* Click-to-Focus lifted state */
 .work-hanging-card[data-position="active"][data-focused="true"] {
   transform: translate3d(0, 0, 80px) scale(1.08) rotate(0deg);
   z-index: 40;
@@ -172,12 +203,12 @@
     0 35px 80px -15px rgba(0, 0, 0, 0.42);
 }
 
-/* Side neighbors: clipped to show a MAXIMUM of 10% width on left and right edges, with 3D tilted depth */
+/* Side neighbors: clipped to max 10% visible edge slice with 3D tilted depth */
 .work-hanging-card[data-position="prev"] {
   transform: translate3d(calc(-50vw - 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(18deg) rotateZ(-2.5deg);
   opacity: 0.82;
   z-index: 5;
-  cursor: pointer;
+  cursor: var(--work-cursor-pointer);
   pointer-events: auto;
 }
 
@@ -185,7 +216,7 @@
   transform: translate3d(calc(50vw + 0.4 * var(--card-width) * 0.82), 0, -60px) scale(0.82) rotateY(-18deg) rotateZ(2.5deg);
   opacity: 0.82;
   z-index: 5;
-  cursor: pointer;
+  cursor: var(--work-cursor-pointer);
   pointer-events: auto;
 }
 
@@ -203,36 +234,54 @@
   pointer-events: none;
 }
 
-/* Mobile: Single active photo dead-center vertically. Zero cropped side neighbors. */
+/* ==========================================================================
+   Mobile Layout (< 640px):
+   - Card width maximized to 88vw
+   - Card, clip, and string dead-center vertically in viewport
+   - Neighbors hidden offscreen at rest, sliding in live during drag
+   ========================================================================== */
 @media (max-width: 640px) {
   .work-gallery-stage {
-    height: calc(100dvh - var(--dock-reserved));
+    height: 100dvh;
     align-items: center;
+    --card-width: 88vw;
+    --card-pad: 8px;
+    --card-height: calc((var(--card-width) - 16px) / var(--card-image-ratio) + 16px);
+  }
+
+  .work-hanging-assembly {
+    height: var(--card-height);
   }
 
   .work-carousel-track {
-    --card-width: min(88vw, 360px);
-    --track-height: min(60vh, 420px);
+    height: var(--card-height);
   }
 
+  .work-hanging-card {
+    height: var(--card-height);
+  }
+
+  /* Offscreen at rest (zero cropped edges), but visible during live drag */
   .work-hanging-card[data-position="prev"] {
-    transform: translate3d(-140vw, 0, 0) scale(0.8) rotate(0deg) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    transform: translate3d(-104vw, 0, 0) scale(0.88) rotate(0deg);
+    opacity: 0.95;
+    pointer-events: none;
   }
 
   .work-hanging-card[data-position="next"] {
-    transform: translate3d(140vw, 0, 0) scale(0.8) rotate(0deg) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    transform: translate3d(104vw, 0, 0) scale(0.88) rotate(0deg);
+    opacity: 0.95;
+    pointer-events: none;
   }
 
   .work-hanging-card[data-position="active"][data-focused="true"] {
-    transform: translate3d(0, 0, 40px) scale(1.05) rotate(0deg);
+    transform: translate3d(0, 0, 40px) scale(1.04) rotate(0deg);
   }
 }
 
-/* Bottom Nav Dock: Z-index 50 (ABOVE EVERYTHING) */
+/* ==========================================================================
+   Bottom Nav Dock: Minimal site typography (< Plied 1/6 > [reset])
+   ========================================================================== */
 .site-nav[data-work-gallery="true"] {
   z-index: 50 !important;
   display: flex;
@@ -272,14 +321,14 @@
 .work-dock-btn {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: 0;
   border-radius: 999px;
   background: transparent;
   color: var(--dock-muted, #65817b);
-  cursor: pointer !important;
+  cursor: var(--work-cursor-pointer) !important;
   pointer-events: auto !important;
   transition: color 150ms ease, background-color 150ms ease;
 }
@@ -295,18 +344,37 @@
 }
 
 .work-dock-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
+}
+
+/* Dock Project Title & Counter: Site default minimal typography */
+.work-dock-info {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding-inline: 4px;
+}
+
+.work-dock-title {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--foreground, #1a1a1a);
+  max-width: clamp(75px, 18vw, 150px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .work-dock-counter {
-  min-width: 44px;
-  font-size: 13px;
+  font-family: inherit;
+  font-size: 12.5px;
   font-weight: 500;
   line-height: 20px;
   color: var(--dock-muted, #65817b);
   font-variant-numeric: tabular-nums;
-  text-align: center;
   white-space: nowrap;
 }
 
