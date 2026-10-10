@@ -108,7 +108,7 @@ export function WorkGallery({
                 </div>
               </Tag>
 
-              {/* Caption: Title / Subtitle horizontal alignment format */}
+              {/* Caption: Title / Subtitle unified 15px font size */}
               <div className="mt-6 flex items-baseline flex-wrap gap-x-1.5 gap-y-0.5">
                 <h2
                   className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
@@ -119,17 +119,18 @@ export function WorkGallery({
                 {item.subtitle && (
                   <>
                     <span
-                      className="text-neutral-400 select-none text-[14px] font-normal"
+                      className="select-none text-[15px] font-normal"
+                      style={{ fontSize: "15px", fontWeight: 400, color: "#737373" }}
                       aria-hidden="true"
                     >
                       /
                     </span>
                     <p
-                      className="text-[14px] font-[400] leading-normal"
+                      className="text-[15px] font-[400] leading-normal"
                       style={{
-                        fontSize: "14px",
+                        fontSize: "15px",
                         fontWeight: 400,
-                        color: "hsl(0, 0%, 25%)",
+                        color: "#737373",
                       }}
                     >
                       {item.subtitle}
