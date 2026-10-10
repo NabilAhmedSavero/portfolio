@@ -247,17 +247,17 @@ export function WorkGallery({
                 className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
                 aria-label={`View ${item.name}`}
               >
-                {/* Image Container: Clean 8px rounded corners, edge-to-edge, zero padding */}
-                <div className="aspect-[16/10] w-full relative overflow-hidden rounded-[8px] p-0 bg-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-300 group-hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)]">
+                {/* Image Container: Clean 8px rounded corners, edge-to-edge, natural height */}
+                <div className="w-full relative overflow-hidden rounded-[8px] p-0 bg-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-300 group-hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)]">
                   <Image
                     src={item.image.src}
                     alt={item.image.alt}
-                    fill
+                    width={1600}
+                    height={Math.round(1600 / (item.image.aspectRatio || 1.6))}
                     unoptimized
                     quality={100}
-                    sizes="(max-width: 768px) 100vw, 50vw"
                     priority={index < 2}
-                    className="w-full h-full absolute inset-0 object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    className="w-full h-auto block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   />
 
                   {/* Desktop Hover State: dimmed overlay + pure white floating text (Skale style) */}
