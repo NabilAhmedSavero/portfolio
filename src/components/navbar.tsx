@@ -18,13 +18,6 @@ export function Navbar() {
       className="site-nav"
       data-work-gallery={isWork ? "true" : undefined}
     >
-      {/* Floating project title positioned directly ABOVE the nav pill */}
-      <div
-        id="work-gallery-title"
-        role="status"
-        aria-live="polite"
-        style={{ display: isWork ? "block" : "none" }}
-      />
       <ul className="nav-links">
         {links.map(({ href, label, segment }) => (
           <li key={href}>

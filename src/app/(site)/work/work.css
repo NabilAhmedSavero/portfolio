@@ -67,7 +67,7 @@ body:has(.work-gallery-layout) {
 .work-gallery-stage {
   --dock-reserved: calc(var(--dock-bottom, 36px) + var(--dock-height, 44px) + env(safe-area-inset-bottom, 0px));
   --card-width: clamp(360px, 50vw, 600px);
-  --card-pad: clamp(8px, 1.2vw, 12px);
+  --card-pad: clamp(10px, 1.4vw, 14px);
   --card-image-ratio: 1.6;
   --card-height: calc((var(--card-width) - (2 * var(--card-pad))) / var(--card-image-ratio) + (2 * var(--card-pad)));
 
@@ -109,13 +109,13 @@ body:has(.work-gallery-layout) {
   overflow: visible;
 }
 
-/* 1. String Layer: Z-index 2 (BEHIND photos at Z:5), anchored to top of card */
+/* 1. String Layer: Z-index 2 (BEHIND photos at Z:5), aligned to miniature clip notch */
 .work-string-line {
   position: absolute;
-  top: -16px;
+  top: -18px;
   left: 0;
   width: 100vw;
-  height: 24px;
+  height: 16px;
   z-index: 2;
   pointer-events: none;
 }
@@ -165,14 +165,15 @@ body:has(.work-gallery-layout) {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 3. Wooden Clothespin: Z-index 15 (clamps over the front of the photo) */
+/* 3. Scaled-down Wooden Clothespin (50% scale: 8px x 25px)
+   Positioned so it only clamps the top white margin and NEVER overlaps the inner photo */
 .work-wooden-clip {
   position: absolute;
-  top: -16px;
+  top: -18px;
   left: 50%;
   transform: translateX(-50%);
-  width: 16px;
-  height: 50px;
+  width: 8px;
+  height: 25px;
   z-index: 15;
   pointer-events: none;
 }
@@ -253,8 +254,8 @@ body:has(.work-gallery-layout) {
     overflow: hidden !important;
     overflow-x: hidden !important;
     --card-width: 90vw;
-    --card-pad: 8px;
-    --card-height: calc((90vw - 16px) / var(--card-image-ratio) + 16px);
+    --card-pad: 10px;
+    --card-height: calc((90vw - 20px) / var(--card-image-ratio) + 20px);
   }
 
   .work-hanging-assembly {
@@ -282,6 +283,7 @@ body:has(.work-gallery-layout) {
     left: calc(-1 * var(--card-width) / 2);
     width: var(--card-width);
     height: var(--card-height);
+    padding: var(--card-pad);
   }
 
   /* Offscreen at rest (zero cropped edges on mobile), visible during drag */
@@ -299,22 +301,26 @@ body:has(.work-gallery-layout) {
 }
 
 /* ==========================================================================
-   Lift-to-Focus Portal Modal: Z-index 100 on Body (Above everything, blurs dock)
+   Overhauled "Lift-to-Focus" State:
+   - Z-index: 9999 (hides nav dock completely)
+   - Stripped away ALL physical aesthetics (NO white frame, NO clip, NO string, NO shadow)
+   - Displays ONLY the raw project image over blurred dark background
+   - Maximize image: exactly 5vh margin on top and bottom (height: 90vh, max-width: 90vw)
    ========================================================================== */
 .work-focus-portal {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100dvh;
-  z-index: 100;
-  background: rgba(14, 14, 14, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999 !important;
+  background: rgba(10, 10, 10, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: var(--work-cursor-pointer);
-  animation: workFocusPortalFade 220ms ease forwards;
+  animation: workFocusPortalFade 200ms ease forwards;
 }
 
 @keyframes workFocusPortalFade {
@@ -326,26 +332,37 @@ body:has(.work-gallery-layout) {
   }
 }
 
-.work-focus-card-wrapper {
-  position: relative;
-  width: min(88vw, 740px);
-  background: #ffffff;
-  border: 1px solid rgba(35, 35, 35, 0.1);
-  border-radius: 2px;
-  padding: clamp(10px, 1.5vw, 14px);
-  box-shadow:
-    0 25px 60px -10px rgba(0, 0, 0, 0.45),
-    0 35px 80px -15px rgba(0, 0, 0, 0.5);
+.work-focus-image-wrapper {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   cursor: default;
-  animation: workFocusCardZoom 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
 }
 
-@keyframes workFocusCardZoom {
+.work-focus-raw-img {
+  display: block;
+  height: 90vh !important;
+  max-height: 90vh !important;
+  width: auto !important;
+  max-width: 90vw !important;
+  object-fit: contain !important;
+  border-radius: 3px;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+  animation: workFocusImgPop 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes workFocusImgPop {
   from {
-    transform: scale(0.92);
-    opacity: 0.8;
+    transform: scale(0.93);
+    opacity: 0;
   }
   to {
     transform: scale(1);
@@ -353,37 +370,9 @@ body:has(.work-gallery-layout) {
   }
 }
 
-.work-focus-card-wrapper .work-wooden-clip {
-  position: absolute;
-  top: -16px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 50px;
-  z-index: 15;
-  pointer-events: none;
-}
-
-.work-focus-card-wrapper .work-print-image-frame {
-  position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: var(--card-image-ratio, 1.6);
-  background: #f5f5f5;
-  box-shadow: 0 0 0 1px rgba(35, 35, 35, 0.06);
-  overflow: hidden;
-}
-
-@media (max-width: 640px) {
-  .work-focus-card-wrapper {
-    width: 90vw;
-    padding: 8px;
-  }
-}
-
 /* ==========================================================================
    Bottom Nav Dock: Strict Pill Layout [Home | Works] [ < ] [ 1 / 6 ] [ > ] [ Reset ]
-   Floating project title sits directly ABOVE the nav pill
+   ZERO project title rendering anywhere in dock
    ========================================================================== */
 .site-nav[data-work-gallery="true"] {
   position: fixed;
@@ -392,38 +381,6 @@ body:has(.work-gallery-layout) {
   align-items: center;
   gap: 8px;
   pointer-events: auto !important;
-}
-
-/* Floating project title positioned directly ABOVE the nav pill */
-#work-gallery-title,
-.work-dock-floating-title {
-  position: absolute;
-  bottom: 100%;
-  margin-bottom: 0.75rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--foreground, #1a1a1a);
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-select: none;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
-  animation: workTitleFadeIn 180ms ease;
-}
-
-@keyframes workTitleFadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 3px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
 }
 
 #work-gallery-dock {

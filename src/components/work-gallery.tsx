@@ -15,12 +15,13 @@ import type { WorkSlide } from "@/data/projects";
 
 const emptySubscribe = () => () => {};
 
+// Scaled down by 50% (8px x 25px) so it only bites the top margin without covering photo
 function WoodenClip({ style }: { style?: CSSProperties }) {
   return (
     <div className="work-wooden-clip" style={style} aria-hidden="true">
       <svg
-        width="16"
-        height="50"
+        width="8"
+        height="25"
         viewBox="0 0 16 50"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +53,6 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   const [isFocused, setIsFocused] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
   const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
-  const [titleNode, setTitleNode] = useState<HTMLElement | null>(null);
 
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
@@ -65,7 +65,6 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
   const currentDragX = useRef(0);
   const pointerHistory = useRef<{ x: number; time: number }[]>([]);
   const hasMoved = useRef(false);
-  const lastStepTime = useRef(0);
 
   // Lock scrollbars strictly while on /work to eliminate flash
   useEffect(() => {
@@ -80,16 +79,15 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     };
   }, []);
 
-  // Persistent dock & floating title discovery for route transitions
+  // Persistent dock discovery for route transitions
   useEffect(() => {
-    const updateNodes = () => {
+    const updateDock = () => {
       setDockNode(document.getElementById("work-gallery-dock"));
-      setTitleNode(document.getElementById("work-gallery-title"));
     };
 
-    updateNodes();
-    const raf = requestAnimationFrame(updateNodes);
-    const observer = new MutationObserver(updateNodes);
+    updateDock();
+    const raf = requestAnimationFrame(updateDock);
+    const observer = new MutationObserver(updateDock);
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
@@ -108,16 +106,6 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     [items.length],
   );
 
-  const safeStep = useCallback(
-    (delta: number) => {
-      const now = Date.now();
-      if (now - lastStepTime.current < 200) return;
-      lastStepTime.current = now;
-      step(delta);
-    },
-    [step],
-  );
-
   // Keyboard navigation & Escape to exit focus
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -128,15 +116,15 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         }
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        safeStep(-1);
+        step(-1);
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        safeStep(1);
+        step(1);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isFocused, safeStep]);
+  }, [isFocused, step]);
 
   // 1:1 Live Drag & Swipe gesture handling
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
@@ -144,7 +132,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     // Don't drag if clicking buttons, dock, or navigation
     if (
       (e.target as HTMLElement).closest(
-        ".site-nav, #work-gallery-dock, #work-gallery-title, .work-floating-dock-fallback, button, a",
+        ".site-nav, #work-gallery-dock, .work-floating-dock-fallback, button, a",
       )
     ) {
       return;
@@ -171,8 +159,8 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     const dx = e.clientX - dragStartX.current;
     const dy = Math.abs(e.clientY - (dragStartY.current ?? e.clientY));
 
-    // Only engage drag mode and pointer capture after genuine movement > 10px
-    if (Math.abs(dx) > 10 || dy > 10) {
+    // Only engage drag mode and pointer capture after genuine movement > 12px
+    if (Math.abs(dx) > 12 || dy > 12) {
       hasMoved.current = true;
       if (!isPointerCaptured.current) {
         try {
@@ -195,7 +183,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
     currentDragX.current = deltaX;
 
-    // Direct 1:1 live movement on DOM for instant response without frame lag
+    // Direct 1:1 live movement on DOM
     if (trackRef.current) {
       trackRef.current.style.transform = `translate3d(${deltaX}px, 0, 0)`;
     }
@@ -240,32 +228,18 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
     dragStartY.current = null;
     currentDragX.current = 0;
 
-    // Displacement check: if under 12px, handle as TAP / CLICK
     const dist = Math.hypot(
       e.clientX - startX,
       e.clientY - (startY ?? e.clientY),
     );
 
-    if (dist < 12) {
-      const cardEl = (e.target as HTMLElement).closest(".work-hanging-card");
-      if (cardEl) {
-        const pos = cardEl.getAttribute("data-position");
-        if (pos === "prev") {
-          safeStep(-1);
-          return;
-        }
-        if (pos === "next") {
-          safeStep(1);
-          return;
-        }
-        if (pos === "active") {
-          setIsFocused(true);
-          return;
-        }
-      }
+    // If movement was small (< 14px), it's a tap/click: DO NOT drag-step!
+    // The native onClick on the card handles navigation vs focus cleanly.
+    if (dist < 14) {
+      return;
     }
 
-    // Evaluate velocity and distance to determine next/prev or snap back
+    // Evaluate drag velocity and distance to determine next/prev or snap back
     let targetDelta = 0;
     const swipeDistance = 45;
     const swipeVelocity = 0.28;
@@ -322,7 +296,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
 
   const activeItem = items[activeIndex];
 
-  // Strictly only controls: [ < ] [ 1 / 6 ] [ > ] [ Reset ]
+  // Strictly only controls: [ < ] [ 1 / 6 ] [ > ] [ Reset ] (ZERO project title)
   const dockControls = (
     <div
       className="work-gallery-dock-controls"
@@ -336,7 +310,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         className="work-dock-btn"
         onClick={(e) => {
           e.stopPropagation();
-          safeStep(-1);
+          step(-1);
         }}
         disabled={activeIndex === 0}
         aria-label="Previous project"
@@ -364,7 +338,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         className="work-dock-btn"
         onClick={(e) => {
           e.stopPropagation();
-          safeStep(1);
+          step(1);
         }}
         disabled={activeIndex === items.length - 1}
         aria-label="Next project"
@@ -426,17 +400,17 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         <div className="work-string-line" aria-hidden="true">
           <svg
             className="work-string-svg"
-            viewBox="0 0 1000 24"
+            viewBox="0 0 1000 16"
             preserveAspectRatio="none"
           >
             <path
-              d="M 0 6 Q 500 14 1000 6"
+              d="M 0 3 Q 500 7 1000 3"
               stroke="rgba(0, 0, 0, 0.05)"
               strokeWidth="1.5"
               fill="none"
             />
             <path
-              d="M 0 5 Q 500 13 1000 5"
+              d="M 0 2.5 Q 500 6.5 1000 2.5"
               stroke="rgba(140, 130, 120, 0.45)"
               strokeWidth="1.2"
               strokeDasharray="6,2"
@@ -469,21 +443,22 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
                   onClick={(e) => {
                     e.stopPropagation();
                     if (hasMoved.current) return;
-                    if (offset === -1) {
-                      safeStep(-1);
-                    } else if (offset === 1) {
-                      safeStep(1);
-                    } else if (offset === 0) {
+                    if (index !== activeIndex) {
+                      // CRITICAL RULE: If clicked card is NOT center card, ONLY navigate!
+                      setIsFocused(false);
+                      setActiveIndex(index);
+                    } else {
+                      // CRITICAL RULE: ONLY open focus overlay if clicked card IS center active card!
                       setIsFocused(true);
                     }
                   }}
                   aria-current={offset === 0 ? "true" : undefined}
                   aria-label={`${item.name} (${index + 1} of ${items.length})`}
                 >
-                  {/* Clothespin Front: Z-index 15 (IN FRONT of photo, clamps wire notch) */}
+                  {/* Scaled-down Wooden Clip: clamps white margin only, no photo overlap */}
                   <WoodenClip style={{ left: "50%", transform: "translateX(-50%)" }} />
 
-                  {/* Clean blank photographic print: image only, no title text inside card */}
+                  {/* Clean blank photographic print: image only, no title text */}
                   <div className="work-print-image-frame">
                     <Image
                       src={item.image.src}
@@ -503,63 +478,38 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         </div>
       </div>
 
-      {/* Floating project title positioned directly ABOVE the nav pill */}
-      {mounted &&
-        titleNode &&
-        createPortal(
-          <span className="work-dock-floating-title">
-            {activeItem ? activeItem.name : ""}
-          </span>,
-          titleNode,
-        )}
-
       {/* Floating dock controls in Navbar */}
       {mounted &&
         (dockNode ? (
           createPortal(dockControls, dockNode)
         ) : (
-          <div className="work-floating-dock-fallback">
-            <span className="work-dock-floating-title">
-              {activeItem ? activeItem.name : ""}
-            </span>
-            {dockControls}
-          </div>
+          <div className="work-floating-dock-fallback">{dockControls}</div>
         ))}
 
-      {/* Lift-to-Focus Portal: Z-index 100 on body (ABOVE EVERYTHING, blurring nav dock) */}
+      {/* Lift-to-Focus Portal: Z-index 9999 on body.
+          STRIPPED OF ALL PHYSICAL AESTHETICS (no white frame, no clip, no string, no shadows).
+          Displays ONLY the raw project image maximized with 5vh margins top & bottom. */}
       {mounted &&
         isFocused &&
         activeItem &&
         createPortal(
           <div
             className="work-focus-portal"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsFocused(false);
-            }}
+            onClick={() => setIsFocused(false)}
             role="dialog"
             aria-modal="true"
             aria-label={`Focused view of ${activeItem.name}`}
           >
             <div
-              className="work-focus-card-wrapper"
+              className="work-focus-image-wrapper"
               onClick={(e) => e.stopPropagation()}
-              style={
-                {
-                  "--card-image-ratio": activeItem.image.aspectRatio ?? 1.6,
-                } as CSSProperties
-              }
             >
-              <WoodenClip style={{ left: "50%", transform: "translateX(-50%)" }} />
-              <div className="work-print-image-frame">
-                <Image
-                  src={activeItem.image.src}
-                  alt={activeItem.image.alt}
-                  fill
-                  sizes="(max-width: 640px) 92vw, (max-width: 1024px) 78vw, 860px"
-                  priority
-                />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={activeItem.image.src}
+                alt={activeItem.image.alt}
+                className="work-focus-raw-img"
+              />
             </div>
           </div>,
           document.body,
