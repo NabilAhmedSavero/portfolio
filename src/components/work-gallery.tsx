@@ -171,61 +171,50 @@ export function WorkGallery({
         })}
       </div>
 
-      {/* Lightbox Modal: Simplified open state */}
+      {/* Lightbox Modal: Maximized open state */}
       {lightboxItem && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-black/90 backdrop-blur-md p-4 sm:p-6 cursor-pointer animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-between py-[3vh] px-4 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
           onClick={() => setLightboxItem(null)}
           role="dialog"
           aria-modal="true"
           aria-label={`Full preview of ${lightboxItem.name}`}
         >
-          {/* Highest point of viewport: Title only with reasonable top padding */}
-          <header
-            className="pt-4 sm:pt-6 text-center cursor-default shrink-0 z-10"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-white text-base sm:text-lg font-medium tracking-tight">
+          {/* Top: Title only on highest point of viewport with reasonable top padding */}
+          <header className="text-center z-20 shrink-0 pointer-events-none select-none">
+            <h2 className="text-white text-sm sm:text-base md:text-lg font-medium tracking-tight">
               {lightboxItem.name}
             </h2>
           </header>
 
-          {/* Center: Maximized Image with equal ~5% viewport gap to top title and bottom navs */}
-          <div
-            className="relative flex items-center justify-center w-full flex-1 max-w-[95vw] my-[5vh] cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative w-full h-full max-h-[78vh] sm:max-h-[80vh] flex items-center justify-center">
-              <Image
-                src={lightboxItem.image.src}
-                alt={lightboxItem.image.alt}
-                fill
-                sizes="95vw"
-                priority
-                className="object-contain rounded-[8px]"
-              />
-            </div>
+          {/* Center: Maximized Image leaving ONLY ~5% top/bottom margin, clicks outside image close overlay */}
+          <div className="relative z-10 flex items-center justify-center w-full flex-1 min-h-0 py-2 sm:py-3 pointer-events-none">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={lightboxItem.image.src}
+              alt={lightboxItem.image.alt}
+              className="h-full w-auto max-h-[85vh] sm:max-h-[88vh] max-w-[95vw] object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
 
-          {/* Bottom: Round Smintfy-style navigation chevrons (20px icons, 8px gap) centered horizontally */}
+          {/* Bottom: Round Smintfy-style navigation chevrons (max height 24px, 8px gap) centered horizontally */}
           <nav
-            className="pb-4 sm:pb-6 flex items-center justify-center gap-2 cursor-default shrink-0 z-10"
-            onClick={(e) => e.stopPropagation()}
+            className="flex items-center justify-center gap-2 z-20 shrink-0"
             aria-label="Modal image navigation"
           >
             <button
               type="button"
               onClick={handlePrev}
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#505050]/90 hover:bg-[#626262] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="w-[24px] h-[24px] max-h-[24px] max-w-[24px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
               aria-label="Previous image"
             >
-              {/* Chevron Left 20px */}
               <svg
-                className="w-[20px] h-[20px]"
+                className="w-[14px] h-[14px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
@@ -236,16 +225,15 @@ export function WorkGallery({
             <button
               type="button"
               onClick={handleNext}
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#505050]/90 hover:bg-[#626262] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="w-[24px] h-[24px] max-h-[24px] max-w-[24px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
               aria-label="Next image"
             >
-              {/* Chevron Right 20px */}
               <svg
-                className="w-[20px] h-[20px]"
+                className="w-[14px] h-[14px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
