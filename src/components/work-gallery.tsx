@@ -147,22 +147,25 @@ function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const pillRef = useRef<HTMLDivElement>(null);
 
-  const updatePillPos = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     if (pillRef.current) {
+      pillRef.current.style.transition = "opacity 450ms ease-out";
       pillRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
     }
-  };
-
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    updatePillPos(e);
     setIsHovered(true);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    updatePillPos(e);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (pillRef.current) {
+      pillRef.current.style.transition = "transform 150ms ease-out, opacity 450ms ease-out";
+      pillRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+    }
   };
 
   const handleMouseLeave = () => {
@@ -213,14 +216,14 @@ function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
             className="w-full h-full object-contain block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
 
-          {/* Cursor-following floating pill: outer tracks position instantly, inner handles scale/fade */}
+          {/* Cursor-following floating pill: outer tracks position with trailing delay, inner handles scale/fade */}
           <div
             ref={pillRef}
-            className="pointer-events-none absolute left-0 top-0 z-50 will-change-transform hidden md:block"
+            className="pointer-events-none absolute left-0 top-0 z-50 will-change-transform hidden md:block transition-opacity duration-[450ms] ease-out"
             style={{ opacity: isHovered ? 1 : 0 }}
           >
             <div
-              className={`flex items-center justify-center gap-[8px] py-2 px-4 rounded-full bg-[#000000]/60 backdrop-blur-[4px] border border-white/10 transform-gpu [backface-visibility:hidden] transition-transform duration-300 ease-out text-white font-medium text-sm tracking-wide select-none shadow-sm ${
+              className={`flex items-center justify-center gap-[8px] py-2 px-4 rounded-full bg-[#000000]/60 backdrop-blur-[4px] border border-white/10 transform-gpu [backface-visibility:hidden] transition-transform duration-[450ms] ease-out text-white font-medium text-sm tracking-wide select-none shadow-sm ${
                 isHovered ? "scale-100" : "scale-0"
               }`}
             >
