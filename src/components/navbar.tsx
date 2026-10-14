@@ -15,7 +15,7 @@ export function Navbar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="site-nav"
+      className="site-nav border border-[#232323]/10"
       data-work-gallery={isWork ? "true" : undefined}
     >
       <ul className="nav-links">
