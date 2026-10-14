@@ -220,17 +220,24 @@ function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
             style={{ opacity: isHovered ? 1 : 0 }}
           >
             <div
-              className={`flex items-center gap-[10px] py-2 px-4 rounded-full bg-[#000000]/20 backdrop-blur-[4px] border border-white/5 transform-gpu [backface-visibility:hidden] transition-transform duration-300 ease-out text-white font-medium text-sm tracking-wide select-none shadow-sm ${
+              className={`flex items-center justify-center gap-[8px] py-2 px-4 rounded-full bg-[#000000]/60 backdrop-blur-[4px] border border-white/10 transform-gpu [backface-visibility:hidden] transition-transform duration-300 ease-out text-white font-medium text-sm tracking-wide select-none shadow-sm ${
                 isHovered ? "scale-100" : "scale-0"
               }`}
             >
               <span>{item.externalUrl ? "Case study" : "Open"}</span>
-              <span
-                className="inline-block select-none font-normal text-sm leading-none"
+              <svg
+                className="w-5 h-5 select-none shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 aria-hidden="true"
               >
-                ↗
-              </span>
+                <line x1="7" y1="17" x2="17" y2="7" />
+                <polyline points="7 7 17 7 17 17" />
+              </svg>
             </div>
           </div>
         </div>
