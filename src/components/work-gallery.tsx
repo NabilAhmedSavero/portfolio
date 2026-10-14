@@ -137,6 +137,144 @@ function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryI
   });
 }
 
+type WorkGalleryCardProps = {
+  item: WorkSlide | WorkGalleryItem;
+  index: number;
+  onCardClick: (e: MouseEvent<HTMLElement>, item: WorkSlide | WorkGalleryItem) => void;
+};
+
+function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+    setIsTransitioning(false);
+    setIsHovered(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setIsTransitioning(false);
+  };
+
+  const Tag = item.externalUrl ? "a" : "div";
+  const linkProps = item.externalUrl
+    ? {
+        href: item.externalUrl,
+        target: "_blank",
+        rel: "noopener noreferrer",
+      }
+    : {
+        role: "button",
+        tabIndex: 0,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onCardClick(e as unknown as MouseEvent<HTMLElement>, item);
+          }
+        },
+      };
+
+  return (
+    <article className="group flex flex-col w-full">
+      <Tag
+        {...linkProps}
+        onClick={(e) => onCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
+        className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
+        aria-label={`View ${item.name}`}
+      >
+        {/* Image Container: Strict aspect-[45/32] ratio, white background, no crop, no shadows */}
+        <div
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="w-full aspect-[45/32] relative overflow-hidden rounded-[8px] bg-white flex items-center justify-center border border-[#232323]/10"
+        >
+          <Image
+            src={item.image.src}
+            alt={item.image.alt}
+            width={1800}
+            height={1280}
+            unoptimized
+            quality={100}
+            priority={index < 2}
+            className="w-full h-full object-contain block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          />
+
+          {/* Cursor-following floating pill */}
+          <div
+            className={`pointer-events-none absolute left-0 top-0 z-20 hidden md:flex items-center gap-[10px] rounded-full py-2 px-4 bg-[#000000]/24 backdrop-blur-[6px] border border-[#ffffff]/10 text-white font-medium text-sm tracking-wide select-none shadow-sm ${
+              isHovered ? "scale-100 opacity-100" : "scale-0 opacity-0"
+            }`}
+            style={{
+              transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0) translate(-50%, -50%)`,
+              transition: isTransitioning
+                ? "transform 400ms cubic-bezier(0.25, 1, 0.5, 1), opacity 200ms ease, scale 200ms cubic-bezier(0.25, 1, 0.5, 1)"
+                : "opacity 200ms ease, scale 200ms cubic-bezier(0.25, 1, 0.5, 1)",
+            }}
+          >
+            <span>{item.externalUrl ? "Case study" : "Open"}</span>
+            <span
+              className="inline-block select-none font-normal text-sm leading-none"
+              aria-hidden="true"
+            >
+              ↗
+            </span>
+          </div>
+        </div>
+      </Tag>
+
+      {/* Caption: Title / Subtitle unified 15px font size */}
+      <div className="mt-6 flex items-baseline flex-wrap gap-x-1.5 gap-y-0.5">
+        <h2
+          className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
+          style={{ fontSize: "15px", fontWeight: 500 }}
+        >
+          {item.name}
+        </h2>
+        {item.subtitle && (
+          <>
+            <span
+              className="select-none text-[15px] font-normal"
+              style={{ fontSize: "15px", fontWeight: 400, color: "#737373" }}
+              aria-hidden="true"
+            >
+              /
+            </span>
+            <p
+              className="text-[15px] font-[400] leading-normal"
+              style={{
+                fontSize: "15px",
+                fontWeight: 400,
+                color: "#737373",
+              }}
+            >
+              {item.subtitle}
+            </p>
+          </>
+        )}
+      </div>
+    </article>
+  );
+}
+
 export function WorkGallery({
   projects,
   items: directItems,
@@ -220,98 +358,14 @@ export function WorkGallery({
     <section aria-label="Work Projects" className="w-full">
       {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-        {items.map((item, index) => {
-          const Tag = item.externalUrl ? "a" : "div";
-          const linkProps = item.externalUrl
-            ? {
-                href: item.externalUrl,
-                target: "_blank",
-                rel: "noopener noreferrer",
-              }
-            : {
-                role: "button",
-                tabIndex: 0,
-                onKeyDown: (e: React.KeyboardEvent) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setLightboxItem(item);
-                  }
-                },
-              };
-
-          return (
-            <article key={item.id} className="group flex flex-col w-full">
-              <Tag
-                {...linkProps}
-                onClick={(e) => handleCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
-                className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
-                aria-label={`View ${item.name}`}
-              >
-                {/* Image Container: Strict aspect-[45/32] ratio, white background, no crop, no shadows */}
-                <div className="w-full aspect-[45/32] relative overflow-hidden rounded-[8px] bg-white flex items-center justify-center border border-[#232323]/10">
-                  <Image
-                    src={item.image.src}
-                    alt={item.image.alt}
-                    width={1800}
-                    height={1280}
-                    unoptimized
-                    quality={100}
-                    priority={index < 2}
-                    className="w-full h-full object-contain block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                  />
-
-                  {/* Desktop Hover State: dimmed overlay + pure white floating text (Skale style) */}
-                  <div className="absolute inset-0 bg-black/35 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                    <div className="flex items-center gap-[6px] text-white text-xl sm:text-2xl md:text-[24px] font-medium tracking-tight transform transition-transform duration-300 scale-95 group-hover:scale-100">
-                      <span>
-                        {item.externalUrl ? "Case study" : "Open"}
-                      </span>
-                      <span className="inline-flex items-center self-center translate-y-[3px]">
-                        <span
-                          className="inline-block transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 select-none font-normal text-[24px] sm:text-[28px] md:text-[28px] leading-none"
-                          aria-hidden="true"
-                        >
-                          ↗
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Tag>
-
-              {/* Caption: Title / Subtitle unified 15px font size */}
-              <div className="mt-6 flex items-baseline flex-wrap gap-x-1.5 gap-y-0.5">
-                <h2
-                  className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
-                  style={{ fontSize: "15px", fontWeight: 500 }}
-                >
-                  {item.name}
-                </h2>
-                {item.subtitle && (
-                  <>
-                    <span
-                      className="select-none text-[15px] font-normal"
-                      style={{ fontSize: "15px", fontWeight: 400, color: "#737373" }}
-                      aria-hidden="true"
-                    >
-                      /
-                    </span>
-                    <p
-                      className="text-[15px] font-[400] leading-normal"
-                      style={{
-                        fontSize: "15px",
-                        fontWeight: 400,
-                        color: "#737373",
-                      }}
-                    >
-                      {item.subtitle}
-                    </p>
-                  </>
-                )}
-              </div>
-            </article>
-          );
-        })}
+        {items.map((item, index) => (
+          <WorkGalleryCard
+            key={item.id}
+            item={item}
+            index={index}
+            onCardClick={handleCardClick}
+          />
+        ))}
       </div>
 
       {/* Lightbox Modal: Maximized open state */}
