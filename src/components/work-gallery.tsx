@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { createWorkSlides, type Project, type WorkSlide } from "@/data/projects";
 import { urlFor, imageUrl } from "@/sanity/lib/images";
 
@@ -144,37 +144,29 @@ type WorkGalleryCardProps = {
 };
 
 function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
-  const [mousePos, setMousePos] = useState<{ x: number | null; y: number | null }>({
-    x: null,
-    y: null,
-  });
   const [isHovered, setIsHovered] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const pillRef = useRef<HTMLDivElement>(null);
+
+  const updatePillPos = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (pillRef.current) {
+      pillRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+    }
+  };
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-    setIsTransitioning(false);
+    updatePillPos(e);
     setIsHovered(true);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-    if (!isTransitioning) {
-      setIsTransitioning(true);
-    }
+    updatePillPos(e);
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setIsTransitioning(false);
   };
 
   const Tag = item.externalUrl ? "a" : "div";
@@ -221,28 +213,25 @@ function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
             className="w-full h-full object-contain block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
 
-          {/* Cursor-following floating pill */}
+          {/* Cursor-following floating pill: outer tracks position instantly, inner handles scale/fade */}
           <div
-            className={`pointer-events-none absolute left-0 top-0 z-20 hidden md:flex items-center gap-[10px] rounded-full py-2 px-4 bg-[#000000]/20 backdrop-blur-[4px] border border-white/5 text-white font-medium text-sm tracking-wide select-none shadow-sm ${
-              isHovered && mousePos.x !== null ? "scale-100 opacity-100" : "scale-0 opacity-0"
-            }`}
-            style={{
-              transform:
-                mousePos.x !== null && mousePos.y !== null
-                  ? `translate3d(${mousePos.x}px, ${mousePos.y}px, 0) translate(-50%, -50%)`
-                  : undefined,
-              transition: isTransitioning
-                ? "transform 350ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, scale 200ms cubic-bezier(0.16, 1, 0.3, 1)"
-                : "opacity 200ms ease, scale 200ms cubic-bezier(0.16, 1, 0.3, 1)",
-            }}
+            ref={pillRef}
+            className="pointer-events-none absolute left-0 top-0 z-50 will-change-transform hidden md:block"
+            style={{ opacity: isHovered ? 1 : 0 }}
           >
-            <span>{item.externalUrl ? "Case study" : "Open"}</span>
-            <span
-              className="inline-block select-none font-normal text-sm leading-none"
-              aria-hidden="true"
+            <div
+              className={`flex items-center gap-[10px] py-2 px-4 rounded-full bg-[#000000]/20 backdrop-blur-[4px] border border-white/5 transform-gpu [backface-visibility:hidden] transition-transform duration-300 ease-out text-white font-medium text-sm tracking-wide select-none shadow-sm ${
+                isHovered ? "scale-100" : "scale-0"
+              }`}
             >
-              ↗
-            </span>
+              <span>{item.externalUrl ? "Case study" : "Open"}</span>
+              <span
+                className="inline-block select-none font-normal text-sm leading-none"
+                aria-hidden="true"
+              >
+                ↗
+              </span>
+            </div>
           </div>
         </div>
       </Tag>
