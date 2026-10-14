@@ -144,7 +144,10 @@ type WorkGalleryCardProps = {
 };
 
 function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState<{ x: number | null; y: number | null }>({
+    x: null,
+    y: null,
+  });
   const [isHovered, setIsHovered] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -220,14 +223,17 @@ function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
 
           {/* Cursor-following floating pill */}
           <div
-            className={`pointer-events-none absolute left-0 top-0 z-20 hidden md:flex items-center gap-[10px] rounded-full py-2 px-4 bg-[#000000]/24 backdrop-blur-[6px] border border-[#ffffff]/10 text-white font-medium text-sm tracking-wide select-none shadow-sm ${
-              isHovered ? "scale-100 opacity-100" : "scale-0 opacity-0"
+            className={`pointer-events-none absolute left-0 top-0 z-20 hidden md:flex items-center gap-[10px] rounded-full py-2 px-4 bg-[#000000]/20 backdrop-blur-[4px] border border-white/5 text-white font-medium text-sm tracking-wide select-none shadow-sm ${
+              isHovered && mousePos.x !== null ? "scale-100 opacity-100" : "scale-0 opacity-0"
             }`}
             style={{
-              transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0) translate(-50%, -50%)`,
+              transform:
+                mousePos.x !== null && mousePos.y !== null
+                  ? `translate3d(${mousePos.x}px, ${mousePos.y}px, 0) translate(-50%, -50%)`
+                  : undefined,
               transition: isTransitioning
-                ? "transform 400ms cubic-bezier(0.25, 1, 0.5, 1), opacity 200ms ease, scale 200ms cubic-bezier(0.25, 1, 0.5, 1)"
-                : "opacity 200ms ease, scale 200ms cubic-bezier(0.25, 1, 0.5, 1)",
+                ? "transform 350ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, scale 200ms cubic-bezier(0.16, 1, 0.3, 1)"
+                : "opacity 200ms ease, scale 200ms cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             <span>{item.externalUrl ? "Case study" : "Open"}</span>
