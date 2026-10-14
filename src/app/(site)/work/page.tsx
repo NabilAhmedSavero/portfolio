@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Work",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const WORK_PROJECTS_QUERY = `
   *[_type == "project" && (isVisible == true || !defined(isVisible)) && !(_id in path("drafts.**"))]
   | order(displayOrder asc, _createdAt desc) {
@@ -30,7 +33,7 @@ export default async function WorkPage() {
       sanityProjects = await client.fetch<SanityProject[]>(
         WORK_PROJECTS_QUERY,
         {},
-        { next: { revalidate: 10 } }
+        { next: { revalidate: 0 } }
       );
     } catch (error) {
       console.warn("[Sanity] Failed to fetch projects on work page:", error);
