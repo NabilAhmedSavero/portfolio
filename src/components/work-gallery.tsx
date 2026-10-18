@@ -214,7 +214,8 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
             priority={true}
             quality={100}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 50vw, 1200px"
-            className="w-full h-full object-cover block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            className="w-full h-full object-cover block"
+            style={{ imageRendering: "-webkit-optimize-contrast" }}
           />
 
           {/* Cursor-following floating pill: outer tracks position with trailing delay, inner handles scale/fade */}
