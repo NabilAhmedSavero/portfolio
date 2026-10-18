@@ -213,7 +213,7 @@ function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
             unoptimized
             quality={100}
             priority={index < 2}
-            className="w-full h-full object-contain block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            className="w-full h-full object-cover block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
 
           {/* Cursor-following floating pill: outer tracks position with trailing delay, inner handles scale/fade */}
