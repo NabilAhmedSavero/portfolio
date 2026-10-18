@@ -13,7 +13,7 @@ export function imageUrl(image: SanityImageSource | null | undefined, preserveOr
   try {
     const source = builder.image(image);
     return preserveOriginal
-      ? source.ignoreImageParams().quality(100).auto("format").url()
+      ? source.ignoreImageParams().url()
       : source.quality(100).auto("format").url();
   } catch {
     return null;

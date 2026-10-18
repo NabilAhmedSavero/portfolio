@@ -55,7 +55,7 @@ function resolveSanityImageUrl(
   try {
     const builder = urlFor(source as SanityImageSource);
     if (builder) {
-      return builder.auto("format").quality(100).url();
+      return builder.url();
     }
   } catch {
     // fallback below
@@ -139,11 +139,11 @@ function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryI
 
 type WorkGalleryCardProps = {
   item: WorkSlide | WorkGalleryItem;
-  index: number;
+  index?: number;
   onCardClick: (e: MouseEvent<HTMLElement>, item: WorkSlide | WorkGalleryItem) => void;
 };
 
-function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
+function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const pillRef = useRef<HTMLDivElement>(null);
 
@@ -210,9 +210,10 @@ function WorkGalleryCard({ item, index, onCardClick }: WorkGalleryCardProps) {
             alt={item.image.alt}
             width={1800}
             height={1280}
-            unoptimized
+            unoptimized={true}
+            priority={true}
             quality={100}
-            priority={index < 2}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 50vw, 1200px"
             className="w-full h-full object-cover block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
 
