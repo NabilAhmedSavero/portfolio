@@ -20,7 +20,7 @@ export function WorkItem({ project }: WorkItemProps) {
             className="object-cover"
           />
         </div>
-        <figcaption className="mt-3.5 flex flex-col items-start text-left w-full">
+        <figcaption className="mt-[24px] md:mt-[32px] flex flex-col items-start text-left w-full">
           <h2 id={headingId} className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight">
             {project.externalUrl ? (
               <a href={project.externalUrl} className="underline underline-offset-4">{project.name}</a>

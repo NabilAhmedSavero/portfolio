@@ -256,8 +256,8 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
         </div>
       </Tag>
 
-      {/* Caption: Title followed by Subtitle vertically aligned */}
-      <div className="mt-3.5 flex flex-col items-start text-left w-full">
+      {/* Caption: Title followed by Subtitle vertically aligned, gap above matches gap below to next item */}
+      <div className="mt-[24px] md:mt-[32px] flex flex-col items-start text-left w-full">
         <h2
           className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight"
           style={{ fontSize: "16px", fontWeight: 500 }}
