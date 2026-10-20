@@ -200,29 +200,29 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
       };
 
   return (
-    <article className="group flex flex-col w-full max-w-[682px] mx-auto">
+    <article className="group flex flex-col w-full">
       <Tag
         {...linkProps}
         onClick={(e) => onCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
         className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
         aria-label={`View ${item.name}`}
       >
-        {/* Image Container: 1440x1024 aspect ratio, 682px max-width, 8px radius */}
+        {/* Image Container: 16:10 aspect ratio, edge-to-edge cover, 8px radius */}
         <div
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="w-full aspect-[1440/1024] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
+          className="w-full aspect-[16/10] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
         >
           <Image
             src={item.image.src}
             alt={item.image.alt}
             width={1440}
-            height={1024}
+            height={900}
             unoptimized={true}
             priority={true}
             quality={100}
-            sizes="(max-width: 768px) 100vw, 682px"
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="w-full h-full object-cover block"
           />
 
@@ -256,8 +256,8 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
         </div>
       </Tag>
 
-      {/* Caption: Title followed by Subtitle vertically aligned, gap above matches gap below to next item */}
-      <div className="mt-[24px] md:mt-[32px] flex flex-col items-start text-left w-full">
+      {/* Caption: Title followed by Subtitle strictly left-aligned (Skale rhythm) */}
+      <div className="mt-3.5 md:mt-4 flex flex-col items-start text-left w-full gap-1">
         <h2
           className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight"
           style={{ fontSize: "16px", fontWeight: 500 }}
@@ -266,7 +266,7 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
         </h2>
         {item.subtitle && (
           <p
-            className="mt-1 text-[14px] font-[400] leading-normal text-neutral-500"
+            className="text-[14px] font-[400] leading-normal text-neutral-500"
             style={{
               fontSize: "14px",
               fontWeight: 400,
@@ -362,8 +362,8 @@ export function WorkGallery({
 
   return (
     <section aria-label="Work Projects" className="w-full">
-      {/* Stream with halved gap: 24px mobile, 32px desktop */}
-      <div className="w-full flex flex-col items-center gap-[24px] md:gap-[32px]">
+      {/* Responsive Grid: 1 col on mobile, 2 cols on md+ (Skale rhythm) */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 md:gap-x-8 gap-y-10 md:gap-y-14 lg:gap-y-16">
         {items.map((item, index) => (
           <WorkGalleryCard
             key={item.id}
