@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import { createWorkSlides, type Project, type WorkSlide } from "@/data/projects";
 import { urlFor, imageUrl } from "@/sanity/lib/images";
 
@@ -242,6 +243,20 @@ export function WorkGallery({
     WorkSlide | WorkGalleryItem | null
   >(null);
 
+  // Lock body scroll and set data attribute to hide navs in focused/lightbox state
+  useEffect(() => {
+    if (!lightboxItem) return;
+
+    document.body.dataset.lightboxOpen = "true";
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      delete document.body.dataset.lightboxOpen;
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [lightboxItem]);
+
   const handlePrev = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
@@ -313,82 +328,85 @@ export function WorkGallery({
         ))}
       </div>
 
-      {/* Lightbox Modal: Maximized open state */}
-      {lightboxItem && (
-        <div
-          className="fixed inset-0 h-[100dvh] z-50 flex flex-col items-center justify-evenly px-4 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
-          onClick={() => setLightboxItem(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Full preview of ${lightboxItem.name}`}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={("fullSrc" in lightboxItem.image && lightboxItem.image.fullSrc) || lightboxItem.image.src}
-            alt={lightboxItem.image.alt}
-            className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          />
-
-          {/* Bottom: Round navigation controls (32px size) with image counter centered horizontally */}
-          <nav
-            className="flex items-center justify-center gap-3 sm:gap-4 z-20 shrink-0 h-[32px]"
-            onClick={(e) => e.stopPropagation()}
-            aria-label="Modal image navigation"
+      {/* Lightbox Modal: Maximized open state rendered in portal above all elements */}
+      {lightboxItem &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 h-[100dvh] z-[9999] flex flex-col items-center justify-evenly px-4 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
+            onClick={() => setLightboxItem(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Full preview of ${lightboxItem.name}`}
           >
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="w-[32px] h-[32px] min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
-              aria-label="Previous image"
-            >
-              <svg
-                className="w-[16px] h-[16px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={("fullSrc" in lightboxItem.image && lightboxItem.image.fullSrc) || lightboxItem.image.src}
+              alt={lightboxItem.image.alt}
+              className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            />
 
-            {/* Counter: e.g. 1 / 18 */}
-            <span
-              className="font-mono text-[13px] sm:text-[14px] text-white/90 select-none tracking-wider tabular-nums flex items-center"
-              aria-live="polite"
-              aria-atomic="true"
+            {/* Bottom: Round navigation controls (32px size) with image counter centered horizontally */}
+            <nav
+              className="flex items-center justify-center gap-3 sm:gap-4 z-20 shrink-0 h-[32px]"
+              onClick={(e) => e.stopPropagation()}
+              aria-label="Modal image navigation"
             >
-              <span>{currentIndex + 1}</span>
-              <span className="text-white/40 mx-1.5 font-sans font-light select-none">/</span>
-              <span>{items.length}</span>
-            </span>
-
-            <button
-              type="button"
-              onClick={handleNext}
-              className="w-[32px] h-[32px] min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
-              aria-label="Next image"
-            >
-              <svg
-                className="w-[16px] h-[16px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+              <button
+                type="button"
+                onClick={handlePrev}
+                className="w-[32px] h-[32px] min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
+                aria-label="Previous image"
               >
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </button>
-          </nav>
-        </div>
-      )}
+                <svg
+                  className="w-[16px] h-[16px]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
+              {/* Counter: e.g. 1 / 18 */}
+              <span
+                className="font-mono text-[13px] sm:text-[14px] text-white/90 select-none tracking-wider tabular-nums flex items-center"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <span>{currentIndex + 1}</span>
+                <span className="text-white/40 mx-1.5 font-sans font-light select-none">/</span>
+                <span>{items.length}</span>
+              </span>
+
+              <button
+                type="button"
+                onClick={handleNext}
+                className="w-[32px] h-[32px] min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] rounded-full bg-[#505050]/90 hover:bg-[#656565] active:scale-95 text-white flex items-center justify-center transition-all duration-150 shadow-md focus:outline-none focus-visible:ring-1 focus-visible:ring-white cursor-pointer"
+                aria-label="Next image"
+              >
+                <svg
+                  className="w-[16px] h-[16px]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </nav>
+          </div>,
+          document.body,
+        )}
     </section>
   );
 }

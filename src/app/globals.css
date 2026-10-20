@@ -124,6 +124,16 @@
     display: flex;
     align-items: center;
     overflow: hidden;
+    transition: opacity 150ms ease, visibility 150ms ease, transform 150ms ease;
+  }
+
+  /* Hide navigation pill during focused modal/lightbox view */
+  body[data-lightbox-open="true"] .site-nav,
+  body:has([aria-modal="true"]) .site-nav {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(12px) !important;
   }
 
   .nav-links {
