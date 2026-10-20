@@ -333,7 +333,7 @@ export function WorkGallery({
         typeof document !== "undefined" &&
         createPortal(
           <div
-            className="fixed inset-0 h-[100dvh] z-[9999] flex flex-col items-center justify-end sm:justify-evenly gap-[5vh] sm:gap-0 px-4 pb-[calc(34px+env(safe-area-inset-bottom,0px))] sm:pb-0 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
+            className="fixed inset-0 h-[100dvh] z-[9999] flex flex-col items-center justify-end sm:justify-evenly gap-[5vh] sm:gap-0 px-4 pb-[22dvh] sm:pb-0 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
             onClick={() => setLightboxItem(null)}
             role="dialog"
             aria-modal="true"
@@ -343,7 +343,7 @@ export function WorkGallery({
             <img
               src={("fullSrc" in lightboxItem.image && lightboxItem.image.fullSrc) || lightboxItem.image.src}
               alt={lightboxItem.image.alt}
-              className="z-10 max-h-[75vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
+              className="z-10 max-h-[65dvh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
               onClick={(e) => e.stopPropagation()}
             />
 
