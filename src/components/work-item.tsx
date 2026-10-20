@@ -9,24 +9,26 @@ export function WorkItem({ project }: WorkItemProps) {
   const headingId = `${project.id}-heading`;
 
   return (
-    <article aria-labelledby={headingId}>
-      <figure className="work-item">
-        <div className="work-image-frame">
+    <article aria-labelledby={headingId} className="w-full max-w-[682px] mx-auto flex flex-col">
+      <figure className="flex flex-col w-full m-0 p-0">
+        <div className="w-full aspect-[1440/920] relative overflow-hidden rounded-[16px] bg-[#f5f5f7] border border-[#232323]/10">
           <Image
             src={project.image.src}
             alt={project.image.alt}
             fill
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, 682px"
             className="object-cover"
           />
         </div>
-        <figcaption className="work-caption">
-          <h2 id={headingId}>
+        <figcaption className="mt-3.5 flex flex-col items-start text-left w-full">
+          <h2 id={headingId} className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight">
             {project.externalUrl ? (
               <a href={project.externalUrl} className="underline underline-offset-4">{project.name}</a>
             ) : project.name}
           </h2>
-          <p className="text-muted">{project.subtitle}</p>
+          {project.subtitle && (
+            <p className="mt-1 text-[14px] font-[400] leading-normal text-neutral-500">{project.subtitle}</p>
+          )}
         </figcaption>
       </figure>
     </article>

@@ -191,29 +191,29 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
       };
 
   return (
-    <article className="group flex flex-col w-full">
+    <article className="group flex flex-col w-full max-w-[682px] mx-auto">
       <Tag
         {...linkProps}
         onClick={(e) => onCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
-        className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
+        className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[16px]"
         aria-label={`View ${item.name}`}
       >
-        {/* Image Container: Strict aspect-[45/32] ratio, white background, no crop, no shadows */}
+        {/* Image Container: Irakli work sizing enlarged by 10% (682px max-width, 1440/920 aspect ratio, 16px radius) */}
         <div
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="w-full aspect-[45/32] relative overflow-hidden rounded-[8px] bg-white flex items-center justify-center border border-[#232323]/10"
+          className="w-full aspect-[1440/920] relative overflow-hidden rounded-[16px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
         >
           <Image
             src={item.image.src}
             alt={item.image.alt}
             width={1800}
-            height={1280}
+            height={1150}
             unoptimized={true}
             priority={true}
             quality={100}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 50vw, 1200px"
+            sizes="(max-width: 768px) 100vw, 682px"
             className="w-full h-full object-cover block"
             style={{ imageRendering: "-webkit-optimize-contrast" }}
           />
@@ -248,34 +248,25 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
         </div>
       </Tag>
 
-      {/* Caption: Title / Subtitle unified 15px font size */}
-      <div className="mt-6 flex items-baseline flex-wrap gap-x-1.5 gap-y-0.5">
+      {/* Caption: Title followed by Subtitle vertically aligned */}
+      <div className="mt-3.5 flex flex-col items-start text-left w-full">
         <h2
-          className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-normal"
-          style={{ fontSize: "15px", fontWeight: 500 }}
+          className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight"
+          style={{ fontSize: "16px", fontWeight: 500 }}
         >
           {item.name}
         </h2>
         {item.subtitle && (
-          <>
-            <span
-              className="select-none text-[15px] font-normal"
-              style={{ fontSize: "15px", fontWeight: 400, color: "#737373" }}
-              aria-hidden="true"
-            >
-              /
-            </span>
-            <p
-              className="text-[15px] font-[400] leading-normal"
-              style={{
-                fontSize: "15px",
-                fontWeight: 400,
-                color: "#737373",
-              }}
-            >
-              {item.subtitle}
-            </p>
-          </>
+          <p
+            className="mt-1 text-[14px] font-[400] leading-normal text-neutral-500"
+            style={{
+              fontSize: "14px",
+              fontWeight: 400,
+              color: "#737373",
+            }}
+          >
+            {item.subtitle}
+          </p>
         )}
       </div>
     </article>
@@ -363,8 +354,11 @@ export function WorkGallery({
 
   return (
     <section aria-label="Work Projects" className="w-full">
-      {/* Responsive CSS Grid: 1 column on mobile, 2 columns on desktop (md+) */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Irakli format: Single column stream with 10% viewport height gap */}
+      <div
+        className="w-full flex flex-col items-center gap-[10vh]"
+        style={{ gap: "10vh" }}
+      >
         {items.map((item, index) => (
           <WorkGalleryCard
             key={item.id}
@@ -388,7 +382,7 @@ export function WorkGallery({
           <img
             src={lightboxItem.image.src}
             alt={lightboxItem.image.alt}
-            className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
+            className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[16px] pointer-events-auto shadow-2xl cursor-default"
             onClick={(e) => e.stopPropagation()}
           />
 
