@@ -204,15 +204,15 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
       <Tag
         {...linkProps}
         onClick={(e) => onCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
-        className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[16px]"
+        className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
         aria-label={`View ${item.name}`}
       >
-        {/* Image Container: 1440x1024 aspect ratio, 682px max-width, 16px radius */}
+        {/* Image Container: 1440x1024 aspect ratio, 682px max-width, 8px radius */}
         <div
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="w-full aspect-[1440/1024] relative overflow-hidden rounded-[16px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
+          className="w-full aspect-[1440/1024] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
         >
           <Image
             src={item.image.src}
@@ -362,11 +362,8 @@ export function WorkGallery({
 
   return (
     <section aria-label="Work Projects" className="w-full">
-      {/* Irakli format: Single column stream with 10% viewport height gap */}
-      <div
-        className="w-full flex flex-col items-center gap-[10vh]"
-        style={{ gap: "10vh" }}
-      >
+      {/* Irakli format: Single column stream matching iraklis.work (48px gap mobile, 64px desktop) */}
+      <div className="w-full flex flex-col items-center gap-[48px] md:gap-[64px]">
         {items.map((item, index) => (
           <WorkGalleryCard
             key={item.id}
@@ -390,7 +387,7 @@ export function WorkGallery({
           <img
             src={("fullSrc" in lightboxItem.image && lightboxItem.image.fullSrc) || lightboxItem.image.src}
             alt={lightboxItem.image.alt}
-            className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[16px] pointer-events-auto shadow-2xl cursor-default"
+            className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
             onClick={(e) => e.stopPropagation()}
           />
 

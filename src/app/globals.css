@@ -152,7 +152,17 @@
     color: #737373;
     text-decoration: none;
     white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
     transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .nav-link:focus {
+    outline: none;
+  }
+
+  .nav-link:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 1.5px rgba(28, 28, 28, 0.4);
   }
 
   .nav-link[aria-current="page"] {
@@ -162,6 +172,14 @@
       0 1px 2px rgba(28, 28, 28, 0.04),
       0 2px 4px -2px rgba(28, 28, 28, 0.08),
       inset 0 0 0 1px rgba(28, 28, 28, 0.20);
+  }
+
+  .nav-link[aria-current="page"]:focus-visible {
+    outline: none;
+    box-shadow:
+      0 1px 2px rgba(28, 28, 28, 0.04),
+      0 2px 4px -2px rgba(28, 28, 28, 0.08),
+      inset 0 0 0 1.5px rgba(28, 28, 28, 0.6);
   }
 
   @media (hover: hover) {
