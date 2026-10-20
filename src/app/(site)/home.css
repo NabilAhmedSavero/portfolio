@@ -20,7 +20,7 @@
   --home-padding: 1rem;
   --home-section-space: 2rem;
   --home-paragraph-gap: 1.25rem;
-  --home-border: hsl(0, 0%, 85%);
+  --home-border: hsl(0, 0%, 88%);
   --home-muted: #737373;
   --home-link: #738c87;
   --home-link-hover: #1f4840;
@@ -45,20 +45,9 @@
   content: "";
   position: absolute;
   inset: 0;
+  border: 1px dashed var(--home-border);
+  border-top: 0;
   pointer-events: none;
-  background-image:
-    repeating-linear-gradient(to bottom, var(--home-border) 0, var(--home-border) 6px, transparent 6px, transparent 12px),
-    repeating-linear-gradient(to bottom, var(--home-border) 0, var(--home-border) 6px, transparent 6px, transparent 12px),
-    repeating-linear-gradient(to right, var(--home-border) 0, var(--home-border) 6px, transparent 6px, transparent 12px);
-  background-size:
-    1px 100%,
-    1px 100%,
-    100% 1px;
-  background-position:
-    left top,
-    right top,
-    left bottom;
-  background-repeat: no-repeat;
 }
 
 .home-page .home-location {
