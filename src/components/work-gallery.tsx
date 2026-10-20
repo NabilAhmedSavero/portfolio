@@ -32,6 +32,7 @@ export type WorkGalleryItem = {
   externalUrl?: string;
   image: {
     src: string;
+    fullSrc?: string;
     alt: string;
     aspectRatio?: number;
   };
@@ -45,6 +46,7 @@ export type WorkGalleryProps = {
 
 function resolveSanityImageUrl(
   source: SanityImageSource | ContentImage | { src?: string; alt?: string } | string | null | undefined,
+  width?: number,
 ): string {
   if (!source) return "/images/work-placeholder.svg";
   if (typeof source === "string") return source;
@@ -55,7 +57,10 @@ function resolveSanityImageUrl(
   try {
     const builder = urlFor(source as SanityImageSource);
     if (builder) {
-      return builder.url();
+      if (width) {
+        return builder.width(width).fit("max").quality(100).auto("format").url();
+      }
+      return builder.auto("format").quality(100).url();
     }
   } catch {
     // fallback below
@@ -82,7 +87,7 @@ function resolveSanityAspectRatio(
       }
     }
   }
-  return 1.6;
+  return 1440 / 1024;
 }
 
 function getAltText(source: unknown, fallback: string): string {
@@ -97,7 +102,8 @@ function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryI
     const name = project.name || project.title || "Untitled";
     const subtitle = project.subtitle || "";
     const coverSource = project.coverImage || project.mainImage;
-    const coverUrl = resolveSanityImageUrl(coverSource);
+    const coverUrl = resolveSanityImageUrl(coverSource, 2048);
+    const coverFullUrl = resolveSanityImageUrl(coverSource);
     const coverAlt = getAltText(coverSource, name);
     const coverRatio = resolveSanityAspectRatio(coverSource);
 
@@ -108,6 +114,7 @@ function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryI
       externalUrl: project.externalUrl,
       image: {
         src: coverUrl,
+        fullSrc: coverFullUrl,
         alt: coverAlt,
         aspectRatio: coverRatio,
       },
@@ -115,7 +122,8 @@ function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryI
 
     const additionalItems: WorkGalleryItem[] = (project.additionalImages ?? []).flatMap(
       (img, idx) => {
-        const src = resolveSanityImageUrl(img);
+        const src = resolveSanityImageUrl(img, 2048);
+        const fullSrc = resolveSanityImageUrl(img);
         if (!src) return [];
         return [
           {
@@ -125,6 +133,7 @@ function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryI
             externalUrl: project.externalUrl,
             image: {
               src,
+              fullSrc,
               alt: getAltText(img, name),
               aspectRatio: resolveSanityAspectRatio(img),
             },
@@ -198,24 +207,23 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
         className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[16px]"
         aria-label={`View ${item.name}`}
       >
-        {/* Image Container: Irakli work sizing enlarged by 10% (682px max-width, 1440/920 aspect ratio, 16px radius) */}
+        {/* Image Container: 1440x1024 aspect ratio, 682px max-width, 16px radius */}
         <div
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="w-full aspect-[1440/920] relative overflow-hidden rounded-[16px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
+          className="w-full aspect-[1440/1024] relative overflow-hidden rounded-[16px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
         >
           <Image
             src={item.image.src}
             alt={item.image.alt}
-            width={1800}
-            height={1150}
+            width={1440}
+            height={1024}
             unoptimized={true}
             priority={true}
             quality={100}
             sizes="(max-width: 768px) 100vw, 682px"
             className="w-full h-full object-cover block"
-            style={{ imageRendering: "-webkit-optimize-contrast" }}
           />
 
           {/* Cursor-following floating pill: outer tracks position with trailing delay, inner handles scale/fade */}
@@ -380,7 +388,7 @@ export function WorkGallery({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={lightboxItem.image.src}
+            src={("fullSrc" in lightboxItem.image && lightboxItem.image.fullSrc) || lightboxItem.image.src}
             alt={lightboxItem.image.alt}
             className="z-10 max-h-[85vh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[16px] pointer-events-auto shadow-2xl cursor-default"
             onClick={(e) => e.stopPropagation()}
