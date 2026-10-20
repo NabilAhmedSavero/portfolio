@@ -11,12 +11,12 @@ export function WorkItem({ project }: WorkItemProps) {
   return (
     <article aria-labelledby={headingId} className="w-full max-w-[682px] mx-auto flex flex-col">
       <figure className="flex flex-col w-full m-0 p-0">
-        <div className="w-full aspect-[16/10] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] border border-[#232323]/10">
+        <div className="w-full aspect-[3/2] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] border border-[#232323]/10">
           <Image
             src={project.image.src}
             alt={project.image.alt}
             fill
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 100vw, 682px"
             className="object-cover"
           />
         </div>
