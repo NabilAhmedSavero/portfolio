@@ -198,8 +198,8 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
       {/* Caption: Title followed by Subtitle strictly left-aligned */}
       <div className="mt-4 flex flex-col items-start text-left w-full gap-0.5">
         <h2
-          className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight"
-          style={{ fontSize: "16px", fontWeight: 500 }}
+          className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-tight"
+          style={{ fontSize: "15px", fontWeight: 500 }}
         >
           {item.name}
         </h2>

@@ -21,7 +21,7 @@ export function WorkItem({ project }: WorkItemProps) {
           />
         </div>
         <figcaption className="mt-4 flex flex-col items-start text-left w-full gap-0.5">
-          <h2 id={headingId} className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight">
+          <h2 id={headingId} className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-tight">
             {project.externalUrl ? (
               <a href={project.externalUrl} className="underline underline-offset-4">{project.name}</a>
             ) : project.name}
