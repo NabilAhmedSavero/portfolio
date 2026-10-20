@@ -23,7 +23,7 @@
   --muted: #595959;
   --line: #dedede;
   --dock-bottom: 20px;
-  --dock-height: 32px;
+  --dock-height: 36px;
   --dock-clearance: 16px;
   --dock-accent: #135e4f;
   --dock-muted: #65817b;
@@ -103,16 +103,16 @@
     left: 50%;
     transform: translateX(-50%);
     width: max-content;
-    height: 32px;
+    height: 36px;
     padding: 0;
     border-radius: 9999px;
 
-    /* Exact Figma Container: Fill #999999 20% */
-    background: rgba(153, 153, 153, 0.2);
+    /* Frosted glass fill with background blur */
+    background: rgba(153, 153, 153, 0.25);
 
-    /* Exact Figma Glass: Frost 4 */
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    /* Blur behind navs */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 
     /* Exact Figma Container Inner Shadow: X 0, Y 0, Blur 0, Spread 1, Color #1C1C1C 4% */
     box-shadow: inset 0 0 0 1px rgba(28, 28, 28, 0.04);
@@ -134,15 +134,15 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    height: 32px;
+    height: 36px;
   }
 
   .nav-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    padding: 6px 10px;
+    height: 36px;
+    padding: 8px 10px;
     border-radius: 9999px;
     font-family: "Portfolio Inter", Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 14px;

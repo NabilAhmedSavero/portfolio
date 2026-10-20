@@ -362,8 +362,8 @@ export function WorkGallery({
 
   return (
     <section aria-label="Work Projects" className="w-full">
-      {/* Irakli format: Single column stream matching iraklis.work (48px gap mobile, 64px desktop) */}
-      <div className="w-full flex flex-col items-center gap-[48px] md:gap-[64px]">
+      {/* Stream with halved gap: 24px mobile, 32px desktop */}
+      <div className="w-full flex flex-col items-center gap-[24px] md:gap-[32px]">
         {items.map((item, index) => (
           <WorkGalleryCard
             key={item.id}
