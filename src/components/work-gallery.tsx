@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
 import { createWorkSlides, type Project, type WorkSlide } from "@/data/projects";
 import { urlFor, imageUrl } from "@/sanity/lib/images";
 
@@ -153,34 +153,6 @@ type WorkGalleryCardProps = {
 };
 
 function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const pillRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    if (pillRef.current) {
-      pillRef.current.style.transition = "opacity 450ms ease-out";
-      pillRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-    }
-    setIsHovered(true);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    if (pillRef.current) {
-      pillRef.current.style.transition = "transform 150ms ease-out, opacity 450ms ease-out";
-      pillRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
   const Tag = item.externalUrl ? "a" : "div";
   const linkProps = item.externalUrl
     ? {
@@ -208,12 +180,7 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
         aria-label={`View ${item.name}`}
       >
         {/* Image Container: Strict 3:2 aspect ratio, edge-to-edge cover, 8px radius */}
-        <div
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          className="w-full aspect-[3/2] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10"
-        >
+        <div className="w-full aspect-[3/2] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10 cursor-pointer">
           <Image
             src={item.image.src}
             alt={item.image.alt}
@@ -223,41 +190,13 @@ function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
             priority={true}
             quality={100}
             sizes="(max-width: 768px) 100vw, 682px"
-            className="w-full h-full object-cover block"
+            className="w-full h-full object-cover block cursor-pointer"
           />
-
-          {/* Cursor-following floating pill: outer tracks position with trailing delay, inner handles scale/fade */}
-          <div
-            ref={pillRef}
-            className="pointer-events-none absolute left-0 top-0 z-50 will-change-transform hidden md:block transition-opacity duration-[450ms] ease-out"
-            style={{ opacity: isHovered ? 1 : 0 }}
-          >
-            <div
-              className={`flex items-center justify-center gap-[8px] py-2 px-4 rounded-full bg-[#000000]/60 backdrop-blur-[4px] border border-white/10 transform-gpu [backface-visibility:hidden] transition-transform duration-[450ms] ease-out text-white font-medium text-sm tracking-wide select-none shadow-sm ${
-                isHovered ? "scale-100" : "scale-0"
-              }`}
-            >
-              <span>{item.externalUrl ? "Case study" : "Open"}</span>
-              <svg
-                className="w-5 h-5 select-none shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <line x1="7" y1="17" x2="17" y2="7" />
-                <polyline points="7 7 17 7 17 17" />
-              </svg>
-            </div>
-          </div>
         </div>
       </Tag>
 
-      {/* Caption: Title followed by Subtitle strictly left-aligned (Skale rhythm) */}
-      <div className="mt-3.5 md:mt-4 flex flex-col items-start text-left w-full gap-1">
+      {/* Caption: Title followed by Subtitle strictly left-aligned */}
+      <div className="mt-4 flex flex-col items-start text-left w-full gap-0.5">
         <h2
           className="text-[16px] font-[500] text-neutral-900 leading-snug tracking-tight"
           style={{ fontSize: "16px", fontWeight: 500 }}
@@ -362,8 +301,8 @@ export function WorkGallery({
 
   return (
     <section aria-label="Work Projects" className="w-full">
-      {/* Strictly 1 column vertical layout with generous row gaps (Skale cadence) */}
-      <div className="w-full flex flex-col items-center gap-y-16 md:gap-y-24">
+      {/* Symmetrical vertical rhythm: 16px between cards matching 16px thumbnail-to-text */}
+      <div className="w-full flex flex-col items-center gap-y-4">
         {items.map((item, index) => (
           <WorkGalleryCard
             key={item.id}
