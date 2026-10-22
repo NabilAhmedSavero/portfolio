@@ -13,7 +13,7 @@ export const getHomeContent = cache(async () => {
   const site = await getSiteContent();
   const rawAvatar = site?.heroProfileImage;
   const croppedProfileUrl = rawAvatar?.asset
-    ? urlFor(rawAvatar)?.width(256).height(256).quality(100).fit("crop").url()
+    ? urlFor(rawAvatar)?.width(512).height(512).quality(100).fit("crop").url()
     : null;
   const profileUrl = croppedProfileUrl || imageUrl(rawAvatar);
   const about = site?.about?.length ? site.about : homeFallback.about;

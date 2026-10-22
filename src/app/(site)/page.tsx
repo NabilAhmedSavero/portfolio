@@ -15,7 +15,7 @@ export default async function HomePage() {
 
   const avatarSrc =
     (site.heroProfileImageRaw?.asset
-      ? urlForImage(site.heroProfileImageRaw)?.width(256).height(256).quality(100).fit("crop").url()
+      ? urlForImage(site.heroProfileImageRaw)?.width(512).height(512).quality(100).fit("crop").url()
       : null) || site.heroProfileImage.src;
 
   return (
@@ -36,7 +36,9 @@ export default async function HomePage() {
                 width={64}
                 height={64}
                 className="w-full h-full object-cover"
+                unoptimized
                 priority
+                style={{ imageRendering: "-webkit-optimize-contrast" }}
               />
               {/* Figma Inner Shadow 2px White Overlay */}
               <div className="absolute inset-0 rounded-[12px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
@@ -54,22 +56,14 @@ export default async function HomePage() {
 
         <main id="main-content" tabIndex={-1} className="flex flex-col gap-[40px]">
           {/* About Section */}
-          <section id="about" aria-labelledby="about-heading" className="w-full max-w-[560px] flex flex-col gap-[12px] p-0">
-            <h2 id="about-heading" className="font-sans text-[15px] font-normal leading-[24px] tracking-[-0.02em] text-[#808080]">
-              About
-            </h2>
-            <div className="h-[1px] w-full bg-[#E5E5E5]" role="separator" />
+          <Section id="about" title="About" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px]">
               <RichText value={site.about} />
             </div>
-          </section>
+          </Section>
 
           {/* Currently Section */}
-          <section id="currently" aria-labelledby="currently-heading" className="w-full max-w-[560px] flex flex-col gap-[12px] p-0">
-            <h2 id="currently-heading" className="font-sans text-[15px] font-normal leading-[24px] tracking-[-0.02em] text-[#808080]">
-              Currently
-            </h2>
-            <div className="h-[1px] w-full bg-[#E5E5E5]" role="separator" />
+          <Section id="currently" title="Currently" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px]">
               <RichText value={site.currently} />
               <p>{site.freelanceStartingPrice}</p>
@@ -80,7 +74,7 @@ export default async function HomePage() {
                 ) : site.currentlyContactCta.text}.
               </p>
             </div>
-          </section>
+          </Section>
 
           {/* Experience Section - strictly untouched */}
           <Section id="experience" title="Experience" className="home-panel">
