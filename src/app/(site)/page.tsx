@@ -23,15 +23,17 @@ export default async function HomePage() {
           {/* Profile Header Stack (Avatar + Name + Location/Time) */}
           <div className="relative -mt-[32px] mx-auto w-fit flex flex-col items-center text-center z-10">
             {/* Profile Avatar Frame */}
-            <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden relative ring-2 ring-inset ring-[#ffffff]">
+            <div className="relative w-[64px] h-[64px] rounded-[12px] overflow-hidden">
               <Image
                 src={site.heroProfileImage.src}
-                alt={site.heroProfileImage.alt}
+                alt={site.heroProfileImage.alt || "Nabil Savero"}
                 width={64}
                 height={64}
-                className="w-full h-full object-cover rounded-[12px]"
+                className="w-full h-full object-cover"
                 priority
               />
+              {/* Figma Inner Shadow 2px White Overlay */}
+              <div className="absolute inset-0 rounded-[12px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
             </div>
 
             {/* Profile Typography */}
