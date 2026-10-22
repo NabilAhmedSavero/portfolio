@@ -37,7 +37,10 @@ export const homeFallback = {
   currentlyContactIntro: "If you think we'd be a good fit,",
   currentlyContactCta: { text: "let's talk", href: "https://x.com/saverovkn" },
   contactEmail: "saverovkn@gmail.com",
-  socialLinks: [{ _key: "twitter", label: "X/Twitter", displayText: "Saverovkn", href: "https://x.com/saverovkn" }],
+  socialLinks: [
+    { _key: "twitter", label: "X/Twitter", displayText: "Saverovkn", href: "https://x.com/saverovkn" },
+    { _key: "linkedin", label: "LinkedIn", displayText: "Nabil Savero", href: "https://www.linkedin.com/in/nabil-saveroo/" },
+  ],
   footerText: "© 2026 Saverovkn",
 };
 

@@ -38,12 +38,24 @@ export const getHomeContent = cache(async () => {
       href: site?.currentlyContactCta ? safeHref(site.currentlyContactCta.href) : homeFallback.currentlyContactCta.href,
     },
     contactEmail: site?.contactEmail?.trim() || homeFallback.contactEmail,
-    socialLinks: (site?.socialLinks ?? homeFallback.socialLinks).flatMap((link) => {
-      const href = safeHref(link.href);
-      return href && link.label?.trim() ? [{
-        id: link._key, label: link.label, displayText: link.displayText?.trim() || link.label, href,
-      }] : [];
-    }),
+    socialLinks: (() => {
+      const rawLinks = site?.socialLinks?.length ? site.socialLinks : homeFallback.socialLinks;
+      const links = rawLinks.flatMap((link) => {
+        const href = safeHref(link.href);
+        return href && link.label?.trim() ? [{
+          id: link._key, label: link.label, displayText: link.displayText?.trim() || link.label, href,
+        }] : [];
+      });
+      if (!links.some((l) => l.label.toLowerCase() === "linkedin")) {
+        links.push({
+          id: "linkedin",
+          label: "LinkedIn",
+          displayText: "Nabil Savero",
+          href: "https://www.linkedin.com/in/nabil-saveroo/",
+        });
+      }
+      return links;
+    })(),
     footerText: site?.footerText?.trim() || homeFallback.footerText,
   };
 });
