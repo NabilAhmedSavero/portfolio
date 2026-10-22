@@ -29,6 +29,11 @@
 }
 
 @layer base {
+  html, body, main {
+    margin: 0;
+    padding: 0;
+  }
+
   html {
     scrollbar-gutter: stable;
   }
@@ -215,7 +220,8 @@
   }
 
   .page-transition {
-    padding-bottom: calc(var(--dock-bottom) + var(--dock-height) + var(--dock-clearance) + env(safe-area-inset-bottom, 0px));
+    margin: 0;
+    padding: 0;
   }
 
   @media (prefers-reduced-motion: reduce) {

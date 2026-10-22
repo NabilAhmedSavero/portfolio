@@ -19,12 +19,12 @@ export default async function HomePage() {
       : null) || site.heroProfileImage.src;
 
   return (
-    <div className="home-page min-h-screen flex flex-col">
-      <div className="w-full max-w-[560px] mx-auto px-4 min-[560px]:px-0 pb-0 flex-1 flex flex-col">
+    <div className="home-page min-h-screen flex flex-col m-0 p-0">
+      <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col border-l border-r border-dashed border-[#e5e5e5] m-0 p-0">
         {/* Hero Profile Header */}
         <header
           aria-labelledby="intro-heading"
-          className="home-panel pt-10 md:pt-14 pb-10 flex flex-col items-center text-center mx-auto w-full"
+          className="home-panel pt-10 md:pt-14 pb-10 flex flex-col items-center text-center mx-auto w-full px-4"
         >
           {/* Profile Avatar Frame */}
           <div className="w-[56px] h-[56px] rounded-[12px] overflow-hidden relative mx-auto">
@@ -51,7 +51,7 @@ export default async function HomePage() {
           </p>
         </header>
 
-        <main id="main-content" tabIndex={-1}>
+        <main id="main-content" tabIndex={-1} className="m-0 p-0">
           {/* About Section */}
           <Section id="about" title="About" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px]">

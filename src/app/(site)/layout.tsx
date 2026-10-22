@@ -23,8 +23,8 @@ export const viewport: Viewport = { viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} antialiased`}>
-      <body className={`${geistSans.className} font-sans antialiased`}>
+    <html lang="en" className={`${geistSans.variable} antialiased m-0 p-0`}>
+      <body className={`${geistSans.className} font-sans antialiased m-0 p-0`}>
         <script id={HOME_ENTRANCE_SCRIPT_ID} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: HOME_ENTRANCE_INIT }} />
         <a href="#main-content" className="skip-link sr-only focus:not-sr-only">
           Skip to content
