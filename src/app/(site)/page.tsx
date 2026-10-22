@@ -85,39 +85,19 @@ export default async function HomePage() {
               </p>
               <p>
                 Previously collaborated with{" "}
-                <a
-                  href="https://faction.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
-                >
+                <a href="https://faction.ai" target="_blank" rel="noopener noreferrer">
                   Faction
                 </a>
                 ,{" "}
-                <a
-                  href="https://servinghours.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
-                >
+                <a href="https://servinghours.com" target="_blank" rel="noopener noreferrer">
                   Serving Hours
                 </a>
                 ,{" "}
-                <a
-                  href="https://plied.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
-                >
+                <a href="https://plied.ai" target="_blank" rel="noopener noreferrer">
                   Plied
                 </a>
                 ,{" "}
-                <a
-                  href="https://caraflorist.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
-                >
+                <a href="https://caraflorist.com/" target="_blank" rel="noopener noreferrer">
                   Cara Florist
                 </a>
                 , and others.
