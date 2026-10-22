@@ -166,6 +166,17 @@
   text-decoration-color: #171717;
 }
 
+.home-page .home-talk-btn,
+.home-page .home-talk-btn:visited {
+  color: #1c1c1c;
+  text-decoration: none;
+}
+
+.home-page .home-talk-btn:hover {
+  color: #1c1c1c;
+  text-decoration: none;
+}
+
 .home-page .home-experiences {
   display: grid;
   gap: var(--home-section-space);
@@ -239,12 +250,15 @@
 }
 
 .home-page .home-footer {
-  padding: 2.5rem var(--home-padding);
   text-align: center;
   font-size: 12px;
   line-height: 16px;
   letter-spacing: -0.02em;
   color: var(--home-muted);
+}
+
+.home-page .home-footer::after {
+  border-bottom: 0;
 }
 
 /* The early initializer releases the first timeline once critical assets are ready.

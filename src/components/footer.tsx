@@ -26,7 +26,9 @@ export async function Footer({ variant = "foundation" }: { variant?: "home" | "f
             ))}
           </dl>
         </Section>
-        <footer className="home-footer home-panel"><p>{home.footerText}</p></footer>
+        <footer className="home-footer home-panel flex-1 flex flex-col items-center justify-center py-6 pb-20">
+          <p>{home.footerText}</p>
+        </footer>
       </>
     );
   }
