@@ -32,8 +32,8 @@ export default async function HomePage() {
                 className="w-full h-full object-cover"
                 priority
               />
-              {/* Figma Inner Shadow 2px White Overlay */}
-              <div className="absolute inset-0 rounded-[12px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
+              {/* Figma Inner Shadow 3px White Overlay */}
+              <div className="absolute inset-0 rounded-[12px] ring-[3px] ring-inset ring-[#ffffff] pointer-events-none z-10" />
             </div>
 
             {/* Profile Typography */}
