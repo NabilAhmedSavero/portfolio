@@ -21,23 +21,10 @@ export default async function HomePage() {
   return (
     <div className="home-page min-h-screen flex flex-col">
       <div className="w-full max-w-[560px] mx-auto px-4 min-[560px]:px-0 pb-0 flex-1 flex flex-col">
-        {/* Top Dashed Header Bar */}
-        <div className="home-panel home-top-bar flex items-center justify-between py-3 px-4">
-          <span className="font-sans text-[15px] leading-[24px] text-neutral-800">
-            saverovkn
-          </span>
-          <a
-            href="mailto:saverovkn@gmail.com"
-            className="home-talk-btn no-underline bg-white text-[#1c1c1c] font-medium text-[14px] leading-[20px] px-3.5 py-1 rounded-full shadow-sm border border-neutral-200/80 hover:bg-neutral-50 transition-colors cursor-pointer"
-          >
-            Let&apos;s talk
-          </a>
-        </div>
-
         {/* Hero Profile Header */}
         <header
           aria-labelledby="intro-heading"
-          className="home-panel pt-8 md:pt-12 pb-10 flex flex-col items-center text-center mx-auto w-full"
+          className="home-panel pt-10 md:pt-14 pb-10 flex flex-col items-center text-center mx-auto w-full"
         >
           {/* Profile Avatar Frame */}
           <div className="w-[56px] h-[56px] rounded-[12px] overflow-hidden relative mx-auto">
