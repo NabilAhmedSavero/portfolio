@@ -102,43 +102,41 @@
   padding: var(--home-section-space) var(--home-padding) 2.5rem;
 }
 
-.home-page h2 {
+.home-page h2,
+.home-page .section-stack h2,
+.home-page #about h2,
+.home-page #about-heading,
+.home-page #currently h2,
+.home-page #currently-heading,
+.home-page #contact h2,
+.home-page #contact-heading {
   font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 450;
   letter-spacing: -0.02em;
   color: #808080;
 }
 
-.home-page #about h2,
-.home-page #about-heading,
-.home-page #currently h2,
-.home-page #currently-heading {
-  font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 24px;
-}
-
+.home-page .home-prose,
+.home-page .home-prose p,
 .home-page #about .home-prose,
 .home-page #about .home-prose p,
 .home-page #currently .home-prose,
-.home-page #currently .home-prose p {
+.home-page #currently .home-prose p,
+.home-page .home-contact-list,
+.home-page .home-contact-row,
+.home-page .home-contact-row dt,
+.home-page .home-contact-row dd {
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 24px;
+  font-weight: 450;
 }
 
 .home-page .home-prose {
   display: grid;
   gap: var(--home-paragraph-gap);
-  font-size: 0.875rem;
-}
-
-@media (min-width: 640px) {
-  .home-page .home-prose {
-    font-size: 0.9375rem;
-  }
 }
 
 .home-page .home-prose p { color: #404040; }

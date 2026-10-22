@@ -8,7 +8,7 @@ export const siteContent = defineType({
     { name: "hero", title: "Hero", default: true },
     { name: "about", title: "About" },
     { name: "currently", title: "Currently" },
-    { name: "contact", title: "Contact / Footer" },
+    { name: "contact", title: "Contacts / Footer" },
     { name: "publishing", title: "Publishing" },
   ],
   fields: [

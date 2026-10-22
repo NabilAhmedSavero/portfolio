@@ -54,14 +54,14 @@ export default async function HomePage() {
         <main id="main-content" tabIndex={-1} className="m-0 p-0">
           {/* About Section */}
           <Section id="about" title="About" className="home-panel">
-            <div className="home-prose font-sans text-[15px] leading-[24px]">
+            <div className="home-prose font-sans text-[15px] leading-[24px] font-[450]">
               <RichText value={site.about} />
             </div>
           </Section>
 
           {/* Currently Section */}
           <Section id="currently" title="Currently" className="home-panel">
-            <div className="home-prose font-sans text-[15px] leading-[24px]">
+            <div className="home-prose font-sans text-[15px] leading-[24px] font-[450]">
               <RichText value={site.currently} />
               <p>{site.freelanceStartingPrice}</p>
               <p>

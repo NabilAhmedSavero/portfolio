@@ -10,18 +10,18 @@ export async function Footer({ variant = "foundation" }: { variant?: "home" | "f
 
     return (
       <>
-        <Section id="contact" title="Contact" className="home-panel">
-          <dl className="home-contact-list">
+        <Section id="contact" title="Contacts" className="home-panel">
+          <dl className="home-contact-list font-sans text-[15px] leading-[24px] font-[450]">
             {emailHref && (
-              <div className="home-contact-row">
-                <dt>Email</dt>
-                <dd><a href={emailHref}>{home.contactEmail}</a></dd>
+              <div className="home-contact-row font-[450]">
+                <dt className="font-[450]">Email</dt>
+                <dd className="font-[450]"><a href={emailHref}>{home.contactEmail}</a></dd>
               </div>
             )}
             {home.socialLinks.map((link) => (
-              <div key={link.id} className="home-contact-row">
-                <dt>{link.label}</dt>
-                <dd><a href={link.href} target="_blank" rel="noopener noreferrer">{link.displayText}</a></dd>
+              <div key={link.id} className="home-contact-row font-[450]">
+                <dt className="font-[450]">{link.label}</dt>
+                <dd className="font-[450]"><a href={link.href} target="_blank" rel="noopener noreferrer">{link.displayText}</a></dd>
               </div>
             ))}
           </dl>
@@ -45,7 +45,7 @@ export async function Footer({ variant = "foundation" }: { variant?: "home" | "f
 
   return (
     <footer className="site-footer">
-      <Section id="contact" title="Contact">
+      <Section id="contact" title="Contacts">
         {hasContactContent ? (
           <>
             {emailHref && (
