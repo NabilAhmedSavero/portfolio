@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Geist } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/page-transition";
 import { HOME_ENTRANCE_INIT, HOME_ENTRANCE_SCRIPT_ID } from "@/components/home-entrance-init";
 import "../globals.css";
 
-const geistSans = Geist({
+const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  variable: "--font-instrument-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,8 +24,8 @@ export const viewport: Viewport = { viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} antialiased m-0 p-0`}>
-      <body className={`${geistSans.className} font-sans antialiased m-0 p-0`}>
+    <html lang="en" className={`${instrumentSans.variable} antialiased m-0 p-0`}>
+      <body className={`${instrumentSans.className} font-sans antialiased m-0 p-0`}>
         <script id={HOME_ENTRANCE_SCRIPT_ID} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: HOME_ENTRANCE_INIT }} />
         <a href="#main-content" className="skip-link sr-only focus:not-sr-only">
           Skip to content
