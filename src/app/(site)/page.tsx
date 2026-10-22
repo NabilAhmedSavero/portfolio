@@ -20,11 +20,10 @@ export default async function HomePage() {
           {/* Cover / Banner Image Frame */}
           <div className="w-full max-w-[560px] h-[132px] rounded-[12px] overflow-hidden relative bg-[#EBEBEB]" />
 
-          {/* Profile Avatar & Info Frame */}
-          {/* Overlapping bottom-left area of banner and centered cleanly above Name and Location/Time block */}
-          <div className="relative -mt-[32px] ml-[20px] w-fit flex flex-col items-center text-center gap-[12px]">
-            {/* Profile Avatar Frame */}
-            <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden relative bg-[#FFFFFF]/[0.01] after:content-[''] after:absolute after:inset-0 after:rounded-[12px] after:shadow-[inset_0_0_0_2px_#ffffff] after:pointer-events-none">
+          {/* Profile Header Stack (Avatar + Name + Location/Time) */}
+          <div className="relative -mt-[32px] mx-auto w-fit flex flex-col items-center text-center z-10">
+            {/* Profile Avatar Frame with 2px White Border */}
+            <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden relative bg-[#FFFFFF]/[0.01] border-2 border-[#ffffff] after:content-[''] after:absolute after:inset-0 after:rounded-[12px] after:shadow-[inset_0_0_0_2px_#ffffff] after:pointer-events-none">
               <Image
                 src={site.heroProfileImage.src}
                 alt={site.heroProfileImage.alt}
@@ -36,36 +35,34 @@ export default async function HomePage() {
             </div>
 
             {/* Profile Typography */}
-            <div className="flex flex-col gap-[2px]">
-              <h1 id="intro-heading" className="font-medium text-[18px] leading-[24px] text-[#1c1c1c]">
-                {site.heroDisplayName}
-              </h1>
-              <p className="font-[450] text-[14px] leading-[20px] text-[#999999]">
-                <LocalClock city="Balikpapan" />
-              </p>
-            </div>
+            <h1 id="intro-heading" className="mt-3 font-medium text-[18px] leading-[24px] text-[#1c1c1c]">
+              {site.heroDisplayName}
+            </h1>
+            <p className="mt-1 font-sans font-[450] text-[15px] leading-[24px] text-[#999999]">
+              <LocalClock city="Balikpapan" />
+            </p>
           </div>
         </section>
 
         <main id="main-content" tabIndex={-1} className="flex flex-col gap-[40px]">
           {/* About Section */}
           <section id="about" aria-labelledby="about-heading" className="w-full max-w-[560px] flex flex-col gap-[12px] p-0">
-            <h2 id="about-heading" className="font-sans text-[0.875rem] font-normal leading-[1.6] tracking-[-0.02em] text-[#808080]">
+            <h2 id="about-heading" className="font-sans text-[15px] font-normal leading-[24px] tracking-[-0.02em] text-[#808080]">
               About
             </h2>
             <div className="h-[1px] w-full bg-[#E5E5E5]" role="separator" />
-            <div className="home-prose">
+            <div className="home-prose font-sans text-[15px] leading-[24px]">
               <RichText value={site.about} />
             </div>
           </section>
 
           {/* Currently Section */}
           <section id="currently" aria-labelledby="currently-heading" className="w-full max-w-[560px] flex flex-col gap-[12px] p-0">
-            <h2 id="currently-heading" className="font-sans text-[0.875rem] font-normal leading-[1.6] tracking-[-0.02em] text-[#808080]">
+            <h2 id="currently-heading" className="font-sans text-[15px] font-normal leading-[24px] tracking-[-0.02em] text-[#808080]">
               Currently
             </h2>
             <div className="h-[1px] w-full bg-[#E5E5E5]" role="separator" />
-            <div className="home-prose">
+            <div className="home-prose font-sans text-[15px] leading-[24px]">
               <RichText value={site.currently} />
               <p>{site.freelanceStartingPrice}</p>
               <p>

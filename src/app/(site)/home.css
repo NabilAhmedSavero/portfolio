@@ -138,6 +138,17 @@
 .home-page #currently h2,
 .home-page #currently-heading {
   font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+.home-page #about .home-prose,
+.home-page #about .home-prose p,
+.home-page #currently .home-prose,
+.home-page #currently .home-prose p {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 24px;
 }
 
 .home-page .home-prose {
