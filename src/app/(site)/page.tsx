@@ -22,14 +22,14 @@ export default async function HomePage() {
 
           {/* Profile Header Stack (Avatar + Name + Location/Time) */}
           <div className="relative -mt-[32px] mx-auto w-fit flex flex-col items-center text-center z-10">
-            {/* Profile Avatar Frame with 2px White Border */}
-            <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden relative bg-[#FFFFFF]/[0.01] border-2 border-[#ffffff] after:content-[''] after:absolute after:inset-0 after:rounded-[12px] after:shadow-[inset_0_0_0_2px_#ffffff] after:pointer-events-none">
+            {/* Profile Avatar Frame */}
+            <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden relative ring-2 ring-inset ring-[#ffffff]">
               <Image
                 src={site.heroProfileImage.src}
                 alt={site.heroProfileImage.alt}
                 width={64}
                 height={64}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-[12px]"
                 priority
               />
             </div>
