@@ -256,12 +256,17 @@ export type AllSanitySchemaTypes =
 
 // Source: src/sanity/lib/queries.ts
 // Variable: SITE_CONTENT_QUERY
-// Query: *[_type == "siteContent" && _id == "siteContent"][0]{    _id, heroDisplayName, heroRole, heroProfileImage, locationTimezoneLabel,    about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,    contactEmail, socialLinks, footerText, useCmsProjects  }
+// Query: *[_type == "siteContent" && _id == "siteContent"][0]{    _id, heroDisplayName, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,    about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,    contactEmail, socialLinks, footerText, useCmsProjects  }
 export type SITE_CONTENT_QUERY_RESULT = {
   _id: "siteContent";
   heroDisplayName: string | null;
   heroRole: string | null;
-  heroProfileImage: ContentImage | null;
+  heroProfileImage: {
+    asset: SanityImageAssetReference | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    alt: string | null;
+  } | null;
   locationTimezoneLabel: string | null;
   about: RichText | null;
   aboutMobile: RichText | null;
@@ -318,7 +323,7 @@ export type PROJECTS_QUERY_RESULT = Array<{
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "siteContent" && _id == "siteContent"][0]{\n    _id, heroDisplayName, heroRole, heroProfileImage, locationTimezoneLabel,\n    about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,\n    contactEmail, socialLinks, footerText, useCmsProjects\n  }\n': SITE_CONTENT_QUERY_RESULT;
+    '\n  *[_type == "siteContent" && _id == "siteContent"][0]{\n    _id, heroDisplayName, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,\n    about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,\n    contactEmail, socialLinks, footerText, useCmsProjects\n  }\n': SITE_CONTENT_QUERY_RESULT;
     '\n  *[_type == "experience" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, position, company, period, description, logo, monogram, displayOrder\n  }\n': EXPERIENCE_QUERY_RESULT;
     '\n  *[_type == "project" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, name, subtitle, coverImage, additionalImages, externalUrl, displayOrder\n  }\n': PROJECTS_QUERY_RESULT;
   }

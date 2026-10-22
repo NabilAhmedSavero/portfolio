@@ -2,7 +2,7 @@ import { defineQuery } from "next-sanity";
 
 export const SITE_CONTENT_QUERY = defineQuery(`
   *[_type == "siteContent" && _id == "siteContent"][0]{
-    _id, heroDisplayName, heroRole, heroProfileImage, locationTimezoneLabel,
+    _id, heroDisplayName, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,
     about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,
     contactEmail, socialLinks, footerText, useCmsProjects
   }

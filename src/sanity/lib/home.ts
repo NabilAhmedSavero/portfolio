@@ -5,13 +5,17 @@ import { experienceFallback, homeFallback, type HomeExperience } from "@/data/ho
 import type { EXPERIENCE_QUERY_RESULT } from "../types";
 import { fetchPublished } from "./client";
 import { getSiteContent } from "./content";
-import { imageUrl } from "./images";
+import { imageUrl, urlFor } from "./images";
 import { safeHref } from "./links";
 import { EXPERIENCE_QUERY } from "./queries";
 
 export const getHomeContent = cache(async () => {
   const site = await getSiteContent();
-  const profileUrl = imageUrl(site?.heroProfileImage);
+  const rawAvatar = site?.heroProfileImage;
+  const croppedProfileUrl = rawAvatar?.asset
+    ? urlFor(rawAvatar)?.width(256).height(256).quality(100).fit("crop").url()
+    : null;
+  const profileUrl = croppedProfileUrl || imageUrl(rawAvatar);
   const about = site?.about?.length ? site.about : homeFallback.about;
 
   return {
@@ -21,6 +25,7 @@ export const getHomeContent = cache(async () => {
       src: profileUrl,
       alt: site?.heroProfileImage?.alt || homeFallback.heroProfileImage.alt,
     } : homeFallback.heroProfileImage,
+    heroProfileImageRaw: rawAvatar,
     locationTimezoneLabel: site?.locationTimezoneLabel?.trim() || homeFallback.locationTimezoneLabel,
     about,
     // Existing CMS About copy also works on smaller screens unless an override is supplied.

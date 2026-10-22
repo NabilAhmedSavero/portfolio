@@ -5,6 +5,7 @@ import { LocalClock } from "@/components/local-clock";
 import { RichText } from "@/components/rich-text";
 import { Section } from "@/components/section";
 import { getHomeContent, getHomeExperiences } from "@/sanity/lib/home";
+import { urlForImage } from "@/sanity/lib/images";
 import "./home.css";
 
 export const metadata: Metadata = { title: { absolute: "Nabil Savero" } };
@@ -12,9 +13,14 @@ export const metadata: Metadata = { title: { absolute: "Nabil Savero" } };
 export default async function HomePage() {
   const [site, experiences] = await Promise.all([getHomeContent(), getHomeExperiences()]);
 
+  const avatarSrc =
+    (site.heroProfileImageRaw?.asset
+      ? urlForImage(site.heroProfileImageRaw)?.width(256).height(256).quality(100).fit("crop").url()
+      : null) || site.heroProfileImage.src;
+
   return (
     <div className="home-page min-h-screen">
-      <div className="w-full max-w-[560px] mx-auto px-4 min-[560px]:px-0 pt-8 pb-20 flex flex-col gap-[40px]">
+      <div className="w-full max-w-[560px] mx-auto px-4 pt-4 min-[560px]:px-0 min-[560px]:pt-8 pb-20 flex flex-col gap-[40px]">
         {/* Hero Banner & Profile Header */}
         <section aria-labelledby="intro-heading" className="w-full max-w-[560px]">
           {/* Cover / Banner Image Frame */}
@@ -25,22 +31,22 @@ export default async function HomePage() {
             {/* Profile Avatar Frame */}
             <div className="relative w-[64px] h-[64px] rounded-[12px] overflow-hidden">
               <Image
-                src={site.heroProfileImage.src}
+                src={avatarSrc}
                 alt={site.heroProfileImage.alt || "Nabil Savero"}
                 width={64}
                 height={64}
                 className="w-full h-full object-cover"
                 priority
               />
-              {/* Figma Inner Shadow 3px White Overlay */}
-              <div className="absolute inset-0 rounded-[12px] ring-[3px] ring-inset ring-[#ffffff] pointer-events-none z-10" />
+              {/* Figma Inner Shadow 2px White Overlay */}
+              <div className="absolute inset-0 rounded-[12px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
             </div>
 
             {/* Profile Typography */}
             <h1 id="intro-heading" className="mt-3 font-medium text-[18px] leading-[24px] text-[#1c1c1c]">
               {site.heroDisplayName}
             </h1>
-            <p className="mt-1 font-sans font-[450] text-[15px] leading-[24px] text-[#999999]">
+            <p className="mt-1 font-sans font-[450] text-[14px] leading-[20px] text-[#999999]">
               <LocalClock city="Balikpapan" />
             </p>
           </div>

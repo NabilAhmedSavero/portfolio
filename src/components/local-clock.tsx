@@ -28,7 +28,7 @@ export function LocalClock({ city = "Balikpapan", className }: LocalClockProps) 
   }, []);
 
   return (
-    <span className={className ?? "font-sans font-[450] text-[15px] leading-[24px] text-[#999999]"} suppressHydrationWarning>
+    <span className={className ?? "font-sans font-[450] text-[14px] leading-[20px] text-[#999999]"} suppressHydrationWarning>
       {city} • {now ? timeFormat.format(now) : "--:--"}
     </span>
   );

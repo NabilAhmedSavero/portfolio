@@ -7,6 +7,10 @@ export function urlFor(source: SanityImageSource) {
   return builder ? builder.image(source) : null;
 }
 
+export function urlForImage(source: SanityImageSource) {
+  return builder ? builder.image(source) : null;
+}
+
 export function imageUrl(image: SanityImageSource | null | undefined, preserveOriginal = true): string | null {
   if (!builder || !image) return null;
 
