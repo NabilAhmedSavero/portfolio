@@ -360,7 +360,7 @@ export function WorkGallery({ items }: { items: readonly WorkSlide[] }) {
         </svg>
       </button>
 
-      <span className="work-dock-counter font-mono" aria-live="polite">
+      <span className="work-dock-counter font-sans" aria-live="polite">
         {items.length ? `${activeIndex + 1} / ${items.length}` : "0 / 0"}
       </span>
 

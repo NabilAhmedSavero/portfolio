@@ -2,8 +2,6 @@
    Works Page — Horizontal Photographic Gallery
    ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap");
-
 :root {
   /* Clean standard cursors */
   --work-cursor-grab: grab;
@@ -473,7 +471,7 @@ body.is-gallery-dragging * {
 /* Technical Monospace Counter: JetBrains Mono, muted (text-gray-500) */
 .work-dock-counter {
   min-width: 52px;
-  font-family: "JetBrains Mono", "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-sans);
   font-size: 12.5px;
   font-weight: 500;
   line-height: 20px;

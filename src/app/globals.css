@@ -1,14 +1,5 @@
 @import "tailwindcss";
 
-/* Shared with the existing Home headings; the dock also needs it on direct Work loads. */
-@font-face {
-  font-family: "Portfolio Inter";
-  src: url("/fonts/inter-medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* Temporary values. Replace these with the final Framer specifications. */
 :root {
   --content-max-width: 37.5rem;
@@ -116,7 +107,7 @@
     /* Exact Figma Container Inner Shadow: X 0, Y 0, Blur 0, Spread 1, Color #1C1C1C 4% */
     box-shadow: inset 0 0 0 1px rgba(28, 28, 28, 0.04);
 
-    font-family: "Portfolio Inter", Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;
@@ -153,7 +144,7 @@
     height: 36px;
     padding: 8px 12px;
     border-radius: 9999px;
-    font-family: "Portfolio Inter", Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;

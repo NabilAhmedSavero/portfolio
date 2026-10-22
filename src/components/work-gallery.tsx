@@ -375,7 +375,7 @@ export function WorkGallery({
 
               {/* Counter: e.g. 1 / 18 */}
               <span
-                className="font-mono text-[13px] sm:text-[14px] text-white/90 select-none tracking-wider tabular-nums flex items-center"
+                className="font-sans text-[13px] sm:text-[14px] text-white/90 select-none tracking-wider tabular-nums flex items-center"
                 aria-live="polite"
                 aria-atomic="true"
               >
