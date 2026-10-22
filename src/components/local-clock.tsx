@@ -2,29 +2,34 @@
 
 import { useEffect, useState } from "react";
 
-const timeFormat = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Asia/Makassar", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+const timeFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Makassar",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
 });
 
-export function LocalClock() {
+type LocalClockProps = {
+  city?: string;
+  className?: string;
+};
+
+export function LocalClock({ city = "Balikpapan", className }: LocalClockProps) {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
     const update = () => setNow(new Date());
     const initial = window.setTimeout(update, 0);
     const interval = window.setInterval(update, 1_000);
-    return () => { window.clearTimeout(initial); window.clearInterval(interval); };
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(interval);
+    };
   }, []);
 
   return (
-    <span className="home-time">
-      <svg className="home-location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
-      <time dateTime={now?.toISOString()} aria-label="Current time in Balikpapan">
-        {now ? timeFormat.format(now) : "--:--"} GMT+8
-      </time>
+    <span className={className} suppressHydrationWarning>
+      {city} • {now ? timeFormat.format(now) : "--:--"}
     </span>
   );
 }

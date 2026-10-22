@@ -4,7 +4,6 @@ import { Footer } from "@/components/footer";
 import { LocalClock } from "@/components/local-clock";
 import { RichText } from "@/components/rich-text";
 import { Section } from "@/components/section";
-import { SiteContainer } from "@/components/site-container";
 import { getHomeContent, getHomeExperiences } from "@/sanity/lib/home";
 import "./home.css";
 
@@ -14,35 +13,58 @@ export default async function HomePage() {
   const [site, experiences] = await Promise.all([getHomeContent(), getHomeExperiences()]);
 
   return (
-    <div className="home-page">
-      <SiteContainer className="home-container">
-        <header className="home-location home-panel">
-          <span className="home-place">
-            <svg className="home-location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M19 10c0 3.976-7 11-7 11s-7-7.024-7-11 3.134-7 7-7 7 3.024 7 7z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            <span>{site.locationTimezoneLabel}</span>
-          </span>
-          <LocalClock />
-        </header>
+    <div className="home-page min-h-screen">
+      <div className="w-full max-w-[560px] mx-auto px-4 min-[560px]:px-0 pt-8 pb-20 flex flex-col gap-[40px]">
+        {/* Hero Banner & Profile Header */}
+        <section aria-labelledby="intro-heading" className="w-full max-w-[560px]">
+          {/* Cover / Banner Image Frame */}
+          <div className="w-full max-w-[560px] h-[132px] rounded-[12px] overflow-hidden relative bg-[#EBEBEB]" />
 
-        <main id="main-content" tabIndex={-1}>
-          <section aria-labelledby="intro-heading" className="home-hero home-panel">
-            <Image src={site.heroProfileImage.src} alt={site.heroProfileImage.alt} width={48} height={48} className="home-profile" preload />
-            <div className="home-identity">
-              <h1 id="intro-heading">{site.heroDisplayName}</h1>
-              <p className="home-role">{site.heroRole}</p>
+          {/* Profile Avatar & Info Frame */}
+          {/* Overlapping bottom-left area of banner and centered cleanly above Name and Location/Time block */}
+          <div className="relative -mt-[32px] ml-[20px] w-fit flex flex-col items-center text-center gap-[12px]">
+            {/* Profile Avatar Frame */}
+            <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden relative bg-[#FFFFFF]/[0.01] after:content-[''] after:absolute after:inset-0 after:rounded-[12px] after:shadow-[inset_0_0_0_2px_#ffffff] after:pointer-events-none">
+              <Image
+                src={site.heroProfileImage.src}
+                alt={site.heroProfileImage.alt}
+                width={64}
+                height={64}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
-          </section>
 
-          <Section id="about" title="About" className="home-panel">
+            {/* Profile Typography */}
+            <div className="flex flex-col gap-[2px]">
+              <h1 id="intro-heading" className="font-medium text-[18px] leading-[24px] text-[#1c1c1c]">
+                {site.heroDisplayName}
+              </h1>
+              <p className="font-[450] text-[14px] leading-[20px] text-[#999999]">
+                <LocalClock city="Balikpapan" />
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <main id="main-content" tabIndex={-1} className="flex flex-col gap-[40px]">
+          {/* About Section */}
+          <section id="about" aria-labelledby="about-heading" className="w-full max-w-[560px] flex flex-col gap-[12px] p-0">
+            <h2 id="about-heading" className="font-sans text-[0.875rem] font-normal leading-[1.6] tracking-[-0.02em] text-[#808080]">
+              About
+            </h2>
+            <div className="h-[1px] w-full bg-[#E5E5E5]" role="separator" />
             <div className="home-prose">
               <RichText value={site.about} />
             </div>
-          </Section>
+          </section>
 
-          <Section id="currently" title="Currently" className="home-panel">
+          {/* Currently Section */}
+          <section id="currently" aria-labelledby="currently-heading" className="w-full max-w-[560px] flex flex-col gap-[12px] p-0">
+            <h2 id="currently-heading" className="font-sans text-[0.875rem] font-normal leading-[1.6] tracking-[-0.02em] text-[#808080]">
+              Currently
+            </h2>
+            <div className="h-[1px] w-full bg-[#E5E5E5]" role="separator" />
             <div className="home-prose">
               <RichText value={site.currently} />
               <p>{site.freelanceStartingPrice}</p>
@@ -53,8 +75,9 @@ export default async function HomePage() {
                 ) : site.currentlyContactCta.text}.
               </p>
             </div>
-          </Section>
+          </section>
 
+          {/* Experience Section - strictly untouched */}
           <Section id="experience" title="Experience" className="home-panel">
             <ul className="home-experiences">
               {experiences.map((experience) => (
@@ -76,8 +99,10 @@ export default async function HomePage() {
             </ul>
           </Section>
         </main>
+
+        {/* Contact and Footer - strictly untouched */}
         <Footer variant="home" />
-      </SiteContainer>
+      </div>
     </div>
   );
 }
