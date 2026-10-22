@@ -82,12 +82,12 @@
   width: 100%;
 }
 
-.home-page h1 {
-  font-size: 1.25rem;
+.home-page h1,
+.home-page #intro-heading {
+  font-size: 18px;
+  line-height: 22px;
   font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.05em;
-  color: #000;
+  color: #1c1c1c;
 }
 
 .home-page .home-role {

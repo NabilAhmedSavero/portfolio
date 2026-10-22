@@ -43,7 +43,7 @@ export default async function HomePage() {
           </div>
 
           {/* Profile Typography */}
-          <h1 id="intro-heading" className="mt-3 font-medium text-[16px] leading-[20px] text-[#1c1c1c] text-center">
+          <h1 id="intro-heading" className="text-[18px] leading-[22px] font-medium text-[#1c1c1c] text-center mt-3">
             {site.heroDisplayName}
           </h1>
           <p className="mt-1 font-sans font-[450] text-[14px] leading-[20px] text-[#999999] text-center">

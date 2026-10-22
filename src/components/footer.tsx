@@ -26,7 +26,7 @@ export async function Footer({ variant = "foundation" }: { variant?: "home" | "f
             ))}
           </dl>
         </Section>
-        <footer className="home-footer mt-auto pb-28 pt-8 px-4 text-center border-t border-dashed border-[#e5e5e5] -mt-px w-full">
+        <footer className="home-footer mt-auto pb-28 pt-8 px-4 text-center w-full">
           <p>{home.footerText}</p>
         </footer>
       </>
