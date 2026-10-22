@@ -20,41 +20,38 @@ export default async function HomePage() {
 
   return (
     <div className="home-page min-h-screen">
-      <div className="w-full max-w-[560px] mx-auto px-4 pt-4 min-[560px]:px-0 min-[560px]:pt-8 pb-20 flex flex-col gap-[40px]">
-        {/* Hero Banner & Profile Header */}
-        <section aria-labelledby="intro-heading" className="w-full max-w-[560px]">
-          {/* Cover / Banner Image Frame */}
-          <div className="w-full max-w-[560px] h-[132px] rounded-[12px] overflow-hidden relative bg-[#EBEBEB]" />
-
-          {/* Profile Header Stack (Avatar + Name + Location/Time) */}
-          <div className="relative -mt-[32px] mx-auto w-fit flex flex-col items-center text-center z-10">
-            {/* Profile Avatar Frame */}
-            <div className="relative w-[64px] h-[64px] rounded-[12px] overflow-hidden">
-              <Image
-                src={avatarSrc}
-                alt={site.heroProfileImage.alt || "Nabil Savero"}
-                width={64}
-                height={64}
-                className="w-full h-full object-cover"
-                unoptimized
-                priority
-                style={{ imageRendering: "-webkit-optimize-contrast" }}
-              />
-              {/* Figma Inner Shadow 2px White Overlay */}
-              <div className="absolute inset-0 rounded-[12px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
-            </div>
-
-            {/* Profile Typography */}
-            <h1 id="intro-heading" className="mt-3 font-medium text-[18px] leading-[24px] text-[#1c1c1c]">
-              {site.heroDisplayName}
-            </h1>
-            <p className="mt-1 font-sans font-[450] text-[14px] leading-[20px] text-[#999999]">
-              <LocalClock city="Balikpapan" />
-            </p>
+      <div className="w-full max-w-[560px] mx-auto px-4 min-[560px]:px-0 pb-20">
+        {/* Hero Profile Header */}
+        <header
+          aria-labelledby="intro-heading"
+          className="home-panel pt-8 md:pt-12 pb-10 flex flex-col items-center text-center mx-auto"
+        >
+          {/* Profile Avatar Frame */}
+          <div className="relative w-[64px] h-[64px] rounded-[12px] overflow-hidden">
+            <Image
+              src={avatarSrc}
+              alt={site.heroProfileImage.alt || "Nabil Savero"}
+              width={64}
+              height={64}
+              className="w-full h-full object-cover"
+              unoptimized
+              priority
+              style={{ imageRendering: "-webkit-optimize-contrast" }}
+            />
+            {/* Figma Inner Shadow 2px White Overlay */}
+            <div className="absolute inset-0 rounded-[12px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
           </div>
-        </section>
 
-        <main id="main-content" tabIndex={-1} className="flex flex-col gap-[40px]">
+          {/* Profile Typography */}
+          <h1 id="intro-heading" className="mt-3 font-medium text-[18px] leading-[24px] text-[#1c1c1c]">
+            {site.heroDisplayName}
+          </h1>
+          <p className="mt-1 font-sans font-[450] text-[14px] leading-[20px] text-[#999999]">
+            <LocalClock city="Balikpapan" />
+          </p>
+        </header>
+
+        <main id="main-content" tabIndex={-1}>
           {/* About Section */}
           <Section id="about" title="About" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px]">

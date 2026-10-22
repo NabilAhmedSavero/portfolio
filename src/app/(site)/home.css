@@ -113,7 +113,7 @@
 
 .home-page .section-stack {
   gap: var(--home-section-space);
-  padding: var(--home-section-space) var(--home-padding);
+  padding: var(--home-section-space) var(--home-padding) 2.5rem;
 }
 
 .home-page h2 {
