@@ -63,12 +63,8 @@ export default async function HomePage() {
           <Section id="currently" title="Currently" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px] font-[450]">
               <RichText value={site.currently} />
-              <p>{site.freelanceStartingPrice}</p>
               <p>
-                {site.currentlyContactIntro}{site.currentlyContactIntro && " "}
-                {site.currentlyContactCta.href ? (
-                  <a href={site.currentlyContactCta.href} target="_blank" rel="noopener noreferrer">{site.currentlyContactCta.text}</a>
-                ) : site.currentlyContactCta.text}.
+                I&apos;m also available for freelance design and development projects, taking on a limited number of projects at a time.
               </p>
               <p>
                 Previously collaborated with{" "}
@@ -87,7 +83,8 @@ export default async function HomePage() {
                 <a href="https://caraflorist.com/" target="_blank" rel="noopener noreferrer">
                   Cara Florist
                 </a>
-                , and others.
+                , and others. If you think we&apos;d be a good fit,{" "}
+                <a href="mailto:saverovkn@gmail.com">let&apos;s talk</a>.
               </p>
             </div>
           </Section>

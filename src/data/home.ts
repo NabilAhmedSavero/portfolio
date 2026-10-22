@@ -33,9 +33,9 @@ export const homeFallback = {
   currently: [
     paragraph("availability", "I'm open to joining design studios and product teams building interesting digital products."),
   ] satisfies RichText,
-  freelanceStartingPrice: "I also take on freelance projects, starting at $1,000, depending on scope.",
+  freelanceStartingPrice: "I'm also available for freelance design and development projects, taking on a limited number of projects at a time.",
   currentlyContactIntro: "If you think we'd be a good fit,",
-  currentlyContactCta: { text: "let's talk", href: "https://x.com/saverovkn" },
+  currentlyContactCta: { text: "let's talk", href: "mailto:saverovkn@gmail.com" },
   contactEmail: "saverovkn@gmail.com",
   socialLinks: [
     { _key: "twitter", label: "X/Twitter", displayText: "Saverovkn", href: "https://x.com/saverovkn" },
