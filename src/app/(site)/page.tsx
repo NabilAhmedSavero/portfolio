@@ -4,14 +4,14 @@ import { Footer } from "@/components/footer";
 import { LocalClock } from "@/components/local-clock";
 import { RichText } from "@/components/rich-text";
 import { Section } from "@/components/section";
-import { getHomeContent, getHomeExperiences } from "@/sanity/lib/home";
+import { getHomeContent } from "@/sanity/lib/home";
 import { urlForImage } from "@/sanity/lib/images";
 import "./home.css";
 
 export const metadata: Metadata = { title: { absolute: "Nabil Savero" } };
 
 export default async function HomePage() {
-  const [site, experiences] = await Promise.all([getHomeContent(), getHomeExperiences()]);
+  const site = await getHomeContent();
 
   const avatarSrc =
     (site.heroProfileImageRaw?.asset
@@ -70,29 +70,46 @@ export default async function HomePage() {
                   <a href={site.currentlyContactCta.href} target="_blank" rel="noopener noreferrer">{site.currentlyContactCta.text}</a>
                 ) : site.currentlyContactCta.text}.
               </p>
+              <p>
+                Previously collaborated with{" "}
+                <a
+                  href="https://faction.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
+                >
+                  Faction
+                </a>
+                ,{" "}
+                <a
+                  href="https://servinghours.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
+                >
+                  Serving Hours
+                </a>
+                ,{" "}
+                <a
+                  href="https://plied.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
+                >
+                  Plied
+                </a>
+                ,{" "}
+                <a
+                  href="https://caraflorist.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="collab-link underline underline-offset-4 decoration-dotted decoration-neutral-400 hover:decoration-neutral-900 transition-colors"
+                >
+                  Cara Florist
+                </a>
+                , and others.
+              </p>
             </div>
-          </Section>
-
-          {/* Experience Section - strictly untouched */}
-          <Section id="experience" title="Experience" className="home-panel">
-            <ul className="home-experiences">
-              {experiences.map((experience) => (
-                <li key={experience.id} className="home-experience">
-                  {experience.logo ? (
-                    <Image src={experience.logo.src} alt={experience.logo.alt} width={28} height={28} className="home-experience-logo" />
-                  ) : <span className={`home-experience-mark${experience.monogram ? " home-monogram" : ""}`} aria-hidden="true">{experience.monogram}</span>}
-                  <div>
-                    <h3>{experience.position}</h3>
-                    <p className="home-experience-period">
-                      <span>{experience.company}</span>
-                      {experience.company && experience.period && <span aria-hidden="true">·</span>}
-                      <span>{experience.period}</span>
-                    </p>
-                    {experience.description && <p className="home-experience-description">{experience.description}</p>}
-                  </div>
-                </li>
-              ))}
-            </ul>
           </Section>
         </main>
 
