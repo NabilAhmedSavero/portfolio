@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   return (
     <div className="home-page min-h-screen flex flex-col m-0 p-0">
-      <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col border-l border-r border-dashed border-[#cccccc] m-0 p-0">
+      <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col border-l border-r border-dashed border-[#d9d9d9] m-0 p-0">
         {/* Hero Profile Header */}
         <header
           aria-labelledby="intro-heading"
