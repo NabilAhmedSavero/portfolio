@@ -19,7 +19,19 @@ export const EXPERIENCE_QUERY = defineQuery(`
 export const PROJECTS_QUERY = defineQuery(`
   *[_type == "project" && isVisible == true
     && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]
-  | order(displayOrder asc, _id asc){
-    _id, name, subtitle, coverImage, additionalImages, externalUrl, displayOrder
+  | order(coalesce(order, displayOrder, 0) asc, _id asc){
+    _id,
+    "title": coalesce(title, name, ""),
+    subtitle,
+    "order": coalesce(order, displayOrder, 0),
+    "images": select(
+      defined(images) && count(images) > 0 => images,
+      defined(image) => [image],
+      defined(coverImage) => [coverImage],
+      []
+    ),
+    coverImage,
+    additionalImages,
+    externalUrl
   }
 `);

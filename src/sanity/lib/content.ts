@@ -16,9 +16,16 @@ export const getExperiences = cache(async () =>
 
 export const getProjectDocuments = cache(() => fetchPublished<PROJECTS_QUERY_RESULT>(PROJECTS_QUERY));
 
+type SanityItemWithAsset = {
+  asset?: { _ref?: string };
+  _key?: string;
+  alt?: string;
+};
+
 export const getWorkProjects = cache(async (): Promise<readonly Project[]> => {
-  function originalAspectRatio(image: ContentImage | null | undefined): number | undefined {
-    const dimensions = image?.asset?._ref?.match(/^image-[^-]+-(\d+)x(\d+)-[a-z0-9]+$/i);
+  function originalAspectRatio(image: SanityItemWithAsset | ContentImage | null | undefined): number | undefined {
+    const ref = image && typeof image === "object" && "asset" in image ? image.asset?._ref : undefined;
+    const dimensions = ref?.match(/^image-[^-]+-(\d+)x(\d+)-[a-z0-9]+$/i);
     if (!dimensions) return undefined;
 
     const width = Number(dimensions[1]);
@@ -32,28 +39,53 @@ export const getWorkProjects = cache(async (): Promise<readonly Project[]> => {
   const cmsProjects = await getProjectDocuments();
   if (!cmsProjects || cmsProjects.length === 0) return projects;
 
-  // An empty successful response remains empty after the editor has activated CMS work.
   return cmsProjects.flatMap((project) => {
-    if (!project.name?.trim()) return [];
-    const coverUrl = imageUrl(project.coverImage, true);
+    const title = project.title || "";
+    if (!title.trim()) return [];
     const externalUrl = safeHref(project.externalUrl);
 
-    return [{
-      id: project._id,
-      name: project.name,
-      subtitle: project.subtitle || "Subtitle placeholder — project description to be added.",
-      image: {
-        src: coverUrl || "/images/work-placeholder.svg",
-        alt: coverUrl
-          ? project.coverImage?.alt || project.name
-          : `Project image placeholder for ${project.name}`,
-        aspectRatio: coverUrl ? originalAspectRatio(project.coverImage) : 1.6,
+    // Normalize images: project.images or legacy coverImage / additionalImages
+    const rawImages: SanityItemWithAsset[] =
+      Array.isArray(project.images) && project.images.length > 0
+        ? (project.images as SanityItemWithAsset[])
+        : ([project.coverImage, ...(project.additionalImages ?? [])].filter(Boolean) as SanityItemWithAsset[]);
+
+    const images = rawImages.flatMap((img, idx) => {
+      const src = imageUrl(img, true);
+      if (!src) return [];
+      return [
+        {
+          id: img?._key || `img-${idx}`,
+          src,
+          fullSrc: imageUrl(img) || src,
+          alt: img?.alt || title,
+          aspectRatio: originalAspectRatio(img) || 1.6,
+        },
+      ];
+    });
+
+    const primaryImage = images[0] || {
+      id: "placeholder",
+      src: "/images/work-placeholder.svg",
+      fullSrc: "/images/work-placeholder.svg",
+      alt: `Project image placeholder for ${title}`,
+      aspectRatio: 1.6,
+    };
+
+    const finalImages = images.length > 0 ? images : [primaryImage];
+
+    return [
+      {
+        id: project._id,
+        title,
+        name: title,
+        subtitle: project.subtitle || "Subtitle placeholder — project description to be added.",
+        order: project.order ?? 0,
+        images: finalImages,
+        image: primaryImage,
+        additionalImages: finalImages.slice(1),
+        ...(externalUrl ? { externalUrl } : {}),
       },
-      additionalImages: (project.additionalImages ?? []).flatMap((image) => {
-        const src = imageUrl(image, true);
-        return src ? [{ id: image._key, src, alt: image.alt || project.name!, aspectRatio: originalAspectRatio(image) }] : [];
-      }),
-      ...(externalUrl ? { externalUrl } : {}),
-    }];
+    ];
   });
 });

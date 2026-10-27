@@ -6,29 +6,79 @@ export const project = defineType({
   type: "document",
   fields: [
     defineField({
-      name: "name",
-      title: "Project name",
+      name: "title",
+      title: "Project / Client Header",
       type: "string",
+      description: "Project/Client header (e.g., 'Faction')",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "subtitle",
-      title: "Short subtitle",
+      title: "Subheader Description",
       type: "string",
-      description: "One short line describing what this design or product is.",
+      description: "Subheader description (e.g., 'AI-integrated enterprise management system')",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "order",
+      title: "Order",
+      type: "number",
+      initialValue: 0,
+      description: "For sorting project groups. Lower numbers appear first.",
+      validation: (rule) => rule.integer().min(0),
+    }),
+    defineField({
+      name: "images",
+      title: "Images",
+      type: "array",
+      description: "Upload and reorder multiple work images under this single project header.",
+      of: [
+        defineArrayMember({
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Alt text",
+              type: "string",
+              description: "Describe this image for screen readers.",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+        }),
+      ],
+      validation: (rule) => rule.required().min(1),
+    }),
+    defineField({
+      name: "name",
+      title: "Legacy Name",
+      type: "string",
+      hidden: true,
+    }),
+    defineField({
+      name: "image",
+      title: "Legacy Image",
+      type: "image",
+      hidden: true,
     }),
     defineField({
       name: "coverImage",
-      title: "Main cover image",
+      title: "Legacy Cover Image",
       type: "contentImage",
-      validation: (rule) => rule.required(),
+      hidden: true,
     }),
     defineField({
       name: "additionalImages",
-      title: "Additional images (optional)",
+      title: "Legacy Additional Images",
       type: "array",
       of: [defineArrayMember({ type: "contentImage" })],
+      hidden: true,
+    }),
+    defineField({
+      name: "displayOrder",
+      title: "Legacy Display Order",
+      type: "number",
+      hidden: true,
     }),
     defineField({
       name: "externalUrl",
@@ -37,22 +87,40 @@ export const project = defineType({
       validation: (rule) => rule.uri({ scheme: ["http", "https"] }),
     }),
     defineField({
-      name: "displayOrder",
-      title: "Display order",
-      type: "number",
-      initialValue: 0,
-      description: "Lower numbers appear first. Edit this field to reorder items.",
-      validation: (rule) => rule.required().integer().min(0),
-    }),
-    defineField({
       name: "isVisible",
       title: "Visible on website",
       type: "boolean",
-      initialValue: false,
+      initialValue: true,
       description: "Turn on and publish to show this project. Drafts never appear on the website.",
       validation: (rule) => rule.required(),
     }),
   ],
-  orderings: [{ title: "Display order", name: "displayOrder", by: [{ field: "displayOrder", direction: "asc" }] }],
-  preview: { select: { title: "name", subtitle: "subtitle", media: "coverImage" } },
+  orderings: [
+    {
+      title: "Order",
+      name: "orderAsc",
+      by: [{ field: "order", direction: "asc" }],
+    },
+    {
+      title: "Display order (legacy)",
+      name: "displayOrderAsc",
+      by: [{ field: "displayOrder", direction: "asc" }],
+    },
+  ],
+  preview: {
+    select: {
+      title: "title",
+      legacyTitle: "name",
+      subtitle: "subtitle",
+      media: "images.0",
+      legacyMedia: "coverImage",
+    },
+    prepare({ title, legacyTitle, subtitle, media, legacyMedia }) {
+      return {
+        title: title || legacyTitle || "Untitled Project",
+        subtitle,
+        media: media || legacyMedia,
+      };
+    },
+  },
 });

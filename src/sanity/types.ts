@@ -14,31 +14,55 @@
 
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
+type ArrayOf<T> = Array<
+  T & {
+    _key: string;
+  }
+>;
+
 // Source: sanity-schema.json
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
 export type Project = {
   _id: string;
   _type: "project";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name?: string;
+  title?: string;
   subtitle?: string;
+  order?: number;
+  images?: Array<{
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  name?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   coverImage?: ContentImage;
   additionalImages?: Array<
     {
       _key: string;
     } & ContentImage
   >;
-  externalUrl?: string;
   displayOrder?: number;
+  externalUrl?: string;
   isVisible?: boolean;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type ContentImage = {
@@ -48,6 +72,22 @@ export type ContentImage = {
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
   alt?: string;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type Experience = {
@@ -115,22 +155,6 @@ export type RichText = Array<{
   _type: "block";
   _key: string;
 }>;
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
 
 export type SanityImagePaletteSwatch = {
   _type: "sanity.imagePaletteSwatch";
@@ -236,14 +260,14 @@ export type Slug = {
 };
 
 export type AllSanitySchemaTypes =
-  | Project
   | SanityImageAssetReference
+  | Project
   | ContentImage
+  | SanityImageCrop
+  | SanityImageHotspot
   | Experience
   | SiteContent
   | RichText
-  | SanityImageCrop
-  | SanityImageHotspot
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -305,11 +329,32 @@ export type EXPERIENCE_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/queries.ts
 // Variable: PROJECTS_QUERY
-// Query: *[_type == "project" && isVisible == true    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]  | order(displayOrder asc, _id asc){    _id, name, subtitle, coverImage, additionalImages, externalUrl, displayOrder  }
+// Query: *[_type == "project" && isVisible == true    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]  | order(coalesce(order, displayOrder, 0) asc, _id asc){    _id,    "title": coalesce(title, name, ""),    subtitle,    "order": coalesce(order, displayOrder, 0),    "images": select(      defined(images) && count(images) > 0 => images,      defined(image) => [image],      defined(coverImage) => [coverImage],      []    ),    coverImage,    additionalImages,    externalUrl  }
 export type PROJECTS_QUERY_RESULT = Array<{
   _id: string;
-  name: string | null;
+  title: string | "";
   subtitle: string | null;
+  order: number | 0;
+  images:
+    | Array<{
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+        _key: string;
+      }>
+    | Array<never>
+    | ArrayOf<ContentImage>
+    | Array<{
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      }>
+    | null;
   coverImage: ContentImage | null;
   additionalImages: Array<
     {
@@ -317,7 +362,6 @@ export type PROJECTS_QUERY_RESULT = Array<{
     } & ContentImage
   > | null;
   externalUrl: string | null;
-  displayOrder: number | null;
 }>;
 
 // Query TypeMap
@@ -325,7 +369,7 @@ declare global {
   interface SanityQueries {
     '\n  *[_type == "siteContent" && _id == "siteContent"][0]{\n    _id, heroDisplayName, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,\n    about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,\n    contactEmail, socialLinks, footerText, useCmsProjects\n  }\n': SITE_CONTENT_QUERY_RESULT;
     '\n  *[_type == "experience" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, position, company, period, description, logo, monogram, displayOrder\n  }\n': EXPERIENCE_QUERY_RESULT;
-    '\n  *[_type == "project" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, name, subtitle, coverImage, additionalImages, externalUrl, displayOrder\n  }\n': PROJECTS_QUERY_RESULT;
+    '\n  *[_type == "project" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(coalesce(order, displayOrder, 0) asc, _id asc){\n    _id,\n    "title": coalesce(title, name, ""),\n    subtitle,\n    "order": coalesce(order, displayOrder, 0),\n    "images": select(\n      defined(images) && count(images) > 0 => images,\n      defined(image) => [image],\n      defined(coverImage) => [coverImage],\n      []\n    ),\n    coverImage,\n    additionalImages,\n    externalUrl\n  }\n': PROJECTS_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

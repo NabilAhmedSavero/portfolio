@@ -12,16 +12,21 @@ export const revalidate = 0;
 
 const WORK_PROJECTS_QUERY = `
   *[_type == "project" && (isVisible == true || !defined(isVisible)) && !(_id in path("drafts.**"))]
-  | order(displayOrder asc, _createdAt desc) {
+  | order(coalesce(order, displayOrder, 0) asc, _createdAt desc) {
     _id,
-    name,
-    title,
+    "title": coalesce(title, name, ""),
     subtitle,
+    "order": coalesce(order, displayOrder, 0),
+    "images": select(
+      defined(images) && count(images) > 0 => images,
+      defined(image) => [image],
+      defined(coverImage) => [coverImage],
+      defined(mainImage) => [mainImage],
+      []
+    ),
     coverImage,
-    mainImage,
     additionalImages,
-    externalUrl,
-    displayOrder
+    externalUrl
   }
 `;
 

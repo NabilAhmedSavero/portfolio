@@ -3,9 +3,8 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
-import { createWorkSlides, type Project, type WorkSlide } from "@/data/projects";
+import { type Project, type ProjectImage, type WorkSlide } from "@/data/projects";
 import { urlFor, imageUrl } from "@/sanity/lib/images";
-
 import type { ContentImage } from "@/sanity/types";
 import type { SanityImageSource } from "@sanity/image-url";
 
@@ -14,6 +13,18 @@ export type SanityProject = {
   name?: string;
   title?: string;
   subtitle?: string;
+  order?: number;
+  displayOrder?: number;
+  images?: Array<
+    ContentImage | SanityImageSource | {
+      _key?: string;
+      asset?: unknown;
+      alt?: string;
+      aspectRatio?: number;
+      src?: string;
+    }
+  >;
+  image?: ContentImage | SanityImageSource;
   coverImage?: ContentImage | SanityImageSource;
   mainImage?: ContentImage | SanityImageSource;
   additionalImages?: Array<
@@ -23,7 +34,23 @@ export type SanityProject = {
     }
   >;
   externalUrl?: string;
-  displayOrder?: number;
+};
+
+export type WorkProjectImage = {
+  id: string;
+  src: string;
+  fullSrc?: string;
+  alt: string;
+  aspectRatio?: number;
+};
+
+export type WorkProjectGroup = {
+  id: string;
+  title: string;
+  subtitle: string;
+  order?: number;
+  externalUrl?: string;
+  images: WorkProjectImage[];
 };
 
 export type WorkGalleryItem = {
@@ -88,7 +115,7 @@ function resolveSanityAspectRatio(
       }
     }
   }
-  return 1440 / 1024;
+  return 3 / 2;
 }
 
 function getAltText(source: unknown, fallback: string): string {
@@ -98,154 +125,171 @@ function getAltText(source: unknown, fallback: string): string {
   return fallback;
 }
 
-function createItemsFromSanity(projects: readonly SanityProject[]): WorkGalleryItem[] {
+type RawSanityImage =
+  | SanityImageSource
+  | ContentImage
+  | { src?: string; alt?: string; aspectRatio?: number; _key?: string }
+  | string
+  | null
+  | undefined;
+
+function createProjectGroupsFromSanity(projects: readonly SanityProject[]): WorkProjectGroup[] {
   return projects.flatMap((project) => {
-    const name = project.name || project.title || "Untitled";
+    const title = project.title || project.name;
+    if (!title?.trim()) return [];
     const subtitle = project.subtitle || "";
-    const coverSource = project.coverImage || project.mainImage;
-    const coverUrl = resolveSanityImageUrl(coverSource, 2048);
-    const coverFullUrl = resolveSanityImageUrl(coverSource);
-    const coverAlt = getAltText(coverSource, name);
-    const coverRatio = resolveSanityAspectRatio(coverSource);
 
-    const coverItem: WorkGalleryItem = {
-      id: `${project._id}:cover`,
-      name,
-      subtitle,
-      externalUrl: project.externalUrl,
-      image: {
-        src: coverUrl,
-        fullSrc: coverFullUrl,
-        alt: coverAlt,
-        aspectRatio: coverRatio,
+    // Normalize images array (support images, image, coverImage, additionalImages)
+    let rawImages: RawSanityImage[] = [];
+    if (Array.isArray(project.images) && project.images.length > 0) {
+      rawImages = project.images as RawSanityImage[];
+    } else if (project.image) {
+      rawImages = [project.image];
+    } else {
+      if (project.coverImage || project.mainImage) {
+        rawImages.push(project.coverImage || project.mainImage);
+      }
+      if (Array.isArray(project.additionalImages)) {
+        rawImages.push(...project.additionalImages);
+      }
+    }
+
+    const images: WorkProjectImage[] = rawImages.flatMap((img, idx) => {
+      const src = resolveSanityImageUrl(img, 2048);
+      const fullSrc = resolveSanityImageUrl(img);
+      if (!src) return [];
+      const key =
+        img && typeof img === "object" && "_key" in img && typeof img._key === "string"
+          ? img._key
+          : `img-${idx}`;
+
+      return [
+        {
+          id: `${project._id}:${key}`,
+          src,
+          fullSrc,
+          alt: getAltText(img, title),
+          aspectRatio: resolveSanityAspectRatio(
+            img as Parameters<typeof resolveSanityAspectRatio>[0],
+          ),
+        },
+      ];
+    });
+
+    if (images.length === 0) {
+      images.push({
+        id: `${project._id}:placeholder`,
+        src: "/images/work-placeholder.svg",
+        fullSrc: "/images/work-placeholder.svg",
+        alt: title,
+        aspectRatio: 3 / 2,
+      });
+    }
+
+    return [
+      {
+        id: project._id,
+        title,
+        subtitle,
+        order: project.order ?? project.displayOrder ?? 0,
+        externalUrl: project.externalUrl,
+        images,
       },
-    };
-
-    const additionalItems: WorkGalleryItem[] = (project.additionalImages ?? []).flatMap(
-      (img, idx) => {
-        const src = resolveSanityImageUrl(img, 2048);
-        const fullSrc = resolveSanityImageUrl(img);
-        if (!src) return [];
-        return [
-          {
-            id: `${project._id}:${img._key || idx}`,
-            name,
-            subtitle,
-            externalUrl: project.externalUrl,
-            image: {
-              src,
-              fullSrc,
-              alt: getAltText(img, name),
-              aspectRatio: resolveSanityAspectRatio(img),
-            },
-          },
-        ];
-      },
-    );
-
-    return [coverItem, ...additionalItems];
+    ];
   });
 }
 
-type WorkGalleryCardProps = {
-  item: WorkSlide | WorkGalleryItem;
-  index?: number;
-  onCardClick: (e: MouseEvent<HTMLElement>, item: WorkSlide | WorkGalleryItem) => void;
-};
-
-function WorkGalleryCard({ item, onCardClick }: WorkGalleryCardProps) {
-  const Tag = item.externalUrl ? "a" : "div";
-  const linkProps = item.externalUrl
-    ? {
-        href: item.externalUrl,
-        target: "_blank",
-        rel: "noopener noreferrer",
-      }
-    : {
-        role: "button",
-        tabIndex: 0,
-        onKeyDown: (e: React.KeyboardEvent) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onCardClick(e as unknown as MouseEvent<HTMLElement>, item);
-          }
-        },
-      };
-
-  return (
-    <article className="group flex flex-col w-full max-w-[682px] mx-auto">
-      <Tag
-        {...linkProps}
-        onClick={(e) => onCardClick(e as unknown as MouseEvent<HTMLElement>, item)}
-        className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
-        aria-label={`View ${item.name}`}
-      >
-        {/* Image Container: Strict 3:2 aspect ratio, edge-to-edge cover, 8px radius */}
-        <div className="w-full aspect-[3/2] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10 cursor-pointer">
-          <Image
-            src={item.image.src}
-            alt={item.image.alt}
-            width={1800}
-            height={1200}
-            unoptimized={true}
-            priority={true}
-            quality={100}
-            sizes="(max-width: 768px) 100vw, 682px"
-            className="w-full h-full object-cover block cursor-pointer"
-          />
-        </div>
-      </Tag>
-
-      {/* Caption: Title followed by Subtitle strictly left-aligned */}
-      <div className="mt-4 flex flex-col items-start text-left w-full gap-0.5">
-        <h2
-          className="text-[15px] font-[500] text-neutral-900 leading-snug tracking-tight"
-          style={{ fontSize: "15px", fontWeight: 500 }}
-        >
-          {item.name}
-        </h2>
-        {item.subtitle && (
-          <p
-            className="text-[14px] font-[400] leading-normal text-neutral-500"
-            style={{
-              fontSize: "14px",
-              fontWeight: 400,
-              color: "#737373",
-            }}
-          >
-            {item.subtitle}
-          </p>
-        )}
-      </div>
-    </article>
-  );
+function createProjectGroupsFromFallback(fallbacks: readonly Project[]): WorkProjectGroup[] {
+  return fallbacks.map((project) => ({
+    id: project.id,
+    title: project.title || project.name || "Untitled",
+    subtitle: project.subtitle,
+    order: project.order,
+    externalUrl: project.externalUrl,
+    images: (
+      project.images && project.images.length > 0
+        ? project.images
+        : [project.image, ...(project.additionalImages ?? [])].filter(
+            Boolean,
+          ) as readonly ProjectImage[]
+    ).map((img, idx) => ({
+      id: img.id || `${project.id}:${idx}`,
+      src: img.src,
+      fullSrc: img.fullSrc || img.src,
+      alt: img.alt || project.title || project.name || "Project image",
+      aspectRatio: img.aspectRatio || 3 / 2,
+    })),
+  }));
 }
+
+function groupLegacyItems(items: readonly (WorkSlide | WorkGalleryItem)[]): WorkProjectGroup[] {
+  const map = new Map<string, WorkProjectGroup>();
+  for (const item of items) {
+    const key = item.name || "Untitled";
+    if (!map.has(key)) {
+      map.set(key, {
+        id: item.id.split(":")[0] || key,
+        title: item.name,
+        subtitle: item.subtitle,
+        externalUrl: item.externalUrl,
+        images: [],
+      });
+    }
+    const group = map.get(key)!;
+    group.images.push({
+      id: item.id,
+      src: item.image.src,
+      fullSrc: "fullSrc" in item.image ? item.image.fullSrc : item.image.src,
+      alt: item.image.alt,
+      aspectRatio: item.image.aspectRatio,
+    });
+  }
+  return Array.from(map.values());
+}
+
+type LightboxImageState = {
+  id: string;
+  src: string;
+  fullSrc?: string;
+  alt: string;
+  projectTitle: string;
+};
 
 export function WorkGallery({
   projects,
   items: directItems,
   fallbackProjects,
 }: WorkGalleryProps) {
-  const items = useMemo(() => {
+  const projectGroups = useMemo<WorkProjectGroup[]>(() => {
     if (projects && projects.length > 0) {
-      return createItemsFromSanity(projects);
+      return createProjectGroupsFromSanity(projects);
     }
     if (directItems && directItems.length > 0) {
-      return directItems;
+      return groupLegacyItems(directItems);
     }
     if (fallbackProjects && fallbackProjects.length > 0) {
-      return createWorkSlides(fallbackProjects);
+      return createProjectGroupsFromFallback(fallbackProjects);
     }
     return [];
   }, [projects, directItems, fallbackProjects]);
 
-  const [lightboxItem, setLightboxItem] = useState<
-    WorkSlide | WorkGalleryItem | null
-  >(null);
+  const allImages = useMemo<LightboxImageState[]>(() => {
+    return projectGroups.flatMap((project) =>
+      project.images.map((img) => ({
+        id: img.id,
+        src: img.src,
+        fullSrc: img.fullSrc || img.src,
+        alt: img.alt || project.title,
+        projectTitle: project.title,
+      })),
+    );
+  }, [projectGroups]);
 
-  // Lock body scroll and set data attribute to hide navs in focused/lightbox state
+  const [lightboxImage, setLightboxImage] = useState<LightboxImageState | null>(null);
+
+  // Lock body scroll and set data attribute to hide navs in lightbox state
   useEffect(() => {
-    if (!lightboxItem) return;
+    if (!lightboxImage) return;
 
     document.body.dataset.lightboxOpen = "true";
     const originalOverflow = document.body.style.overflow;
@@ -255,37 +299,37 @@ export function WorkGallery({
       delete document.body.dataset.lightboxOpen;
       document.body.style.overflow = originalOverflow;
     };
-  }, [lightboxItem]);
+  }, [lightboxImage]);
 
   const handlePrev = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (!lightboxItem) return;
-      const currentIndex = items.findIndex((i) => i.id === lightboxItem.id);
-      const prevIndex = (currentIndex - 1 + items.length) % items.length;
-      setLightboxItem(items[prevIndex]);
+      if (!lightboxImage || allImages.length === 0) return;
+      const currentIndex = allImages.findIndex((i) => i.id === lightboxImage.id);
+      const prevIndex = (currentIndex - 1 + allImages.length) % allImages.length;
+      setLightboxImage(allImages[prevIndex]);
     },
-    [lightboxItem, items],
+    [lightboxImage, allImages],
   );
 
   const handleNext = useCallback(
     (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (!lightboxItem) return;
-      const currentIndex = items.findIndex((i) => i.id === lightboxItem.id);
-      const nextIndex = (currentIndex + 1) % items.length;
-      setLightboxItem(items[nextIndex]);
+      if (!lightboxImage || allImages.length === 0) return;
+      const currentIndex = allImages.findIndex((i) => i.id === lightboxImage.id);
+      const nextIndex = (currentIndex + 1) % allImages.length;
+      setLightboxImage(allImages[nextIndex]);
     },
-    [lightboxItem, items],
+    [lightboxImage, allImages],
   );
 
   // Close lightbox on Escape, navigate with ArrowLeft/ArrowRight
   useEffect(() => {
-    if (!lightboxItem) return;
+    if (!lightboxImage) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setLightboxItem(null);
+        setLightboxImage(null);
       } else if (e.key === "ArrowLeft") {
         handlePrev();
       } else if (e.key === "ArrowRight") {
@@ -295,59 +339,141 @@ export function WorkGallery({
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [lightboxItem, handlePrev, handleNext]);
+  }, [lightboxImage, handlePrev, handleNext]);
 
-  const handleCardClick = (
+  const handleImageClick = (
     e: MouseEvent<HTMLElement>,
-    item: WorkSlide | WorkGalleryItem,
+    image: WorkProjectImage,
+    project: WorkProjectGroup,
   ) => {
-    if (!item.externalUrl) {
+    if (!project.externalUrl) {
       e.preventDefault();
-      setLightboxItem(item);
+      setLightboxImage({
+        id: image.id,
+        src: image.src,
+        fullSrc: image.fullSrc || image.src,
+        alt: image.alt || project.title,
+        projectTitle: project.title,
+      });
     }
   };
 
-  const currentIndex = lightboxItem
+  const currentLightboxIndex = lightboxImage
     ? Math.max(
         0,
-        items.findIndex((i) => i.id === lightboxItem.id),
+        allImages.findIndex((i) => i.id === lightboxImage.id),
       )
     : 0;
 
   return (
     <section aria-label="Work Projects" className="w-full">
-      {/* Symmetrical vertical rhythm: 16px between cards matching 16px thumbnail-to-text */}
-      <div className="w-full flex flex-col items-center gap-y-4">
-        {items.map((item, index) => (
-          <WorkGalleryCard
-            key={item.id}
-            item={item}
-            index={index}
-            onCardClick={handleCardClick}
-          />
-        ))}
+      <div className="w-full max-w-[682px] mx-auto flex flex-col">
+        {projectGroups.map((project, projectIndex) => {
+          const isLastProject = projectIndex === projectGroups.length - 1;
+
+          return (
+            <div key={project.id} className="w-full">
+              <article className="w-full flex flex-col items-center">
+                {/* 1. Header & Subheader Group (Centered above the images) */}
+                <header className="flex flex-col items-center text-center gap-[4px] mb-[20px]">
+                  <h2 className="text-[15px] leading-[20px] font-medium text-[#1c1c1c]">
+                    {project.title}
+                  </h2>
+                  {project.subtitle && (
+                    <p className="text-[14px] leading-[20px] font-normal text-[#737373]">
+                      {project.subtitle}
+                    </p>
+                  )}
+                </header>
+
+                {/* 2. Project Images Stack */}
+                <div className="flex flex-col gap-[20px] w-full">
+                  {project.images.map((image, imgIndex) => {
+                    const Tag = project.externalUrl ? "a" : "div";
+                    const linkProps = project.externalUrl
+                      ? {
+                          href: project.externalUrl,
+                          target: "_blank",
+                          rel: "noopener noreferrer",
+                        }
+                      : {
+                          role: "button",
+                          tabIndex: 0,
+                          onKeyDown: (e: React.KeyboardEvent) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleImageClick(
+                                e as unknown as MouseEvent<HTMLElement>,
+                                image,
+                                project,
+                              );
+                            }
+                          },
+                        };
+
+                    return (
+                      <Tag
+                        key={image.id || `${project.id}-${imgIndex}`}
+                        {...linkProps}
+                        onClick={(e) =>
+                          handleImageClick(
+                            e as unknown as MouseEvent<HTMLElement>,
+                            image,
+                            project,
+                          )
+                        }
+                        className="group/image block w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
+                        aria-label={`View ${image.alt || project.title}`}
+                      >
+                        {/* Image Container: Strict 3:2 aspect ratio, edge-to-edge cover, 8px radius */}
+                        <div className="w-full aspect-[3/2] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10 cursor-pointer">
+                          <Image
+                            src={image.src}
+                            alt={image.alt || project.title}
+                            width={1800}
+                            height={1200}
+                            unoptimized={true}
+                            priority={projectIndex === 0 && imgIndex === 0}
+                            quality={100}
+                            sizes="(max-width: 768px) 100vw, 682px"
+                            className="w-full h-full object-cover block cursor-pointer"
+                          />
+                        </div>
+                      </Tag>
+                    );
+                  })}
+                </div>
+              </article>
+
+              {/* 3. Horizontal Divider Below Bottom-Most Image */}
+              {!isLastProject && (
+                <hr className="w-full h-[1px] border-0 bg-[hsl(0,0%,90%)] mt-[40px] mb-[40px]" />
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Lightbox Modal: Maximized open state rendered in portal above all elements */}
-      {lightboxItem &&
+      {/* Lightbox Modal */}
+      {lightboxImage &&
         typeof document !== "undefined" &&
         createPortal(
           <div
             className="fixed inset-0 h-[100dvh] z-[9999] flex flex-col items-center justify-end sm:justify-evenly gap-[5vh] sm:gap-0 px-4 pb-[22dvh] sm:pb-0 bg-black/90 backdrop-blur-md cursor-pointer animate-in fade-in duration-200 select-none"
-            onClick={() => setLightboxItem(null)}
+            onClick={() => setLightboxImage(null)}
             role="dialog"
             aria-modal="true"
-            aria-label={`Full preview of ${lightboxItem.name}`}
+            aria-label={`Full preview of ${lightboxImage.projectTitle}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={("fullSrc" in lightboxItem.image && lightboxItem.image.fullSrc) || lightboxItem.image.src}
-              alt={lightboxItem.image.alt}
+              src={lightboxImage.fullSrc || lightboxImage.src}
+              alt={lightboxImage.alt}
               className="z-10 max-h-[65dvh] sm:max-h-[87vh] max-w-[96vw] sm:max-w-[98vw] w-auto h-auto object-contain rounded-[8px] pointer-events-auto shadow-2xl cursor-default"
               onClick={(e) => e.stopPropagation()}
             />
 
-            {/* Bottom: Round navigation controls (32px size) with image counter centered horizontally */}
+            {/* Bottom Controls */}
             <nav
               className="flex items-center justify-center gap-3 sm:gap-4 z-20 shrink-0 h-[32px]"
               onClick={(e) => e.stopPropagation()}
@@ -373,15 +499,14 @@ export function WorkGallery({
                 </svg>
               </button>
 
-              {/* Counter: e.g. 1 / 18 */}
               <span
                 className="font-sans text-[13px] sm:text-[14px] text-white/90 select-none tracking-wider tabular-nums flex items-center"
                 aria-live="polite"
                 aria-atomic="true"
               >
-                <span>{currentIndex + 1}</span>
+                <span>{currentLightboxIndex + 1}</span>
                 <span className="text-white/40 mx-1.5 font-sans font-light select-none">/</span>
-                <span>{items.length}</span>
+                <span>{allImages.length}</span>
               </span>
 
               <button
