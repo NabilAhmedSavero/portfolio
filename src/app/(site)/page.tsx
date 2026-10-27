@@ -18,7 +18,6 @@ export default async function HomePage() {
       : null) || site.heroProfileImage.src;
 
   const handleText = site.roleSubtitle || "@saverovkn";
-  const hasAtPrefix = handleText.startsWith("@");
 
   return (
     <div className="home-page min-h-screen flex flex-col m-0 p-0">
@@ -53,14 +52,10 @@ export default async function HomePage() {
               <VerifiedBadge />
             </div>
             <p className="font-sans text-[15px] leading-[18px] font-normal text-[#999999]">
-              {hasAtPrefix ? (
-                <span className="inline-flex items-center">
-                  <span className="-translate-y-[0.5px]">@</span>
-                  <span>{handleText.slice(1)}</span>
-                </span>
-              ) : (
-                handleText
-              )}
+              <span className="inline-flex items-baseline text-[15px] leading-[18px] text-[#999999]">
+                <span className="text-[13.5px] -translate-y-[1.5px] select-none">@</span>
+                <span>{handleText.replace(/^@/, "")}</span>
+              </span>
             </p>
           </div>
         </header>

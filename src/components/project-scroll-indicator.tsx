@@ -144,10 +144,10 @@ export function ProjectScrollIndicator({ projects }: ProjectScrollIndicatorProps
             }}
             aria-label={`Scroll to ${project.title}`}
             aria-current={isActive ? "true" : undefined}
-            className="group flex items-center cursor-pointer py-1 -my-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded"
+            className="group relative h-[4px] flex items-center cursor-pointer before:content-[''] before:absolute before:-inset-y-1 before:inset-x-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded"
           >
             {/* Fixed 32px bar container ensures label start position aligns across all rows */}
-            <div className="w-[32px] flex items-center justify-start">
+            <div className="w-[32px] h-[4px] flex items-center justify-start">
               <span
                 className={`h-[4px] rounded-full transition-all duration-300 ease-out ${
                   isActive
@@ -161,7 +161,7 @@ export function ProjectScrollIndicator({ projects }: ProjectScrollIndicatorProps
 
             {/* Project title label with Home page reveal easing/blur */}
             {showLabel && (
-              <span className="project-indicator-label-enter ml-3 text-[14px] leading-[20px] font-normal text-[#1C1C1C] whitespace-nowrap pointer-events-none select-none">
+              <span className="project-indicator-label-enter absolute left-[42px] top-1/2 -translate-y-1/2 text-[14px] leading-[20px] font-medium text-[#1C1C1C] whitespace-nowrap pointer-events-none select-none">
                 {project.title}
               </span>
             )}

@@ -90,7 +90,7 @@ export const homeFallback = {
     { _key: "twitter", label: "X/Twitter", displayText: "Saverovkn", href: "https://x.com/saverovkn" },
     { _key: "linkedin", label: "LinkedIn", displayText: "Nabil Savero", href: "https://www.linkedin.com/in/nabil-saveroo/" },
   ],
-  footerText: "© saverovkn",
+  footerText: "© 2026 saverovkn",
 };
 
 export type HomeExperience = {
