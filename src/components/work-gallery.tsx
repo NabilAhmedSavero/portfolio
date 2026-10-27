@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { type Project, type ProjectImage, type WorkSlide } from "@/data/projects";
+import { ProjectScrollIndicator, getProjectSectionId } from "./project-scroll-indicator";
 import { urlFor, imageUrl } from "@/sanity/lib/images";
 import type { ContentImage } from "@/sanity/types";
 import type { SanityImageSource } from "@sanity/image-url";
@@ -367,12 +368,19 @@ export function WorkGallery({
 
   return (
     <section aria-label="Work Projects" className="w-full">
+      <ProjectScrollIndicator projects={projectGroups} />
+
       <div className="w-full max-w-[682px] mx-auto flex flex-col">
         {projectGroups.map((project, projectIndex) => {
           const isLastProject = projectIndex === projectGroups.length - 1;
+          const sectionId = getProjectSectionId(project.id);
 
           return (
-            <div key={project.id} className="w-full">
+            <div
+              key={project.id}
+              id={sectionId}
+              className="w-full scroll-mt-8 sm:scroll-mt-12 md:scroll-mt-16"
+            >
               <article className="w-full flex flex-col items-center">
                 {/* 1. Header & Subheader Group (Centered above the images) */}
                 <header className="flex flex-col items-center text-center gap-[4px] mb-[20px]">
