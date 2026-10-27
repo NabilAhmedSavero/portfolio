@@ -15,7 +15,7 @@ export function Navbar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="site-nav"
+      className="site-nav bg-[#e8e8e8]/80 backdrop-blur-md"
       data-work-gallery={isWork ? "true" : undefined}
     >
       <ul className="nav-links">

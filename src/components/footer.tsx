@@ -6,8 +6,11 @@ import { safeHref } from "@/sanity/lib/links";
 export async function Footer({ variant = "foundation" }: { variant?: "home" | "foundation" } = {}) {
   if (variant === "home") {
     return (
-      <footer className="home-panel home-footer mt-auto flex items-center justify-between pt-24 pb-16 px-4 font-sans text-[14px] leading-[20px] text-[#737373] w-full">
-        <span>© saverovkn</span>
+      <footer className="home-panel home-footer mt-auto flex items-center justify-between pt-24 pb-28 md:pb-32 px-4 font-sans text-[14px] leading-[20px] text-[#737373] w-full">
+        <span className="inline-flex items-center gap-[5px]">
+          <span className="text-[13px] leading-none translate-y-[0.5px]">©</span>
+          <span>saverovkn</span>
+        </span>
         <LocalClock />
       </footer>
     );

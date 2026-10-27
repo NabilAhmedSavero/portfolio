@@ -19,9 +19,9 @@ export function Section({ id, title, ariaLabel, children, className }: SectionPr
       className={`section-stack${className ? ` ${className}` : ""}`}
     >
       {title && (
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col items-start w-full">
           <h2 id={headingId}>{title}</h2>
-          <hr aria-hidden="true" className="w-[36px] h-[1px] bg-[#e5e5e5] border-0 mt-[12px] mb-[16px]" />
+          <hr aria-hidden="true" className="w-full h-[1px] bg-[#e5e5e5] border-0 mt-[10px] mb-[16px]" />
         </div>
       )}
       {children}
