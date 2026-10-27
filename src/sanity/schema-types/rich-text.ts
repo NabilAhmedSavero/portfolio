@@ -27,6 +27,11 @@ export const richText = defineType({
                     scheme: ["http", "https", "mailto", "tel"],
                   }),
               }),
+              defineField({
+                name: "hoverColor",
+                title: "Hover color (optional)",
+                type: "color",
+              }),
             ],
           }),
         ],

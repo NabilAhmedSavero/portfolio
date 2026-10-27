@@ -1,35 +1,15 @@
+import { LocalClock } from "@/components/local-clock";
 import { Section } from "@/components/section";
 import { getSiteContent } from "@/sanity/lib/content";
-import { getHomeContent } from "@/sanity/lib/home";
 import { safeHref } from "@/sanity/lib/links";
 
 export async function Footer({ variant = "foundation" }: { variant?: "home" | "foundation" } = {}) {
   if (variant === "home") {
-    const home = await getHomeContent();
-    const emailHref = safeHref(`mailto:${home.contactEmail}`);
-
     return (
-      <>
-        <Section id="contact" title="Contacts" className="home-panel">
-          <dl className="home-contact-list font-sans text-[15px] leading-[24px] font-[450]">
-            {emailHref && (
-              <div className="home-contact-row font-[450]">
-                <dt className="font-[450]">Email</dt>
-                <dd className="font-[450]"><a href={emailHref}>{home.contactEmail}</a></dd>
-              </div>
-            )}
-            {home.socialLinks.map((link) => (
-              <div key={link.id} className="home-contact-row font-[450]">
-                <dt className="font-[450]">{link.label}</dt>
-                <dd className="font-[450]"><a href={link.href} target="_blank" rel="noopener noreferrer">{link.displayText}</a></dd>
-              </div>
-            ))}
-          </dl>
-        </Section>
-        <footer className="home-footer mt-auto pb-28 pt-8 px-4 text-center w-full">
-          <p>{home.footerText}</p>
-        </footer>
-      </>
+      <footer className="home-panel home-footer mt-auto flex items-center justify-between pt-12 pb-16 px-4 text-[14px] leading-[20px] text-[#737373] w-full">
+        <span>© saverovkn</span>
+        <LocalClock />
+      </footer>
     );
   }
 

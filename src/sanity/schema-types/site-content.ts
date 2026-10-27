@@ -19,6 +19,13 @@ export const siteContent = defineType({
       group: "hero",
     }),
     defineField({
+      name: "roleSubtitle",
+      title: "Role subtitle",
+      type: "string",
+      group: "hero",
+      initialValue: "Product Designer",
+    }),
+    defineField({
       name: "heroRole",
       title: "Hero role / title",
       type: "string",
@@ -35,6 +42,12 @@ export const siteContent = defineType({
       title: "Location / timezone label",
       type: "string",
       group: "hero",
+    }),
+    defineField({
+      name: "cityHoverColor",
+      title: "City ('Balikpapan') hover color",
+      type: "color",
+      group: "about",
     }),
     defineField({
       name: "about",
@@ -83,7 +96,18 @@ export const siteContent = defineType({
           validation: (rule) =>
             rule.uri({ allowRelative: true, scheme: ["http", "https", "mailto", "tel"] }),
         }),
+        defineField({
+          name: "hoverColor",
+          title: "Hover color (optional)",
+          type: "color",
+        }),
       ],
+    }),
+    defineField({
+      name: "contactsCopy",
+      title: "Contacts copy",
+      type: "richText",
+      group: "contact",
     }),
     defineField({
       name: "contactEmail",
@@ -119,6 +143,11 @@ export const siteContent = defineType({
               title: "URL",
               type: "url",
               validation: (rule) => rule.required().uri({ scheme: ["http", "https"] }),
+            }),
+            defineField({
+              name: "hoverColor",
+              title: "Hover color (optional)",
+              type: "color",
             }),
           ],
           preview: { select: { title: "label", subtitle: "href" } },

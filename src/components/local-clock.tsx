@@ -2,19 +2,20 @@
 
 import { useEffect, useState } from "react";
 
-const timeFormat = new Intl.DateTimeFormat("en-US", {
+const timeFormat = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Asia/Makassar",
-  hour: "numeric",
+  hour: "2-digit",
   minute: "2-digit",
-  hour12: true,
+  second: "2-digit",
+  hour12: false,
+  hourCycle: "h23",
 });
 
 type LocalClockProps = {
-  city?: string;
   className?: string;
 };
 
-export function LocalClock({ city = "Balikpapan", className }: LocalClockProps) {
+export function LocalClock({ className }: LocalClockProps) {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -28,8 +29,11 @@ export function LocalClock({ city = "Balikpapan", className }: LocalClockProps) 
   }, []);
 
   return (
-    <span className={className ?? "font-sans font-[450] text-[14px] leading-[20px] text-[#999999]"} suppressHydrationWarning>
-      {city} • {now ? timeFormat.format(now) : "--:--"}
+    <span
+      className={className ?? "tabular-nums font-mono text-[14px] leading-[20px] text-[#737373]"}
+      suppressHydrationWarning
+    >
+      {now ? timeFormat.format(now) : "--:--:--"}
     </span>
   );
 }

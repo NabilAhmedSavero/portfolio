@@ -1,21 +1,226 @@
+"use client";
+
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { PortableText, type PortableTextBlockComponent, type PortableTextComponents } from "@portabletext/react";
 import { safeHref } from "@/sanity/lib/links";
-import type { RichText as RichTextValue } from "@/sanity/types";
+import type { Color, RichText as RichTextValue } from "@/sanity/types";
+
+export const HOVER_PALETTE = [
+  "#2563EB", // blue
+  "#16A34A", // green
+  "#D97706", // amber
+  "#DC2626", // red
+  "#9333EA", // purple
+  "#0D9488", // teal
+] as const;
+
+function resolveHexColor(color?: Color | string | null): string | undefined {
+  if (!color) return undefined;
+  if (typeof color === "string") return color.trim() || undefined;
+  if (typeof color === "object" && typeof color.hex === "string") {
+    return color.hex.trim() || undefined;
+  }
+  return undefined;
+}
+
+function pickRandomPaletteColor(current?: string): string {
+  const candidates = HOVER_PALETTE.filter((c) => c !== current);
+  const pool = candidates.length > 0 ? candidates : HOVER_PALETTE;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+export function InlineLink({
+  href,
+  hoverColor,
+  children,
+}: {
+  href: string;
+  hoverColor?: Color | string | null;
+  children: ReactNode;
+}) {
+  const customHex = resolveHexColor(hoverColor);
+  const [activeHoverColor, setActiveHoverColor] = useState<string>(customHex || HOVER_PALETTE[0]);
+
+  const handleEnter = () => {
+    if (customHex) {
+      setActiveHoverColor(customHex);
+    } else {
+      setActiveHoverColor((prev) => pickRandomPaletteColor(prev));
+    }
+  };
+
+  const isExternal = /^https?:/.test(href);
+
+  return (
+    <a
+      href={href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener noreferrer" : undefined}
+      className="home-inline-link"
+      style={{ "--link-hover-color": customHex || activeHoverColor } as CSSProperties}
+      onMouseEnter={handleEnter}
+      onFocus={handleEnter}
+    >
+      {children}
+    </a>
+  );
+}
+
+export function BalikpapanTrigger({
+  hoverColor,
+  children,
+}: {
+  hoverColor?: Color | string | null;
+  children: ReactNode;
+}) {
+  const customHex = resolveHexColor(hoverColor);
+  const [activeHoverColor, setActiveHoverColor] = useState<string>(customHex || HOVER_PALETTE[0]);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleEnter = () => {
+    if (customHex) {
+      setActiveHoverColor(customHex);
+    } else {
+      setActiveHoverColor((prev) => pickRandomPaletteColor(prev));
+    }
+    setIsHovered(true);
+  };
+
+  const handleLeave = () => {
+    setIsHovered(false);
+  };
+
+  return (
+    <span
+      className="relative inline-block cursor-pointer align-baseline focus:outline-none"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onFocus={handleEnter}
+      onBlur={handleLeave}
+      tabIndex={0}
+      aria-describedby="balikpapan-tooltip"
+    >
+      <span
+        className="home-inline-link"
+        data-hovered={isHovered ? "true" : undefined}
+        style={{ "--link-hover-color": customHex || activeHoverColor } as CSSProperties}
+      >
+        {children}
+      </span>
+      <span
+        id="balikpapan-tooltip"
+        role="tooltip"
+        className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap z-30 bg-[#1c1c1c] text-white text-[12px] leading-[16px] px-2.5 py-1 rounded-md shadow-sm pointer-events-none transition-all duration-200 ${
+          isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+        }`}
+      >
+        GMT+8 · Indonesia
+      </span>
+    </span>
+  );
+}
 
 const Paragraph: PortableTextBlockComponent = ({ children }) => <p className="text-muted">{children}</p>;
 
-const components: Partial<PortableTextComponents> = {
-  block: Paragraph,
-  marks: {
-    link: ({ children, value }) => {
-      const href = safeHref(typeof value?.href === "string" ? value.href : null);
-      return href ? (
-        <a href={href} target={/^https?:/.test(href) ? "_blank" : undefined} rel={/^https?:/.test(href) ? "noopener noreferrer" : undefined} className="underline underline-offset-4">{children}</a>
-      ) : <>{children}</>;
-    },
-  },
-};
+function injectBalikpapanMark(
+  blocks: RichTextValue,
+  cityHoverColor?: Color | string | null,
+): RichTextValue {
+  let injected = false;
+  return blocks.map((block) => {
+    if (injected || !block.children?.length) return block;
 
-export function RichText({ value }: { value: RichTextValue }) {
-  return <PortableText value={value} components={components} onMissingComponent={false} />;
+    const hasBalikpapan = block.children.some(
+      (child) => typeof child.text === "string" && child.text.includes("Balikpapan"),
+    );
+    if (!hasBalikpapan) return block;
+
+    const markKey = "city-balikpapan-trigger";
+    const newChildren: NonNullable<typeof block.children> = [];
+
+    for (const child of block.children) {
+      if (!injected && typeof child.text === "string" && child.text.includes("Balikpapan")) {
+        injected = true;
+        const idx = child.text.indexOf("Balikpapan");
+        const before = child.text.slice(0, idx);
+        const after = child.text.slice(idx + "Balikpapan".length);
+
+        if (before) {
+          newChildren.push({
+            ...child,
+            _key: `${child._key}-before`,
+            text: before,
+          });
+        }
+        newChildren.push({
+          _type: "span",
+          _key: `${child._key}-balikpapan`,
+          text: "Balikpapan",
+          marks: [markKey],
+        });
+        if (after) {
+          newChildren.push({
+            ...child,
+            _key: `${child._key}-after`,
+            text: after,
+          });
+        }
+      } else {
+        newChildren.push(child);
+      }
+    }
+
+    const existingMarkDefs = block.markDefs ?? [];
+    return {
+      ...block,
+      children: newChildren,
+      markDefs: [
+        ...existingMarkDefs,
+        {
+          _type: "cityTrigger" as "link",
+          _key: markKey,
+          hoverColor: typeof cityHoverColor === "string" ? ({ _type: "color", hex: cityHoverColor } as Color) : (cityHoverColor ?? undefined),
+        },
+      ],
+    };
+  });
+}
+
+export function RichText({
+  value,
+  cityHoverColor,
+}: {
+  value: RichTextValue;
+  cityHoverColor?: Color | string | null;
+}) {
+  const processedValue = useMemo(
+    () => injectBalikpapanMark(value, cityHoverColor),
+    [value, cityHoverColor],
+  );
+
+  const components = useMemo<Partial<PortableTextComponents>>(
+    () => ({
+      block: Paragraph,
+      marks: {
+        link: ({ children, value: markValue }) => {
+          const href = safeHref(typeof markValue?.href === "string" ? markValue.href : null);
+          return href ? (
+            <InlineLink href={href} hoverColor={markValue?.hoverColor}>
+              {children}
+            </InlineLink>
+          ) : (
+            <>{children}</>
+          );
+        },
+        cityTrigger: ({ children, value: markValue }) => (
+          <BalikpapanTrigger hoverColor={markValue?.hoverColor ?? cityHoverColor}>
+            {children}
+          </BalikpapanTrigger>
+        ),
+      },
+    }),
+    [cityHoverColor],
+  );
+
+  return <PortableText value={processedValue} components={components} onMissingComponent={false} />;
 }

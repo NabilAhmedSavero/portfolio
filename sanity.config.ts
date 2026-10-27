@@ -1,5 +1,6 @@
 "use client";
 
+import { colorInput } from "@sanity/color-input";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { dataset, projectId } from "./src/sanity/env";
@@ -14,7 +15,7 @@ export default defineConfig({
   // Studio until real environment identifiers are supplied.
   projectId: projectId || "unconfigured",
   dataset: dataset || "production",
-  plugins: [structureTool({ structure })],
+  plugins: [structureTool({ structure }), colorInput()],
   schema: { types: schemaTypes },
   document: { singletons: ["siteContent"] },
   // Default Sanity authentication and project permissions are intentionally used.

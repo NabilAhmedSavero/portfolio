@@ -4,10 +4,11 @@
   --home-padding: 1rem;
   --home-section-space: 2rem;
   --home-paragraph-gap: 1.25rem;
-  --home-border: #d9d9d9;
+  --home-border: transparent;
   --home-muted: #737373;
-  --home-link: #738c87;
-  --home-link-hover: #1f4840;
+  --link-default-color: #737373;
+  --home-link: var(--link-default-color);
+  --home-link-hover: #2563EB;
   --home-entrance-duration: 950ms;
   --home-entrance-delay: 150ms;
   --home-entrance-easing: cubic-bezier(0.22, 1, 0.36, 1);
@@ -27,14 +28,6 @@
 }
 
 .home-page .home-panel { position: relative; }
-
-.home-page .home-panel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-bottom: 1px dashed var(--home-border);
-  pointer-events: none;
-}
 
 .home-page .home-location {
   display: flex;
@@ -98,8 +91,8 @@
 }
 
 .home-page .section-stack {
-  gap: var(--home-section-space);
-  padding: var(--home-section-space) var(--home-padding) 2.5rem;
+  gap: 0.75rem;
+  padding: 0 var(--home-padding);
 }
 
 .home-page h2,
@@ -142,13 +135,25 @@
 .home-page .home-prose p { color: #404040; }
 
 .home-page a,
-.home-page a:visited {
-  color: var(--home-link);
-  text-decoration: underline dotted;
-  text-underline-offset: auto;
+.home-page a:visited,
+.home-page .home-inline-link {
+  color: var(--link-default-color, #737373);
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: currentColor;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 150ms ease, text-decoration-color 150ms ease;
 }
 
-.home-page a:hover { color: var(--home-link-hover); }
+.home-page a:hover,
+.home-page a:focus-visible,
+.home-page .home-inline-link:hover,
+.home-page .home-inline-link:focus-visible,
+.home-page .home-inline-link[data-hovered="true"] {
+  color: var(--link-hover-color, var(--home-link-hover));
+  text-decoration-color: var(--link-hover-color, var(--home-link-hover));
+}
 
 .home-page .home-experiences {
   display: grid;
@@ -223,15 +228,9 @@
 }
 
 .home-page .home-footer {
-  text-align: center;
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: -0.02em;
-  color: var(--home-muted);
-}
-
-.home-page .home-footer::after {
-  border-bottom: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: #737373;
 }
 
 /* The early initializer releases the first timeline once critical assets are ready.

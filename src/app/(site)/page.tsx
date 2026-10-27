@@ -1,7 +1,6 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { Footer } from "@/components/footer";
-import { LocalClock } from "@/components/local-clock";
 import { RichText } from "@/components/rich-text";
 import { Section } from "@/components/section";
 import { getHomeContent } from "@/sanity/lib/home";
@@ -20,14 +19,14 @@ export default async function HomePage() {
 
   return (
     <div className="home-page min-h-screen flex flex-col m-0 p-0">
-      <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col border-l border-r border-dashed border-[#d9d9d9] m-0 p-0">
+      <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col m-0 p-0">
         {/* Hero Profile Header */}
         <header
           aria-labelledby="intro-heading"
-          className="home-panel pt-10 md:pt-14 pb-10 flex flex-col items-center text-center mx-auto w-full px-4"
+          className="home-panel pt-12 md:pt-16 pb-8 px-4 flex items-center gap-3.5 w-full"
         >
           {/* Profile Avatar Frame */}
-          <div className="w-[56px] h-[56px] rounded-[12px] overflow-hidden relative mx-auto">
+          <div className="w-[56px] h-[56px] rounded-[12px] overflow-hidden relative shrink-0">
             <Image
               src={avatarSrc}
               alt={site.heroProfileImage.alt || "Nabil Savero"}
@@ -43,19 +42,21 @@ export default async function HomePage() {
           </div>
 
           {/* Profile Typography */}
-          <h1 id="intro-heading" className="text-[18px] leading-[22px] font-medium text-[#1c1c1c] text-center mt-3">
-            {site.heroDisplayName}
-          </h1>
-          <p className="mt-1 font-sans font-[450] text-[14px] leading-[20px] text-[#999999] text-center">
-            <LocalClock city="Balikpapan" />
-          </p>
+          <div className="flex flex-col text-left">
+            <h1 id="intro-heading" className="text-[18px] leading-[22px] font-medium text-[#1c1c1c]">
+              {site.heroDisplayName}
+            </h1>
+            <p className="font-sans text-[14px] leading-[20px] text-[#737373]">
+              {site.roleSubtitle}
+            </p>
+          </div>
         </header>
 
-        <main id="main-content" tabIndex={-1} className="m-0 p-0">
-          {/* About Section */}
-          <Section id="about" title="About" className="home-panel">
+        <main id="main-content" tabIndex={-1} className="m-0 p-0 flex flex-col gap-10">
+          {/* Intro / About Section (No heading label) */}
+          <Section id="about" ariaLabel="About" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px] font-[450]">
-              <RichText value={site.about} />
+              <RichText value={site.about} cityHoverColor={site.cityHoverColor} />
             </div>
           </Section>
 
@@ -63,34 +64,18 @@ export default async function HomePage() {
           <Section id="currently" title="Currently" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px] font-[450]">
               <RichText value={site.currently} />
-              <p>
-                I&apos;m also available for freelance design and development projects, taking on a limited number of projects at a time.
-              </p>
-              <p>
-                Previously collaborated with{" "}
-                <a href="https://faction.ai" target="_blank" rel="noopener noreferrer">
-                  Faction
-                </a>
-                ,{" "}
-                <a href="https://servinghours.com" target="_blank" rel="noopener noreferrer">
-                  Serving Hours
-                </a>
-                ,{" "}
-                <a href="https://plied.ai" target="_blank" rel="noopener noreferrer">
-                  Plied
-                </a>
-                ,{" "}
-                <a href="https://caraflorist.com/" target="_blank" rel="noopener noreferrer">
-                  Cara Florist
-                </a>
-                , and others. If you think we&apos;d be a good fit,{" "}
-                <a href="mailto:saverovkn@gmail.com">let&apos;s talk</a>.
-              </p>
+            </div>
+          </Section>
+
+          {/* Contacts Section */}
+          <Section id="contact" title="Contacts" className="home-panel">
+            <div className="home-prose font-sans text-[15px] leading-[24px] font-[450]">
+              <RichText value={site.contactsCopy} />
             </div>
           </Section>
         </main>
 
-        {/* Contact and Footer - strictly untouched */}
+        {/* Minimalist Footer with Live Local Clock */}
         <Footer variant="home" />
       </div>
     </div>
