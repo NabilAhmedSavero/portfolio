@@ -26,33 +26,33 @@ export default async function HomePage() {
           className="home-panel pt-12 md:pt-16 pb-8 px-4 flex items-center gap-3.5 w-full"
         >
           {/* Profile Avatar Frame */}
-          <div className="w-[56px] h-[56px] rounded-[12px] overflow-hidden relative shrink-0">
+          <div className="w-[40px] h-[40px] rounded-[10px] overflow-hidden relative shrink-0">
             <Image
               src={avatarSrc}
               alt={site.heroProfileImage.alt || "Nabil Savero"}
-              width={56}
-              height={56}
+              width={40}
+              height={40}
               className="w-full h-full object-cover"
               unoptimized
               priority
               style={{ imageRendering: "-webkit-optimize-contrast" }}
             />
             {/* Figma Inner Shadow 2px White Overlay */}
-            <div className="absolute inset-0 rounded-[12px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
+            <div className="absolute inset-0 rounded-[10px] ring-2 ring-inset ring-[#ffffff] pointer-events-none z-10" />
           </div>
 
           {/* Profile Typography */}
-          <div className="flex flex-col text-left">
-            <h1 id="intro-heading" className="text-[18px] leading-[22px] font-medium text-[#1c1c1c]">
+          <div className="h-[40px] flex flex-col justify-between py-[2px] text-left leading-none">
+            <h1 id="intro-heading" className="font-sans text-[15px] leading-none font-medium text-[#1c1c1c]">
               {site.heroDisplayName}
             </h1>
-            <p className="font-sans text-[14px] leading-[20px] text-[#737373]">
+            <p className="font-sans text-[15px] leading-none text-[#999999]">
               {site.roleSubtitle}
             </p>
           </div>
         </header>
 
-        <main id="main-content" tabIndex={-1} className="m-0 p-0 flex flex-col gap-10">
+        <main id="main-content" tabIndex={-1} className="m-0 p-0 flex flex-col gap-20">
           {/* Intro / About Section (No heading label) */}
           <Section id="about" ariaLabel="About" className="home-panel">
             <div className="home-prose font-sans text-[15px] leading-[24px] font-[450]">

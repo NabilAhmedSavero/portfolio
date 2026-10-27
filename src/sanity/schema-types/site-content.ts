@@ -23,7 +23,7 @@ export const siteContent = defineType({
       title: "Role subtitle",
       type: "string",
       group: "hero",
-      initialValue: "Product Designer",
+      initialValue: "@saverovkn",
     }),
     defineField({
       name: "heroRole",

@@ -11,8 +11,8 @@ function paragraph(key: string, text: string): RichText[number] {
 
 export const homeFallback = {
   heroDisplayName: "Nabil Savero",
-  roleSubtitle: "Product Designer",
-  heroRole: "Product Designer",
+  roleSubtitle: "@saverovkn",
+  heroRole: "@saverovkn",
   heroProfileImage: { src: "/images/home/profile.avif", alt: "Profile Image" },
   locationTimezoneLabel: "BALIKPAPAN, ID",
   cityHoverColor: undefined as string | undefined,

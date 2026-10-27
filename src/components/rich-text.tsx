@@ -23,32 +23,43 @@ function resolveHexColor(color?: Color | string | null): string | undefined {
   return undefined;
 }
 
-function pickRandomPaletteColor(current?: string): string {
-  const candidates = HOVER_PALETTE.filter((c) => c !== current);
-  const pool = candidates.length > 0 ? candidates : HOVER_PALETTE;
-  return pool[Math.floor(Math.random() * pool.length)];
+const DETERMINISTIC_KEY_COLORS: Record<string, (typeof HOVER_PALETTE)[number]> = {
+  "city-balikpapan-trigger": "#2563EB", // blue
+  "profile-link": "#16A34A", // green
+  "faction-link": "#D97706", // amber
+  "serving-hours-link": "#DC2626", // red
+  "plied-link": "#9333EA", // purple
+  "cara-florist-link": "#0D9488", // teal
+  "cta-link": "#2563EB", // blue
+  "email-link": "#16A34A", // green
+  "twitter-link": "#9333EA", // purple
+  "linkedin-link": "#0D9488", // teal
+};
+
+function getDeterministicPaletteColor(seed: string): string {
+  if (seed in DETERMINISTIC_KEY_COLORS) {
+    return DETERMINISTIC_KEY_COLORS[seed];
+  }
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return HOVER_PALETTE[hash % HOVER_PALETTE.length];
 }
 
 export function InlineLink({
   href,
+  markKey,
   hoverColor,
   children,
 }: {
   href: string;
+  markKey?: string;
   hoverColor?: Color | string | null;
   children: ReactNode;
 }) {
   const customHex = resolveHexColor(hoverColor);
-  const [activeHoverColor, setActiveHoverColor] = useState<string>(customHex || HOVER_PALETTE[0]);
-
-  const handleEnter = () => {
-    if (customHex) {
-      setActiveHoverColor(customHex);
-    } else {
-      setActiveHoverColor((prev) => pickRandomPaletteColor(prev));
-    }
-  };
-
+  const assignedColor = customHex || getDeterministicPaletteColor(markKey || href);
   const isExternal = /^https?:/.test(href);
 
   return (
@@ -57,9 +68,7 @@ export function InlineLink({
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
       className="home-inline-link"
-      style={{ "--link-hover-color": customHex || activeHoverColor } as CSSProperties}
-      onMouseEnter={handleEnter}
-      onFocus={handleEnter}
+      style={{ "--link-hover-color": assignedColor } as CSSProperties}
     >
       {children}
     </a>
@@ -74,43 +83,30 @@ export function BalikpapanTrigger({
   children: ReactNode;
 }) {
   const customHex = resolveHexColor(hoverColor);
-  const [activeHoverColor, setActiveHoverColor] = useState<string>(customHex || HOVER_PALETTE[0]);
+  const assignedColor = customHex || getDeterministicPaletteColor("city-balikpapan-trigger");
   const [isHovered, setIsHovered] = useState(false);
-
-  const handleEnter = () => {
-    if (customHex) {
-      setActiveHoverColor(customHex);
-    } else {
-      setActiveHoverColor((prev) => pickRandomPaletteColor(prev));
-    }
-    setIsHovered(true);
-  };
-
-  const handleLeave = () => {
-    setIsHovered(false);
-  };
 
   return (
     <span
       className="relative inline-block cursor-pointer align-baseline focus:outline-none"
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-      onFocus={handleEnter}
-      onBlur={handleLeave}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
       tabIndex={0}
       aria-describedby="balikpapan-tooltip"
     >
       <span
         className="home-inline-link"
         data-hovered={isHovered ? "true" : undefined}
-        style={{ "--link-hover-color": customHex || activeHoverColor } as CSSProperties}
+        style={{ "--link-hover-color": assignedColor } as CSSProperties}
       >
         {children}
       </span>
       <span
         id="balikpapan-tooltip"
         role="tooltip"
-        className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap z-30 bg-[#1c1c1c] text-white text-[12px] leading-[16px] px-2.5 py-1 rounded-md shadow-sm pointer-events-none transition-all duration-200 ${
+        className={`font-sans absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap z-30 bg-[#1c1c1c] text-white text-[12px] leading-[16px] px-2.5 py-1 rounded-md shadow-sm pointer-events-none transition-all duration-200 ${
           isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
         }`}
       >
@@ -202,10 +198,10 @@ export function RichText({
     () => ({
       block: Paragraph,
       marks: {
-        link: ({ children, value: markValue }) => {
+        link: ({ children, value: markValue, markKey }) => {
           const href = safeHref(typeof markValue?.href === "string" ? markValue.href : null);
           return href ? (
-            <InlineLink href={href} hoverColor={markValue?.hoverColor}>
+            <InlineLink href={href} markKey={markKey} hoverColor={markValue?.hoverColor}>
               {children}
             </InlineLink>
           ) : (
