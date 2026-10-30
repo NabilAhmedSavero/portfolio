@@ -97,15 +97,17 @@
 
 .home-page h2,
 .home-page .section-stack h2,
+.home-page #intro h2,
+.home-page #intro-heading,
 .home-page #about h2,
 .home-page #about-heading,
+.home-page #experience h2,
+.home-page #experience-heading,
 .home-page #currently h2,
-.home-page #currently-heading,
-.home-page #contact h2,
-.home-page #contact-heading {
+.home-page #currently-heading {
   font-family: var(--font-sans);
   font-size: 15px;
-  line-height: 24px;
+  line-height: 20px;
   font-weight: 450;
   letter-spacing: -0.02em;
   color: #999999;
@@ -113,8 +115,12 @@
 
 .home-page .home-prose,
 .home-page .home-prose p,
+.home-page #intro .home-prose,
+.home-page #intro .home-prose p,
 .home-page #about .home-prose,
 .home-page #about .home-prose p,
+.home-page #experience .home-prose,
+.home-page #experience .home-prose p,
 .home-page #currently .home-prose,
 .home-page #currently .home-prose p,
 .home-page .home-contact-list,
@@ -153,6 +159,48 @@
 .home-page .home-inline-link[data-hovered="true"] {
   color: var(--link-hover-color, var(--home-link-hover));
   text-decoration-color: var(--link-hover-color, var(--home-link-hover));
+}
+
+.home-page a.home-cta-pill,
+.home-page a.home-cta-pill:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: #1C1C1C;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  padding: 8px 20px;
+  text-decoration: none;
+  transition: background-color 200ms ease;
+}
+
+.home-page a.home-cta-pill:hover,
+.home-page a.home-cta-pill:focus-visible {
+  background-color: #333333;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.home-page a.home-cta-secondary,
+.home-page a.home-cta-secondary:visited {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #737373;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-color: #999999;
+  text-underline-offset: 4px;
+  transition: color 200ms ease, text-decoration-color 200ms ease;
+}
+
+.home-page a.home-cta-secondary:hover,
+.home-page a.home-cta-secondary:focus-visible {
+  color: #1C1C1C;
+  text-decoration-color: #1C1C1C;
 }
 
 .home-page .home-experiences {

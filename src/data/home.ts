@@ -4,7 +4,10 @@ import type { RichText } from "@/sanity/types";
 // These remain local fallbacks; published Sanity content takes precedence.
 function paragraph(key: string, text: string): RichText[number] {
   return {
-    _type: "block", _key: key, style: "normal", markDefs: [],
+    _type: "block",
+    _key: key,
+    style: "normal",
+    markDefs: [],
     children: [{ _type: "span", _key: `${key}-text`, text, marks: [] }],
   };
 }
@@ -18,7 +21,9 @@ export const homeFallback = {
   cityHoverColor: undefined as string | undefined,
   about: [
     {
-      _type: "block", _key: "intro", style: "normal",
+      _type: "block",
+      _key: "intro",
+      style: "normal",
       markDefs: [{ _type: "link", _key: "profile-link", href: "https://x.com/saverovkn" }],
       children: [
         { _type: "span", _key: "intro-text", text: "Hi! I'm Nabil Ahmed Savero, based in Balikpapan. You might know me as ", marks: [] },
@@ -26,15 +31,38 @@ export const homeFallback = {
         { _type: "span", _key: "intro-end", text: ".", marks: [] },
       ],
     },
-    paragraph("interests", "I like designing AI products, workflow-heavy digital tools, and websites, occasionally writing code to build and ship them end-to-end."),
-    paragraph("background", "I come from a computer science background, but most of my work has always been on the design side, collaborating with founders and teams across tech startups, creative studios, and independent brands."),
+    paragraph(
+      "interests",
+      "I like designing AI products, workflow-heavy digital tools, and websites, occasionally writing code to build and ship them end-to-end.",
+    ),
+    {
+      _type: "block",
+      _key: "contacts-inline",
+      style: "normal",
+      markDefs: [
+        { _type: "link", _key: "email-link", href: "mailto:saverovkn@gmail.com" },
+        { _type: "link", _key: "twitter-link", href: "https://x.com/saverovkn" },
+        { _type: "link", _key: "linkedin-link", href: "https://www.linkedin.com/in/nabil-saveroo/" },
+      ],
+      children: [
+        { _type: "span", _key: "ci-1", text: "You can reach out via email ", marks: [] },
+        { _type: "span", _key: "ci-email", text: "saverovkn@gmail.com", marks: ["email-link"] },
+        { _type: "span", _key: "ci-2", text: ", find me on ", marks: [] },
+        { _type: "span", _key: "ci-twitter", text: "X", marks: ["twitter-link"] },
+        { _type: "span", _key: "ci-3", text: ", or connect on ", marks: [] },
+        { _type: "span", _key: "ci-linkedin", text: "LinkedIn", marks: ["linkedin-link"] },
+        { _type: "span", _key: "ci-4", text: ".", marks: [] },
+      ],
+    },
   ] satisfies RichText,
   get aboutMobile() {
     return this.about;
   },
-  currently: [
-    paragraph("availability", "I'm open to joining design studios and product teams building interesting digital products."),
-    paragraph("freelance", "I'm also available for freelance design and development projects, taking on a limited number of projects at a time."),
+  experience: [
+    paragraph(
+      "background",
+      "I come from a computer science background, but most of my work has always been on the design side, collaborating with founders and teams across tech startups, creative studios, and independent brands.",
+    ),
     {
       _type: "block",
       _key: "collaborations",
@@ -44,7 +72,6 @@ export const homeFallback = {
         { _type: "link", _key: "serving-hours-link", href: "https://servinghours.com" },
         { _type: "link", _key: "plied-link", href: "https://plied.ai" },
         { _type: "link", _key: "cara-florist-link", href: "https://caraflorist.com/" },
-        { _type: "link", _key: "cta-link", href: "mailto:saverovkn@gmail.com" },
       ],
       children: [
         { _type: "span", _key: "collab-1", text: "Previously collaborated with ", marks: [] },
@@ -55,35 +82,19 @@ export const homeFallback = {
         { _type: "span", _key: "collab-plied", text: "Plied", marks: ["plied-link"] },
         { _type: "span", _key: "collab-4", text: ", ", marks: [] },
         { _type: "span", _key: "collab-cara", text: "Cara Florist", marks: ["cara-florist-link"] },
-        { _type: "span", _key: "collab-5", text: ", and others. If you think we'd be a good fit, ", marks: [] },
-        { _type: "span", _key: "collab-cta", text: "let's talk", marks: ["cta-link"] },
-        { _type: "span", _key: "collab-6", text: ".", marks: [] },
+        { _type: "span", _key: "collab-5", text: ", and others.", marks: [] },
       ],
     },
   ] satisfies RichText,
-  freelanceStartingPrice: "I'm also available for freelance design and development projects, taking on a limited number of projects at a time.",
-  currentlyContactIntro: "If you think we'd be a good fit,",
-  currentlyContactCta: { text: "let's talk", href: "mailto:saverovkn@gmail.com" },
-  contactsCopy: [
-    {
-      _type: "block",
-      _key: "contacts-copy",
-      style: "normal",
-      markDefs: [
-        { _type: "link", _key: "email-link", href: "mailto:saverovkn@gmail.com" },
-        { _type: "link", _key: "twitter-link", href: "https://x.com/saverovkn" },
-        { _type: "link", _key: "linkedin-link", href: "https://www.linkedin.com/in/nabil-saveroo/" },
-      ],
-      children: [
-        { _type: "span", _key: "c-1", text: "You can reach out to me via email ", marks: [] },
-        { _type: "span", _key: "c-email", text: "saverovkn@gmail.com", marks: ["email-link"] },
-        { _type: "span", _key: "c-2", text: ", find me on ", marks: [] },
-        { _type: "span", _key: "c-twitter", text: "X/Twitter", marks: ["twitter-link"] },
-        { _type: "span", _key: "c-3", text: ", or connect with me on ", marks: [] },
-        { _type: "span", _key: "c-linkedin", text: "LinkedIn", marks: ["linkedin-link"] },
-        { _type: "span", _key: "c-4", text: ".", marks: [] },
-      ],
-    },
+  currently: [
+    paragraph(
+      "availability",
+      "I'm open to joining design studios and product teams building interesting digital products.",
+    ),
+    paragraph(
+      "freelance",
+      "I'm also available for freelance design and development projects, taking on a limited number of projects at a time.",
+    ),
   ] satisfies RichText,
   contactEmail: "saverovkn@gmail.com",
   socialLinks: [

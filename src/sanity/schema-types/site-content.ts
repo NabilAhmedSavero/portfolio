@@ -6,9 +6,10 @@ export const siteContent = defineType({
   type: "document",
   groups: [
     { name: "hero", title: "Hero", default: true },
-    { name: "about", title: "About" },
-    { name: "currently", title: "Currently" },
-    { name: "contact", title: "Contacts / Footer" },
+    { name: "about", title: "Intro (Section 1)" },
+    { name: "experience", title: "Experience (Section 2)" },
+    { name: "currently", title: "Currently (Section 3)" },
+    { name: "contact", title: "Contacts & Footer" },
     { name: "publishing", title: "Publishing" },
   ],
   fields: [
@@ -51,63 +52,28 @@ export const siteContent = defineType({
     }),
     defineField({
       name: "about",
-      title: "About paragraphs",
+      title: "Intro paragraphs",
       type: "richText",
       group: "about",
     }),
     defineField({
       name: "aboutMobile",
-      title: "About paragraphs — tablet / mobile (optional)",
+      title: "Intro paragraphs — tablet / mobile (optional)",
       type: "richText",
       group: "about",
-      description: "The published Framer page has different About copy below 1200px. Leave empty to use the main About copy on every screen.",
+      description: "Leave empty to use the main Intro copy on every screen.",
+    }),
+    defineField({
+      name: "experience",
+      title: "Experience paragraphs",
+      type: "richText",
+      group: "experience",
     }),
     defineField({
       name: "currently",
       title: "Currently paragraphs",
       type: "richText",
       group: "currently",
-    }),
-    defineField({
-      name: "freelanceStartingPrice",
-      title: "Freelance starting price",
-      type: "string",
-      group: "currently",
-      description: "Enter the complete freelance paragraph, including the starting price and currency. Displayed exactly as entered.",
-    }),
-    defineField({
-      name: "currentlyContactIntro",
-      title: "Currently contact sentence — before the link",
-      type: "string",
-      group: "currently",
-      description: "The introductory text before the contact CTA. Include any punctuation; the link follows after a space.",
-    }),
-    defineField({
-      name: "currentlyContactCta",
-      title: "Currently contact CTA",
-      type: "object",
-      group: "currently",
-      fields: [
-        defineField({ name: "text", title: "Text", type: "string" }),
-        defineField({
-          name: "href",
-          title: "Link",
-          type: "url",
-          validation: (rule) =>
-            rule.uri({ allowRelative: true, scheme: ["http", "https", "mailto", "tel"] }),
-        }),
-        defineField({
-          name: "hoverColor",
-          title: "Hover color (optional)",
-          type: "color",
-        }),
-      ],
-    }),
-    defineField({
-      name: "contactsCopy",
-      title: "Contacts copy",
-      type: "richText",
-      group: "contact",
     }),
     defineField({
       name: "contactEmail",

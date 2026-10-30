@@ -120,15 +120,8 @@ export type SiteContent = {
   cityHoverColor?: Color;
   about?: RichText;
   aboutMobile?: RichText;
+  experience?: RichText;
   currently?: RichText;
-  freelanceStartingPrice?: string;
-  currentlyContactIntro?: string;
-  currentlyContactCta?: {
-    text?: string;
-    href?: string;
-    hoverColor?: Color;
-  };
-  contactsCopy?: RichText;
   contactEmail?: string;
   socialLinks?: Array<{
     label?: string;
@@ -323,7 +316,7 @@ export type AllSanitySchemaTypes =
 
 // Source: src/sanity/lib/queries.ts
 // Variable: SITE_CONTENT_QUERY
-// Query: *[_type == "siteContent" && _id == "siteContent"][0]{    _id, heroDisplayName, roleSubtitle, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,    cityHoverColor, about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,    contactsCopy, contactEmail, socialLinks, footerText, useCmsProjects  }
+// Query: *[_type == "siteContent" && _id == "siteContent"][0]{    _id, heroDisplayName, roleSubtitle, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,    cityHoverColor, about, aboutMobile, experience, currently,    contactEmail, socialLinks, footerText, useCmsProjects  }
 export type SITE_CONTENT_QUERY_RESULT = {
   _id: "siteContent";
   heroDisplayName: string | null;
@@ -339,15 +332,8 @@ export type SITE_CONTENT_QUERY_RESULT = {
   cityHoverColor: Color | null;
   about: RichText | null;
   aboutMobile: RichText | null;
+  experience: RichText | null;
   currently: RichText | null;
-  freelanceStartingPrice: string | null;
-  currentlyContactIntro: string | null;
-  currentlyContactCta: {
-    text?: string;
-    href?: string;
-    hoverColor?: Color;
-  } | null;
-  contactsCopy: RichText | null;
   contactEmail: string | null;
   socialLinks: Array<{
     label?: string;
@@ -415,7 +401,7 @@ export type PROJECTS_QUERY_RESULT = Array<{
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "siteContent" && _id == "siteContent"][0]{\n    _id, heroDisplayName, roleSubtitle, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,\n    cityHoverColor, about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,\n    contactsCopy, contactEmail, socialLinks, footerText, useCmsProjects\n  }\n': SITE_CONTENT_QUERY_RESULT;
+    '\n  *[_type == "siteContent" && _id == "siteContent"][0]{\n    _id, heroDisplayName, roleSubtitle, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,\n    cityHoverColor, about, aboutMobile, experience, currently,\n    contactEmail, socialLinks, footerText, useCmsProjects\n  }\n': SITE_CONTENT_QUERY_RESULT;
     '\n  *[_type == "experience" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(displayOrder asc, _id asc){\n    _id, position, company, period, description, logo, monogram, displayOrder\n  }\n': EXPERIENCE_QUERY_RESULT;
     '\n  *[_type == "project" && isVisible == true\n    && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]\n  | order(coalesce(order, displayOrder, 0) asc, _id asc){\n    _id,\n    "title": coalesce(title, name, ""),\n    subtitle,\n    "order": coalesce(order, displayOrder, 0),\n    "images": select(\n      defined(images) && count(images) > 0 => images,\n      defined(image) => [image],\n      defined(coverImage) => [coverImage],\n      []\n    ),\n    coverImage,\n    additionalImages,\n    externalUrl\n  }\n': PROJECTS_QUERY_RESULT;
   }

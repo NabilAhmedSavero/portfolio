@@ -3,8 +3,8 @@ import { defineQuery } from "next-sanity";
 export const SITE_CONTENT_QUERY = defineQuery(`
   *[_type == "siteContent" && _id == "siteContent"][0]{
     _id, heroDisplayName, roleSubtitle, heroRole, heroProfileImage { asset, crop, hotspot, alt }, locationTimezoneLabel,
-    cityHoverColor, about, aboutMobile, currently, freelanceStartingPrice, currentlyContactIntro, currentlyContactCta,
-    contactsCopy, contactEmail, socialLinks, footerText, useCmsProjects
+    cityHoverColor, about, aboutMobile, experience, currently,
+    contactEmail, socialLinks, footerText, useCmsProjects
   }
 `);
 
