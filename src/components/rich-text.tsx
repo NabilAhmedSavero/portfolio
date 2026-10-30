@@ -51,11 +51,13 @@ export function InlineLink({
   href,
   markKey,
   hoverColor,
+  className,
   children,
 }: {
   href: string;
   markKey?: string;
   hoverColor?: Color | string | null;
+  className?: string;
   children: ReactNode;
 }) {
   const customHex = resolveHexColor(hoverColor);
@@ -67,7 +69,7 @@ export function InlineLink({
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className="home-inline-link"
+      className={`home-inline-link${className ? ` ${className}` : ""}`}
       style={{ "--link-hover-color": assignedColor } as CSSProperties}
     >
       {children}

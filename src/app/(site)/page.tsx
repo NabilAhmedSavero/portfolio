@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { Footer } from "@/components/footer";
-import { RichText, VerifiedBadge } from "@/components/rich-text";
+import { InlineLink, RichText, VerifiedBadge } from "@/components/rich-text";
 import { Section } from "@/components/section";
 import { getHomeContent } from "@/sanity/lib/home";
 import { urlForImage } from "@/sanity/lib/images";
@@ -88,14 +88,13 @@ export default async function HomePage() {
               >
                 Email
               </a>
-              <a
+              <InlineLink
                 href="https://x.com/saverovkn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] md:text-[14px] leading-[20px] font-normal text-[#999999] border-b border-dotted border-[#999999] pb-[1px] hover:text-[#1C1C1C] hover:border-[#1C1C1C] transition-colors duration-150 no-underline home-cta-secondary"
+                hoverColor="#1C1C1C"
+                className="text-[13px] md:text-[14px] leading-[20px] font-normal"
               >
                 Send message on X
-              </a>
+              </InlineLink>
             </div>
           </Section>
         </main>
