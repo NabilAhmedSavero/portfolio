@@ -25,7 +25,7 @@ export function Section({ id, title, ariaLabel, children, className }: SectionPr
           </h2>
           <div
             aria-hidden="true"
-            className="w-full h-0 border-t border-[#e5e5e5] my-[14px] pointer-events-none"
+            className="w-full h-[1.5px] bg-[#e5e5e5] my-[14px] pointer-events-none"
             style={{ transform: "translateZ(0)" }}
           />
         </div>
