@@ -80,7 +80,8 @@
   font-size: 15px;
   line-height: 18px;
   font-weight: 500;
-  color: #1c1c1c;
+  color: #1C1C1C !important;
+  opacity: 1 !important;
 }
 
 .home-page .home-role {
@@ -98,7 +99,6 @@
 .home-page h2,
 .home-page .section-stack h2,
 .home-page #intro h2,
-.home-page #intro-heading,
 .home-page #about h2,
 .home-page #about-heading,
 .home-page #experience h2,
@@ -169,12 +169,19 @@
   border-radius: 9999px;
   background-color: #1C1C1C;
   color: #ffffff;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 13px;
+  line-height: 1;
   font-weight: 500;
-  padding: 8px 20px;
+  padding: 8px 14px;
   text-decoration: none;
-  transition: background-color 200ms ease;
+  transition: background-color 150ms ease;
+}
+
+@media (min-width: 768px) {
+  .home-page a.home-cta-pill,
+  .home-page a.home-cta-pill:visited {
+    font-size: 14px;
+  }
 }
 
 .home-page a.home-cta-pill:hover,
@@ -186,21 +193,28 @@
 
 .home-page a.home-cta-secondary,
 .home-page a.home-cta-secondary:visited {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 20px;
   font-weight: 400;
-  color: #737373;
-  text-decoration-line: underline;
-  text-decoration-style: solid;
-  text-decoration-color: #999999;
-  text-underline-offset: 4px;
-  transition: color 200ms ease, text-decoration-color 200ms ease;
+  color: #999999;
+  text-decoration: none;
+  border-bottom: 1px dotted #999999;
+  padding-bottom: 1px;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+@media (min-width: 768px) {
+  .home-page a.home-cta-secondary,
+  .home-page a.home-cta-secondary:visited {
+    font-size: 14px;
+  }
 }
 
 .home-page a.home-cta-secondary:hover,
 .home-page a.home-cta-secondary:focus-visible {
   color: #1C1C1C;
-  text-decoration-color: #1C1C1C;
+  border-bottom-color: #1C1C1C;
+  text-decoration: none;
 }
 
 .home-page .home-experiences {

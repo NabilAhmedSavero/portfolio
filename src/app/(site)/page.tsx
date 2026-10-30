@@ -46,7 +46,7 @@ export default async function HomePage() {
           {/* Profile Typography */}
           <div className="h-[44px] flex flex-col justify-between py-[2px] text-left leading-[18px]">
             <div className="inline-flex items-center gap-[5px]">
-              <h1 id="intro-heading" className="font-sans text-[15px] leading-[18px] font-medium text-[#1c1c1c]">
+              <h1 id="intro-heading" className="font-sans text-[15px] leading-[18px] font-medium text-[#1C1C1C] opacity-100">
                 {site.heroDisplayName}
               </h1>
               <VerifiedBadge />
@@ -84,7 +84,7 @@ export default async function HomePage() {
             <div className="mt-6 flex items-center gap-5">
               <a
                 href="mailto:saverovkn@gmail.com"
-                className="inline-flex items-center justify-center rounded-full bg-[#1C1C1C] text-white text-[14px] leading-[20px] font-medium px-5 py-2 hover:bg-[#333333] transition-colors duration-200 home-cta-pill"
+                className="inline-flex items-center justify-center rounded-full bg-[#1C1C1C] text-white text-[13px] md:text-[14px] leading-none font-medium px-3.5 py-2 hover:bg-[#333333] transition-colors duration-150 no-underline home-cta-pill"
               >
                 Email
               </a>
@@ -92,7 +92,7 @@ export default async function HomePage() {
                 href="https://x.com/saverovkn"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[14px] leading-[20px] font-normal text-[#737373] underline decoration-[#999999] underline-offset-4 hover:text-[#1C1C1C] hover:decoration-[#1C1C1C] transition-colors duration-200 home-cta-secondary"
+                className="text-[13px] md:text-[14px] leading-[20px] font-normal text-[#999999] border-b border-dotted border-[#999999] pb-[1px] hover:text-[#1C1C1C] hover:border-[#1C1C1C] transition-colors duration-150 no-underline home-cta-secondary"
               >
                 Send message on X
               </a>
