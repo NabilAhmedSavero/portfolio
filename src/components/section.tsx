@@ -20,10 +20,14 @@ export function Section({ id, title, ariaLabel, children, className }: SectionPr
     >
       {title && (
         <div className="flex flex-col items-start w-full">
-          <h2 id={headingId} className="font-sans text-[15px] leading-[20px] text-[#999999] font-[450]">
+          <h2 id={headingId} className="font-sans text-[15px] leading-[20px] font-normal text-[#999999]">
             {title}
           </h2>
-          <hr aria-hidden="true" className="w-full h-[1px] bg-[#e5e5e5] border-0 my-[14px]" />
+          <div
+            aria-hidden="true"
+            className="w-full h-0 border-t border-[#e5e5e5] my-[14px] pointer-events-none"
+            style={{ transform: "translateZ(0)" }}
+          />
         </div>
       )}
       {children}
