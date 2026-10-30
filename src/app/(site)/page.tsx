@@ -81,7 +81,7 @@ export default async function HomePage() {
               <RichText value={site.currently} />
             </div>
             {/* WithArc Action CTA Row */}
-            <div className="mt-6 flex items-center gap-5">
+            <div className="mt-[20px] flex items-center gap-5">
               <a
                 href="mailto:saverovkn@gmail.com"
                 className="inline-flex items-center justify-center rounded-full bg-[#1C1C1C] text-white text-[13px] md:text-[14px] leading-none font-medium px-3.5 py-2 hover:bg-[#333333] transition-colors duration-150 no-underline home-cta-pill"

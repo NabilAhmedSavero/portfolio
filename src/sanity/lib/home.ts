@@ -47,6 +47,42 @@ function normalizeAboutCopy(rawAbout: RichText | null | undefined): RichText {
         })),
       };
     }
+
+    // Unify any split X and /Twitter into a single X/Twitter link
+    if (block.children?.length) {
+      const newChildren: NonNullable<typeof block.children> = [];
+      for (let i = 0; i < block.children.length; i++) {
+        const current = block.children[i];
+        const next = block.children[i + 1];
+        if (
+          current.text === "X" &&
+          current.marks?.length &&
+          next &&
+          typeof next.text === "string" &&
+          /^\/twitter/i.test(next.text)
+        ) {
+          newChildren.push({
+            ...current,
+            text: "X/Twitter",
+          });
+          const remainingText = next.text.replace(/^\/twitter/i, "");
+          if (remainingText) {
+            newChildren.push({
+              ...next,
+              text: remainingText,
+            });
+          }
+          i++;
+          continue;
+        }
+        newChildren.push(current);
+      }
+      return {
+        ...block,
+        children: newChildren,
+      };
+    }
+
     return block;
   });
 

@@ -48,7 +48,7 @@ export const homeFallback = {
         { _type: "span", _key: "ci-1", text: "You can reach out via email ", marks: [] },
         { _type: "span", _key: "ci-email", text: "saverovkn@gmail.com", marks: ["email-link"] },
         { _type: "span", _key: "ci-2", text: ", find me on ", marks: [] },
-        { _type: "span", _key: "ci-twitter", text: "X", marks: ["twitter-link"] },
+        { _type: "span", _key: "ci-twitter", text: "X/Twitter", marks: ["twitter-link"] },
         { _type: "span", _key: "ci-3", text: ", or connect on ", marks: [] },
         { _type: "span", _key: "ci-linkedin", text: "LinkedIn", marks: ["linkedin-link"] },
         { _type: "span", _key: "ci-4", text: ".", marks: [] },
