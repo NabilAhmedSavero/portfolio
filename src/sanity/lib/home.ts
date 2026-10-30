@@ -78,6 +78,16 @@ function normalizeCurrentlyCopy(rawCurrently: RichText | null | undefined): Rich
   });
 
   if (!cleaned.length) return homeFallback.currently;
+
+  const hasFreelance = cleaned.some((block) => {
+    const text = block.children?.map((c) => c.text ?? "").join("") ?? "";
+    return text.toLowerCase().includes("freelance design");
+  });
+
+  if (!hasFreelance) {
+    cleaned.push(homeFallback.currently[1]);
+  }
+
   return cleaned;
 }
 

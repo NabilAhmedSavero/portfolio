@@ -22,7 +22,7 @@ export const richText = defineType({
                 title: "Link URL",
                 type: "url",
                 validation: (rule) =>
-                  rule.required().uri({
+                  rule.uri({
                     allowRelative: true,
                     scheme: ["http", "https", "mailto", "tel"],
                   }),
