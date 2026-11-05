@@ -119,7 +119,7 @@ export function ProjectScrollIndicator({ projects }: ProjectScrollIndicatorProps
   return (
     <aside
       aria-label="Project indicator navigation"
-      className="fixed left-6 md:left-10 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-start gap-[8px] select-none"
+      className="fixed left-4 min-[1360px]:left-10 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-start gap-[8px] select-none"
     >
       {projects.map((project) => {
         const isActive = activeId === project.id;
