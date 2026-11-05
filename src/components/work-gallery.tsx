@@ -357,7 +357,7 @@ export function WorkGallery({
     <section aria-label="Work Projects" className="w-full m-0 p-0">
       <ProjectScrollIndicator projects={projectGroups} />
 
-      <div className="max-w-[1080px] w-full mx-auto p-0 flex flex-col">
+      <div className="max-w-[880px] w-full mx-auto p-0 flex flex-col">
         {projectGroups.map((project, projectIndex) => {
           const sectionId = getProjectSectionId(project.id);
 
@@ -386,7 +386,7 @@ export function WorkGallery({
                 <div className="flex flex-col gap-[20px] w-full">
                   {project.images.map((image, imgIndex) => {
                     const imageElement = (
-                      <div className="max-w-[1080px] w-full mx-auto rounded-[12px] md:rounded-[16px] overflow-hidden ring-1 ring-black/[0.06]">
+                      <div className="max-w-[880px] w-full mx-auto rounded-[12px] md:rounded-[16px] overflow-hidden ring-1 ring-black/[0.06]">
                         <Image
                           src={image.src}
                           alt={image.alt || project.title}
@@ -395,7 +395,7 @@ export function WorkGallery({
                           unoptimized={true}
                           priority={projectIndex === 0 && imgIndex === 0}
                           quality={100}
-                          sizes="(max-width: 1280px) 100vw, 1080px"
+                          sizes="(max-width: 1024px) 100vw, 880px"
                           className="w-full h-auto block"
                           style={{ aspectRatio: image.aspectRatio }}
                         />
