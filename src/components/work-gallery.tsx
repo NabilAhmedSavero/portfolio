@@ -282,7 +282,7 @@ export function WorkGallery({
             >
               <article className="w-full mt-0 flex flex-col items-center">
                 {/* 1. Header & Subheader Group (Centered above the images) */}
-                <header className="mt-0 flex flex-col items-center text-center gap-[4px] mb-[20px]">
+                <header className="mt-0 flex flex-col items-center text-center gap-[4px] mb-[40px]">
                   <h2 className="m-0 text-[15px] leading-[20px] font-medium text-[#1c1c1c]">
                     {project.title}
                   </h2>
@@ -337,7 +337,7 @@ export function WorkGallery({
 
               {/* 3. Horizontal Divider Below Bottom-Most Image */}
               {!isLastProject && (
-                <hr className="w-full h-[1px] border-0 bg-[hsl(0,0%,90%)] mt-[26px] mb-[20px]" />
+                <hr className="w-full h-[1px] border-0 bg-[hsl(0,0%,90%)] mt-[40px] mb-[40px]" />
               )}
             </div>
           );
