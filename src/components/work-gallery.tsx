@@ -271,14 +271,15 @@ export function WorkGallery({
 
       <div className="w-full max-w-[682px] mx-auto m-0 p-0 flex flex-col">
         {projectGroups.map((project, projectIndex) => {
-          const isLastProject = projectIndex === projectGroups.length - 1;
           const sectionId = getProjectSectionId(project.id);
 
           return (
             <div
               key={project.id}
               id={sectionId}
-              className="w-full mt-0 scroll-mt-8 sm:scroll-mt-12 md:scroll-mt-16"
+              className={`w-full scroll-mt-8 sm:scroll-mt-12 md:scroll-mt-16 ${
+                projectIndex > 0 ? "mt-[40px]" : "mt-0"
+              }`}
             >
               <article className="w-full mt-0 flex flex-col items-center">
                 {/* 1. Header & Subheader Group (Centered above the images) */}
@@ -334,11 +335,6 @@ export function WorkGallery({
                   })}
                 </div>
               </article>
-
-              {/* 3. Horizontal Divider Below Bottom-Most Image */}
-              {!isLastProject && (
-                <hr className="w-full h-[1px] border-0 bg-[hsl(0,0%,90%)] mt-[40px] mb-[40px]" />
-              )}
             </div>
           );
         })}
