@@ -337,7 +337,7 @@ export function WorkGallery({
 
               {/* 3. Horizontal Divider Below Bottom-Most Image */}
               {!isLastProject && (
-                <hr className="w-full h-[1px] border-0 bg-[hsl(0,0%,90%)] mt-[40px] mb-[35px]" />
+                <hr className="w-full h-[1px] border-0 bg-[hsl(0,0%,90%)] mt-[26px] mb-[20px]" />
               )}
             </div>
           );
