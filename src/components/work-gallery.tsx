@@ -8,6 +8,12 @@ import { urlFor, imageUrl } from "@/sanity/lib/images";
 import type { ContentImage } from "@/sanity/types";
 import type { SanityImageSource } from "@sanity/image-url";
 
+export type SanityImageDimensions = {
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
+};
+
 export type SanityProject = {
   _id: string;
   name?: string;
@@ -16,21 +22,25 @@ export type SanityProject = {
   order?: number;
   displayOrder?: number;
   images?: Array<
-    ContentImage | SanityImageSource | {
-      _key?: string;
-      asset?: unknown;
-      alt?: string;
-      aspectRatio?: number;
-      src?: string;
-    }
+    | ContentImage
+    | SanityImageSource
+    | {
+        _key?: string;
+        asset?: unknown;
+        alt?: string;
+        aspectRatio?: number;
+        dimensions?: SanityImageDimensions | null;
+        src?: string;
+      }
   >;
-  image?: ContentImage | SanityImageSource;
-  coverImage?: ContentImage | SanityImageSource;
-  mainImage?: ContentImage | SanityImageSource;
+  image?: (ContentImage & { dimensions?: SanityImageDimensions | null }) | SanityImageSource;
+  coverImage?: (ContentImage & { dimensions?: SanityImageDimensions | null }) | SanityImageSource;
+  mainImage?: (ContentImage & { dimensions?: SanityImageDimensions | null }) | SanityImageSource;
   additionalImages?: Array<
     ContentImage & {
       _key?: string;
       aspectRatio?: number;
+      dimensions?: SanityImageDimensions | null;
     }
   >;
   externalUrl?: string;
@@ -41,7 +51,9 @@ export type WorkProjectImage = {
   src: string;
   fullSrc?: string;
   alt: string;
-  aspectRatio?: number;
+  width: number;
+  height: number;
+  aspectRatio: number;
 };
 
 export type WorkProjectGroup = {
@@ -97,25 +109,82 @@ function resolveSanityImageUrl(
   return imageUrl(source as SanityImageSource) || "/images/work-placeholder.svg";
 }
 
-function resolveSanityAspectRatio(
-  source: ContentImage | SanityImageSource | { aspectRatio?: number } | null | undefined,
-): number {
+function resolveSanityDimensions(
+  source:
+    | ContentImage
+    | SanityImageSource
+    | {
+        aspectRatio?: number;
+        width?: number;
+        height?: number;
+        dimensions?: SanityImageDimensions | null;
+        asset?: {
+          _ref?: string;
+          metadata?: { dimensions?: SanityImageDimensions | null } | null;
+        } | null;
+      }
+    | null
+    | undefined,
+): { width: number; height: number; aspectRatio: number } {
   if (source && typeof source === "object") {
-    if ("aspectRatio" in source && typeof source.aspectRatio === "number") {
-      return source.aspectRatio;
+    const dims =
+      ("dimensions" in source && source.dimensions ? source.dimensions : null) ||
+      ("asset" in source &&
+      source.asset &&
+      typeof source.asset === "object" &&
+      "metadata" in source.asset &&
+      source.asset.metadata &&
+      typeof source.asset.metadata === "object" &&
+      "dimensions" in source.asset.metadata
+        ? source.asset.metadata.dimensions
+        : null);
+
+    if (dims && typeof dims === "object") {
+      const w = typeof dims.width === "number" && dims.width > 0 ? dims.width : undefined;
+      const h = typeof dims.height === "number" && dims.height > 0 ? dims.height : undefined;
+      const ar =
+        typeof dims.aspectRatio === "number" && dims.aspectRatio > 0
+          ? dims.aspectRatio
+          : w && h
+            ? w / h
+            : undefined;
+      if (w && h && ar) {
+        return { width: w, height: h, aspectRatio: ar };
+      }
+      if (ar) {
+        return { width: Math.round(1024 * ar), height: 1024, aspectRatio: ar };
+      }
     }
+
     const asset = "asset" in source ? source.asset : undefined;
-    const ref = asset && typeof asset === "object" && "_ref" in asset ? asset._ref : undefined;
+    const ref =
+      asset && typeof asset === "object" && "_ref" in asset ? asset._ref : undefined;
     if (typeof ref === "string") {
       const match = ref.match(/^image-[^-]+-(\d+)x(\d+)-[a-z0-9]+$/i);
       if (match) {
         const w = Number(match[1]);
         const h = Number(match[2]);
-        if (w > 0 && h > 0) return w / h;
+        if (w > 0 && h > 0) {
+          return { width: w, height: h, aspectRatio: w / h };
+        }
       }
     }
+
+    if ("aspectRatio" in source && typeof source.aspectRatio === "number" && source.aspectRatio > 0) {
+      const ar = source.aspectRatio;
+      const w =
+        "width" in source && typeof source.width === "number" && source.width > 0
+          ? source.width
+          : Math.round(1024 * ar);
+      const h =
+        "height" in source && typeof source.height === "number" && source.height > 0
+          ? source.height
+          : 1024;
+      return { width: w, height: h, aspectRatio: ar };
+    }
   }
-  return 3 / 2;
+
+  return { width: 1440, height: 1024, aspectRatio: 1440 / 1024 };
 }
 
 function getAltText(source: unknown, fallback: string): string {
@@ -128,7 +197,13 @@ function getAltText(source: unknown, fallback: string): string {
 type RawSanityImage =
   | SanityImageSource
   | ContentImage
-  | { src?: string; alt?: string; aspectRatio?: number; _key?: string }
+  | {
+      src?: string;
+      alt?: string;
+      aspectRatio?: number;
+      dimensions?: SanityImageDimensions | null;
+      _key?: string;
+    }
   | string
   | null
   | undefined;
@@ -155,13 +230,16 @@ function createProjectGroupsFromSanity(projects: readonly SanityProject[]): Work
     }
 
     const images: WorkProjectImage[] = rawImages.flatMap((img, idx) => {
-      const src = resolveSanityImageUrl(img, 2048);
+      const src = resolveSanityImageUrl(img, 2400);
       const fullSrc = resolveSanityImageUrl(img);
       if (!src) return [];
       const key =
         img && typeof img === "object" && "_key" in img && typeof img._key === "string"
           ? img._key
           : `img-${idx}`;
+      const dimensions = resolveSanityDimensions(
+        img as Parameters<typeof resolveSanityDimensions>[0],
+      );
 
       return [
         {
@@ -169,9 +247,9 @@ function createProjectGroupsFromSanity(projects: readonly SanityProject[]): Work
           src,
           fullSrc,
           alt: getAltText(img, title),
-          aspectRatio: resolveSanityAspectRatio(
-            img as Parameters<typeof resolveSanityAspectRatio>[0],
-          ),
+          width: dimensions.width,
+          height: dimensions.height,
+          aspectRatio: dimensions.aspectRatio,
         },
       ];
     });
@@ -182,7 +260,9 @@ function createProjectGroupsFromSanity(projects: readonly SanityProject[]): Work
         src: "/images/work-placeholder.svg",
         fullSrc: "/images/work-placeholder.svg",
         alt: title,
-        aspectRatio: 3 / 2,
+        width: 1440,
+        height: 1024,
+        aspectRatio: 1440 / 1024,
       });
     }
 
@@ -212,13 +292,18 @@ function createProjectGroupsFromFallback(fallbacks: readonly Project[]): WorkPro
         : [project.image, ...(project.additionalImages ?? [])].filter(
             Boolean,
           ) as readonly ProjectImage[]
-    ).map((img, idx) => ({
-      id: img.id || `${project.id}:${idx}`,
-      src: img.src,
-      fullSrc: img.fullSrc || img.src,
-      alt: img.alt || project.title || project.name || "Project image",
-      aspectRatio: img.aspectRatio || 3 / 2,
-    })),
+    ).map((img, idx) => {
+      const aspectRatio = img.aspectRatio || 1440 / 1024;
+      return {
+        id: img.id || `${project.id}:${idx}`,
+        src: img.src,
+        fullSrc: img.fullSrc || img.src,
+        alt: img.alt || project.title || project.name || "Project image",
+        width: Math.round(1024 * aspectRatio),
+        height: 1024,
+        aspectRatio,
+      };
+    }),
   }));
 }
 
@@ -236,12 +321,15 @@ function groupLegacyItems(items: readonly (WorkSlide | WorkGalleryItem)[]): Work
       });
     }
     const group = map.get(key)!;
+    const aspectRatio = item.image.aspectRatio || 1440 / 1024;
     group.images.push({
       id: item.id,
       src: item.image.src,
       fullSrc: "fullSrc" in item.image ? item.image.fullSrc : item.image.src,
       alt: item.image.alt,
-      aspectRatio: item.image.aspectRatio,
+      width: Math.round(1024 * aspectRatio),
+      height: 1024,
+      aspectRatio,
     });
   }
   return Array.from(map.values());
@@ -269,7 +357,7 @@ export function WorkGallery({
     <section aria-label="Work Projects" className="w-full m-0 p-0">
       <ProjectScrollIndicator projects={projectGroups} />
 
-      <div className="w-full max-w-[682px] mx-auto m-0 p-0 flex flex-col">
+      <div className="w-full max-w-[1160px] mx-auto m-0 p-0 flex flex-col">
         {projectGroups.map((project, projectIndex) => {
           const sectionId = getProjectSectionId(project.id);
 
@@ -298,17 +386,18 @@ export function WorkGallery({
                 <div className="flex flex-col gap-[20px] w-full">
                   {project.images.map((image, imgIndex) => {
                     const imageElement = (
-                      <div className="w-full aspect-[3/2] relative overflow-hidden rounded-[8px] bg-[#f5f5f7] flex items-center justify-center border border-[#232323]/10">
+                      <div className="w-full max-w-[1160px] mx-auto rounded-[12px] md:rounded-[16px] overflow-hidden ring-1 ring-black/[0.06]">
                         <Image
                           src={image.src}
                           alt={image.alt || project.title}
-                          width={1800}
-                          height={1200}
+                          width={image.width}
+                          height={image.height}
                           unoptimized={true}
                           priority={projectIndex === 0 && imgIndex === 0}
                           quality={100}
-                          sizes="(max-width: 768px) 100vw, 682px"
-                          className="w-full h-full object-cover block"
+                          sizes="(max-width: 1280px) 100vw, 1160px"
+                          className="w-full h-auto block"
+                          style={{ aspectRatio: image.aspectRatio }}
                         />
                       </div>
                     );
@@ -319,7 +408,7 @@ export function WorkGallery({
                         href={project.externalUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/image block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[8px]"
+                        className="group/image block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#135E4F] rounded-[12px] md:rounded-[16px]"
                         aria-label={`View ${image.alt || project.title}`}
                       >
                         {imageElement}
@@ -327,7 +416,7 @@ export function WorkGallery({
                     ) : (
                       <div
                         key={image.id || `${project.id}-${imgIndex}`}
-                        className="block w-full rounded-[8px]"
+                        className="block w-full rounded-[12px] md:rounded-[16px]"
                       >
                         {imageElement}
                       </div>

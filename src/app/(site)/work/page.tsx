@@ -18,14 +18,36 @@ const WORK_PROJECTS_QUERY = `
     subtitle,
     "order": coalesce(order, displayOrder, 0),
     "images": select(
-      defined(images) && count(images) > 0 => images,
-      defined(image) => [image],
-      defined(coverImage) => [coverImage],
-      defined(mainImage) => [mainImage],
+      defined(images) && count(images) > 0 => images[]{
+        ...,
+        "dimensions": asset->metadata.dimensions
+      },
+      defined(image) => [image{
+        ...,
+        "dimensions": asset->metadata.dimensions
+      }],
+      defined(coverImage) => [coverImage{
+        ...,
+        "dimensions": asset->metadata.dimensions
+      }],
+      defined(mainImage) => [mainImage{
+        ...,
+        "dimensions": asset->metadata.dimensions
+      }],
       []
     ),
-    coverImage,
-    additionalImages,
+    "image": image{
+      ...,
+      "dimensions": asset->metadata.dimensions
+    },
+    "coverImage": coverImage{
+      ...,
+      "dimensions": asset->metadata.dimensions
+    },
+    "additionalImages": additionalImages[]{
+      ...,
+      "dimensions": asset->metadata.dimensions
+    },
     externalUrl
   }
 `;
@@ -46,7 +68,7 @@ export default async function WorkPage() {
   }
 
   return (
-    <div className="w-full max-w-full m-0 px-4 sm:px-6 md:px-12 pt-14 md:pt-[88px] pb-20 sm:pb-24">
+    <div className="w-full max-w-full m-0 px-5 md:px-16 lg:px-20 pt-14 md:pt-[88px] pb-20 sm:pb-24">
       <h1 className="sr-only">Work</h1>
       <WorkGallery projects={sanityProjects} fallbackProjects={fallbackProjects} />
     </div>
