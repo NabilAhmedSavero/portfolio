@@ -30,7 +30,7 @@ export function LocalClock({ className }: LocalClockProps) {
 
   return (
     <span
-      className={className ?? "font-sans tabular-nums text-[14px] leading-[20px] text-[#737373]"}
+      className={className ?? "font-sans tabular-nums text-[14px] leading-[20px] font-[450] text-[#737373]"}
       suppressHydrationWarning
     >
       {now ? timeFormat.format(now) : "--:--:--"}

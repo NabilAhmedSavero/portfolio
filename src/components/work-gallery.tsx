@@ -367,10 +367,10 @@ export function WorkGallery({
     : 0;
 
   return (
-    <section aria-label="Work Projects" className="w-full">
+    <section aria-label="Work Projects" className="w-full m-0 p-0">
       <ProjectScrollIndicator projects={projectGroups} />
 
-      <div className="w-full max-w-[682px] mx-auto flex flex-col">
+      <div className="w-full max-w-[682px] mx-auto m-0 p-0 flex flex-col">
         {projectGroups.map((project, projectIndex) => {
           const isLastProject = projectIndex === projectGroups.length - 1;
           const sectionId = getProjectSectionId(project.id);
@@ -379,16 +379,16 @@ export function WorkGallery({
             <div
               key={project.id}
               id={sectionId}
-              className="w-full scroll-mt-8 sm:scroll-mt-12 md:scroll-mt-16"
+              className="w-full mt-0 scroll-mt-8 sm:scroll-mt-12 md:scroll-mt-16"
             >
-              <article className="w-full flex flex-col items-center">
+              <article className="w-full mt-0 flex flex-col items-center">
                 {/* 1. Header & Subheader Group (Centered above the images) */}
-                <header className="flex flex-col items-center text-center gap-[4px] mb-[20px]">
-                  <h2 className="text-[15px] leading-[20px] font-medium text-[#1c1c1c]">
+                <header className="mt-0 flex flex-col items-center text-center gap-[4px] mb-[20px]">
+                  <h2 className="m-0 text-[15px] leading-[20px] font-medium text-[#1c1c1c]">
                     {project.title}
                   </h2>
                   {project.subtitle && (
-                    <p className="text-[14px] leading-[20px] font-normal text-[#737373]">
+                    <p className="m-0 text-[14px] leading-[20px] font-normal text-[#737373]">
                       {project.subtitle}
                     </p>
                   )}

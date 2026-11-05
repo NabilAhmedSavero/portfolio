@@ -46,7 +46,7 @@ export default async function WorkPage() {
   }
 
   return (
-    <div className="w-full max-w-full px-4 sm:px-6 md:px-12 pt-4 md:pt-12 pb-20 sm:pb-24">
+    <div className="w-full max-w-full m-0 px-4 sm:px-6 md:px-12 pt-14 md:pt-[88px] pb-20 sm:pb-24">
       <h1 className="sr-only">Work</h1>
       <WorkGallery projects={sanityProjects} fallbackProjects={fallbackProjects} />
     </div>

@@ -21,14 +21,33 @@ export default async function HomePage() {
 
   return (
     <div className="home-page min-h-screen flex flex-col m-0 p-0">
+      {/* Top Progressive Viewport Blur (Home only) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-0 h-[48px] z-30 backdrop-blur-[2.5px] bg-gradient-to-b from-[#fafafa]/35 to-transparent"
+        style={{
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, transparent 100%)",
+          maskImage: "linear-gradient(to bottom, black 0%, transparent 100%)",
+        }}
+      />
+      {/* Bottom Progressive Viewport Blur (Home only) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 bottom-0 h-[56px] z-30 backdrop-blur-[2.5px] bg-gradient-to-t from-[#fafafa]/35 to-transparent"
+        style={{
+          WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 100%)",
+          maskImage: "linear-gradient(to top, black 0%, transparent 100%)",
+        }}
+      />
+
       <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col m-0 p-0">
         {/* Hero Profile Header */}
         <header
           aria-labelledby="intro-heading"
-          className="home-panel pt-20 md:pt-28 pb-8 px-4 flex items-center gap-3.5 w-full"
+          className="home-panel mt-0 pt-14 md:pt-[88px] pb-8 px-4 flex items-center gap-3.5 w-full"
         >
           {/* Profile Avatar Frame */}
-          <div className="w-[44px] h-[44px] rounded-[10px] overflow-hidden relative shrink-0">
+          <div className="mt-0 w-[44px] h-[44px] rounded-[10px] overflow-hidden relative shrink-0">
             <Image
               src={avatarSrc}
               alt={site.heroProfileImage.alt || "Nabil Savero"}
@@ -44,15 +63,15 @@ export default async function HomePage() {
           </div>
 
           {/* Profile Typography */}
-          <div className="h-[44px] flex flex-col justify-between py-[2px] text-left leading-[18px]">
-            <div className="inline-flex items-center gap-[5px]">
-              <h1 id="intro-heading" className="font-sans text-[15px] leading-[18px] font-medium text-[#1C1C1C] opacity-100">
+          <div className="mt-0 h-[44px] flex flex-col justify-between py-[2px] text-left leading-[18px]">
+            <div className="mt-0 inline-flex items-center gap-[5px]">
+              <h1 id="intro-heading" className="m-0 font-sans text-[15px] leading-[18px] font-medium text-[#1C1C1C] opacity-100">
                 {site.heroDisplayName}
               </h1>
               <VerifiedBadge />
             </div>
-            <p className="font-sans text-[15px] leading-[18px] font-normal text-[#999999]">
-              <span className="inline-flex items-baseline text-[15px] leading-[18px] text-[#999999]">
+            <p className="m-0 font-sans text-[15px] leading-[18px] font-[450] text-[#999999]">
+              <span className="inline-flex items-baseline text-[15px] leading-[18px] font-[450] text-[#999999]">
                 <span className="text-[13.5px] -translate-y-[1.5px] select-none">@</span>
                 <span>{handleText.replace(/^@/, "")}</span>
               </span>
@@ -91,7 +110,7 @@ export default async function HomePage() {
               <InlineLink
                 href="https://x.com/saverovkn"
                 hoverColor="#1C1C1C"
-                className="text-[13px] md:text-[14px] leading-[20px] font-normal"
+                className="text-[13px] md:text-[14px] leading-[20px] font-[450]"
               >
                 Send message on X
               </InlineLink>

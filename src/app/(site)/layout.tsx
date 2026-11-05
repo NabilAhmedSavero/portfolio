@@ -31,24 +31,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <PageTransition>{children}</PageTransition>
-        {/* Top Progressive Viewport Blur */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-x-0 top-0 h-[48px] z-30 backdrop-blur-[2.5px] bg-gradient-to-b from-[#fafafa]/35 to-transparent"
-          style={{
-            WebkitMaskImage: "linear-gradient(to bottom, black 0%, transparent 100%)",
-            maskImage: "linear-gradient(to bottom, black 0%, transparent 100%)",
-          }}
-        />
-        {/* Bottom Progressive Viewport Blur */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-x-0 bottom-0 h-[56px] z-30 backdrop-blur-[2.5px] bg-gradient-to-t from-[#fafafa]/35 to-transparent"
-          style={{
-            WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 100%)",
-            maskImage: "linear-gradient(to top, black 0%, transparent 100%)",
-          }}
-        />
         <Navbar />
       </body>
     </html>

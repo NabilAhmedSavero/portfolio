@@ -69,7 +69,7 @@ export function InlineLink({
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`home-inline-link${className ? ` ${className}` : ""}`}
+      className={`home-inline-link font-[450]${className ? ` ${className}` : ""}`}
       style={{ "--link-hover-color": assignedColor } as CSSProperties}
     >
       {children}
@@ -144,7 +144,7 @@ export function BalikpapanTrigger({
       aria-describedby="balikpapan-tooltip"
     >
       <span
-        className="home-inline-link"
+        className="home-inline-link font-[450]"
         data-hovered={isHovered ? "true" : undefined}
         style={{ "--link-hover-color": assignedColor } as CSSProperties}
       >
@@ -165,7 +165,7 @@ export function BalikpapanTrigger({
   );
 }
 
-const Paragraph: PortableTextBlockComponent = ({ children }) => <p className="text-muted">{children}</p>;
+const Paragraph: PortableTextBlockComponent = ({ children }) => <p className="m-0 text-muted font-[450]">{children}</p>;
 
 function injectBalikpapanMark(
   blocks: RichTextValue,
