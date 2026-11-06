@@ -25,10 +25,8 @@ export function Section({ id, title, ariaLabel, children, className }: SectionPr
           </h2>
           <div
             aria-hidden="true"
-            className="w-full h-[2px] mt-[14px] mb-[12px] flex items-start pointer-events-none"
-          >
-            <div className="w-full h-[1.5px] bg-[#e5e5e5]" />
-          </div>
+            className="w-full border-b border-[#e5e5e5] my-[14px] pointer-events-none"
+          />
         </div>
       )}
       {children}
